@@ -7,6 +7,7 @@ using UnityEngine;
 using FMODUnity;
 
 using Receiver2ModdingKit.CustomSounds;
+using Receiver2;
 
 namespace Receiver2ModdingKit.Editor {
 	[CreateAssetMenu(fileName = "Custom Sounds list", menuName = "Receiver 2 Modding/Custom Sounds list")]
@@ -66,6 +67,11 @@ namespace Receiver2ModdingKit.Editor {
 		public void Initialize(ModGunScript gun) {
 			sound_fields = typeof(ModGunScript).GetFields(BindingFlags.Instance | BindingFlags.Public).Where(field => field.GetCustomAttributes<EventRefAttribute>().Count() > 0).ToArray();
 
+			if (string.IsNullOrEmpty(this.prefix)) {
+				Debug.LogError("Prefix for gun " + gun.InternalName + "is empty, falling back to gun's name");
+				this.prefix = gun.InternalName.Substring(this.prefix.IndexOf(".") + 1);
+			}
+
 			if (ModAudioManager.IsPrefixPresent(this.prefix)) {
 				string prev_prefix = this.prefix;
 				int iterations = 1;
@@ -85,7 +91,14 @@ namespace Receiver2ModdingKit.Editor {
 
 			}
 
-			ModAudioManager.LoadCustomEvents(this.prefix, Path.IsPathRooted(sound_path) ? sound_path : Path.Combine(Application.persistentDataPath, sound_path));
+			if (!string.IsNullOrEmpty(sound_path)) {
+				ModAudioManager.LoadCustomEvents(this.prefix, Path.IsPathRooted(sound_path) ? sound_path : Path.Combine(Application.persistentDataPath, sound_path));
+			}
+			else {
+				Debug.LogError("sound_path of audio list for gun " + gun.InternalName + " is empty, falling back on default sounds");
+
+				force_options = ForceOptions.ForceDefaultSounds;
+			}
 
 			if (BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("R2CustomSounds")) {
 				BepInEx.Bootstrap.Chainloader
@@ -100,6 +113,10 @@ namespace Receiver2ModdingKit.Editor {
 		public void SetSoundEvents() {
 			if (gun == null) {
 				Debug.LogError("CustomSoundsList.SetSoundEvents(): Attempted to set sound events before calling Initialize()");
+				return;
+			}
+
+			if (ReceiverCoreScript.Instance() == null) { //In case of the gun being started in the editor
 				return;
 			}
 

@@ -6,6 +6,10 @@ using Receiver2;
 
 namespace Receiver2ModdingKit {
 	public static class ReflectionManager {
+		public class MissingFieldException : Exception {
+			public MissingFieldException(string message) : base() { }
+		}
+
 		public static FieldInfo GS_disconnector_needs_reset {
 			get;
 			private set;
@@ -58,12 +62,17 @@ namespace Receiver2ModdingKit {
 			private set;
 		}
 
+		public static FieldInfo PH_bounds {
+			get;
+			private set;
+		}
+
 		private static FieldInfo GetFieldInfo(Type type, string fieldName) {
 			FieldInfo field = type.GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 
 			if (field == null) {
 				Debug.LogError("Cannot find field \"" + fieldName + "\", perhaps your Modding Kit plugin is out of date?");
-				throw new Exception("Cannot Find Field: - " + type.ToString() + "." + fieldName);
+				throw new MissingFieldException("Cannot Find Field: - " + type.ToString() + "." + fieldName);
 			}
 
 			return field;
@@ -77,12 +86,12 @@ namespace Receiver2ModdingKit {
 				method = type.GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 			} catch (AmbiguousMatchException) {
 				Debug.LogError("Cannot identify method \"" + methodName + "\", perhaps your Modding Kit plugin is out of date?");
-				throw new Exception("Wrong Method Parameters: - " + type.ToString() + "." + methodName);
+				throw new MissingFieldException("Wrong Method Parameters: - " + type.ToString() + "." + methodName);
 			}
 
 			if (method == null) {
 				Debug.LogError("Cannot find method \"" + methodName + "\", perhaps your Modding Kit plugin is out of date?");
-				throw new Exception("Cannot Find Method: - " + type.ToString() + "." + methodName);
+				throw new MissingFieldException("Cannot Find Method: - " + type.ToString() + "." + methodName);
 			}
 
 			return method;
@@ -95,12 +104,12 @@ namespace Receiver2ModdingKit {
 				method = type.GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, parameters, null);
 			} catch (AmbiguousMatchException) {
 				Debug.LogError("Cannot identify method \"" + methodName + "\", perhaps your Modding Kit plugin is out of date?");
-				throw new Exception("Wrong Method Parameters: - " + type.ToString() + "." + methodName);
+				throw new MissingFieldException("Wrong Method Parameters: - " + type.ToString() + "." + methodName);
 			}
 
 			if (method == null) {
 				Debug.LogError("Cannot find method \"" + methodName + "\", perhaps your Modding Kit plugin is out of date?");
-				throw new Exception("Cannot Find Method: - " + type.ToString() + "." + methodName);
+				throw new MissingFieldException("Cannot Find Method: - " + type.ToString() + "." + methodName);
 			}
 
 			return method;
@@ -113,10 +122,11 @@ namespace Receiver2ModdingKit {
 			GS_hammer_state = GetFieldInfo(typeof(GunScript), "hammer_state");
 			GS_slide_stop_locked = GetFieldInfo(typeof(GunScript), "slide_stop_locked");
 			GS_select_fire = GetFieldInfo(typeof(GunScript), "select_fire");
-
+			PH_bounds = GetFieldInfo(typeof(PegboardHanger), "bounds");
 			RCS_magazine_prefabs_all = GetFieldInfo(typeof(ReceiverCoreScript), "magazine_prefabs_all");
 
 			LAH_BulletInventory = typeof(LocalAimHandler).GetNestedTypes(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Single(t => t.Name == "BulletInventory");
+
 			LAH_BulletInventory_item = GetFieldInfo(LAH_BulletInventory, "item");
 			LAH_Get_Last_Bullet = GetMethodInfo(typeof(LocalAimHandler), "GetLastMatchingLooseBullet");
 			LAH_bullet_shake_time = GetFieldInfo(typeof(LocalAimHandler), "show_bullet_shake_time");

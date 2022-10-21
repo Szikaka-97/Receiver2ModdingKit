@@ -44,7 +44,7 @@ namespace Receiver2ModdingKit {
 		}
 
 		public static void AddConfigEventListener(EventHandler<SettingChangedEventArgs> settings_changed_listener) {
-			ModdingKitCorePlugin.instance.Config.SettingChanged += settings_changed_listener;
+			if (ModdingKitCorePlugin.instance != null) ModdingKitCorePlugin.instance.Config.SettingChanged += settings_changed_listener;
 		}
 	}
 }

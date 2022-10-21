@@ -6,6 +6,7 @@ using UnityEngine;
 using HarmonyLib;
 using ImGuiNET;
 using Receiver2;
+using System.Linq;
 
 namespace Receiver2ModdingKit {
 	static class HarmonyManager {
@@ -39,6 +40,8 @@ namespace Receiver2ModdingKit {
 				CodeMatcher codeMatcher = new CodeMatcher(instructions).MatchForward(false, 
 					new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(ImGui), "EndMainMenuBar"))
 				);
+
+				return codeMatcher.InstructionEnumeration();
 
 				if (!codeMatcher.ReportFailure(__originalMethod, Debug.LogError)) {
 					Debug.Log("Patching");
@@ -85,18 +88,17 @@ namespace Receiver2ModdingKit {
 			}
 		}
 
-		[HarmonyPatch(typeof(ReceiverCoreScript), "Awake")]
-		[HarmonyPostfix]
-		static void PatchCoreAwake(ref ReceiverCoreScript __instance, List<GameObject> ___gun_prefabs_all) {
-			foreach(var gun in ___gun_prefabs_all) {
-				var modGunScript = gun.GetComponent<ModGunScript>();
+		private static Harmony CustomSoundsHarmonyInstance;
+		private static System.Collections.IEnumerator FixLegacySounds() {
+			yield return null; //1 frame of delay
 
-				if (modGunScript != null) {
-					ModLoader.LoadGun(modGunScript);
-				}
+			foreach (var method in CustomSoundsHarmonyInstance.GetPatchedMethods()) {
+				Patches patch = Harmony.GetPatchInfo(method); //You look reasonably sane bruv
+
+				if(patch.Owners.Count == 1) yield break; //All is well, no need to do anything
+
+				CustomSoundsHarmonyInstance.Unpatch(method, HarmonyPatchType.Prefix, patch.Owners.First(ownerID => ownerID != CustomSoundsHarmonyInstance.Id));
 			}
-
-			ModdingKitConfig.Initialize();
 		}
 
 		[HarmonyPatch(typeof(CartridgeSpec), "SetFromPreset")]
@@ -111,13 +113,16 @@ namespace Receiver2ModdingKit {
 				__instance.diameter = spec.diameter;
 			}
 		}
-		
+
 		public static void Initialize() {
 			Harmony.CreateAndPatchAll(typeof(HarmonyManager));
 			Harmony.CreateAndPatchAll(typeof(PopulateItemsTranspiler));
 			Harmony.CreateAndPatchAll(typeof(GunScriptTranspiler));
 			Harmony.CreateAndPatchAll(typeof(ModHelpEntryManager));
-			Harmony.CreateAndPatchAll(typeof(CustomSounds.ModAudioManager));
+			CustomSoundsHarmonyInstance = Harmony.CreateAndPatchAll(typeof(CustomSounds.ModAudioManager));
+			Harmony.CreateAndPatchAll(typeof(ModLoader));
+
+			ModdingKitCorePlugin.instance.StartCoroutine(FixLegacySounds()); //Calling this method has to be delayed to wait for all patches to get applied
 		}
 	}
 }

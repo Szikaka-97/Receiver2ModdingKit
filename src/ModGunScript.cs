@@ -4,9 +4,14 @@ using UnityEngine;
 using Receiver2;
 using SimpleJSON;
 using static Receiver2.Constants;
+using System.Reflection;
 
 namespace Receiver2ModdingKit {
 	public abstract class ModGunScript : GunScript {
+
+		private class AwakePatcher {
+
+		}
 
 		protected bool _disconnector_needs_reset {
 			get { return (bool) ReflectionManager.GS_disconnector_needs_reset.GetValue(this); }
@@ -87,9 +92,17 @@ namespace Receiver2ModdingKit {
 		new public void Awake() {
 			player_input = new PlayerInput(this);
 
-			base.Awake();
+			try {
+				base.Awake();
+			} catch (NullReferenceException e) {
+				Debug.LogError(e.StackTrace);
+			}
 
 			foreach (var spring in this.update_springs) {
+				if (spring.spring == null) {
+					Debug.LogError("Null spring in gun \"" + InternalName + "\"");
+					continue;
+				}
 				spring.spring.orig_center = (spring.spring.transform.InverseTransformPoint(spring.spring.new_top.position) + spring.spring.transform.InverseTransformPoint(spring.spring.new_bottom.position)) / 2;
 				spring.spring.orig_dist = Vector3.Distance(spring.spring.new_top.position, spring.spring.new_bottom.position);
 			}
@@ -104,7 +117,12 @@ namespace Receiver2ModdingKit {
 				this.audio.SetSoundEvents();
 			}
 
-			AwakeGun();
+			try {
+				AwakeGun();
+			} catch (Exception e) {
+				Debug.LogError(String.Format("Catched exception during {0}'s AwakeGun", this.InternalName));
+				Debug.LogException(e);
+			}
 		}
 		new public void Update() {
 			base.Update();
