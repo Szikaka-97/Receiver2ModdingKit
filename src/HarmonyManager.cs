@@ -4,14 +4,20 @@ using System.Reflection;
 using System.Reflection.Emit;
 using UnityEngine;
 using HarmonyLib;
-using ImGuiNET;
 using Receiver2;
 using System.Linq;
+using Receiver2ModdingKit.ModInstaller;
+using Receiver2ModdingKit.Editor;
+using ImGuiNET;
+using Wolfire;
 
 namespace Receiver2ModdingKit {
-	static class HarmonyManager {
+    public static class HarmonyManager {
+
+		#region Transpilers
+
 		[HarmonyPatch(typeof(RuntimeTileLevelGenerator), "PopulateItems")]
-		static class PopulateItemsTranspiler {
+		private static class PopulateItemsTranspiler {
 			private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, MethodBase __originalMethod) {
 				CodeMatcher codeMatcher = new CodeMatcher(instructions).MatchForward(false, 
 					new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(GunScript), "gun_type")),
@@ -34,40 +40,8 @@ namespace Receiver2ModdingKit {
 			}
 		}
 
-		[HarmonyPatch(typeof(MenuManagerScript), "UpdateDeveloperMenu")]
-		static class MenuTranspiler {
-			private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, MethodBase __originalMethod) {
-				CodeMatcher codeMatcher = new CodeMatcher(instructions).MatchForward(false, 
-					new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(ImGui), "EndMainMenuBar"))
-				);
-
-				return codeMatcher.InstructionEnumeration();
-
-				if (!codeMatcher.ReportFailure(__originalMethod, Debug.LogError)) {
-					Debug.Log("Patching");
-
-					codeMatcher
-						.SetAndAdvance(OpCodes.Nop, null)
-						.InsertAndAdvance(new CodeInstruction(OpCodes.Ldstr, "Moje Menu"))
-						.InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ImGui), "BeginMenu", new Type[] {typeof(string)})))
-						.InsertAndAdvance(new CodeInstruction(OpCodes.Pop))
-						.InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ImGui), "EndMenu")))
-						.InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ImGui), "EndMainMenuBar")));
-				}
-
-				return codeMatcher.InstructionEnumeration();
-			}
-
-			public static void createMenu() {
-				if (ImGui.BeginMenu("Moje Menu")) {
-					ImGui.Text("Lubie Placki");
-				}
-				ImGui.EndMenu();
-			}
-		}
-
 		[HarmonyPatch(typeof(GunScript), "Update")]
-		static class GunScriptTranspiler {
+		private static class GunScriptTranspiler {
 			private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, MethodBase __originalMethod) {
 				CodeMatcher codeMatcher = new CodeMatcher(instructions)
 				.MatchForward(false, 
@@ -88,22 +62,130 @@ namespace Receiver2ModdingKit {
 			}
 		}
 
-		private static Harmony CustomSoundsHarmonyInstance;
+		[HarmonyPatch(typeof(MenuManagerScript), "UpdateDeveloperMenu")]
+		private static class DevMenuTranspiler {
+			private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase __originalMethod) {
+				CodeMatcher codeMatcher = new CodeMatcher(instructions, generator)
+				.MatchForward(false, 
+					new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(ImGui), "EndMainMenuBar"))
+				);
+
+				if (!codeMatcher.ReportFailure(__originalMethod, Debug.LogError)) {
+					codeMatcher
+						.SetAndAdvance(OpCodes.Ldstr, "Modding")
+						.InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ImGui), "BeginMenu", new Type[] { typeof(string) })))
+						.Insert(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ImGui), "EndMainMenuBar")))
+						.InsertBranchAndAdvance(OpCodes.Brfalse, codeMatcher.Pos)
+						.InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModInfoAsset), "DisplayImGuiControls")))
+						.InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ImGui), "EndMenu")));
+				}
+								
+				return codeMatcher.InstructionEnumeration();
+			}
+		}
+
+		#endregion
+
+
+		[HarmonyPatch(typeof(MagazineScript), "UpdateRoundPositions")]
+		[HarmonyPostfix]
+		private static void PatchMagazineRoundPositions(ref MagazineScript __instance, Vector3 ___orig_follower_local_position) {
+			if (__instance is not DoubleStackMagazine) return;
+
+			for (int i = 0; i < __instance.NumRounds(); i++) {
+				var round = __instance.rounds[i];
+
+				bool left = i % 2 == 0 == (__instance.rounds.Count % 2 == 0) != __instance.round_position_params.mirror_double_stack;
+
+				round.transform.localPosition = new Vector3(
+					(Vector3.right * round.GetComponent<BoxCollider>().size.x * __instance.round_position_params.param_e * (left ? -1 : 1)).x,
+					round.transform.localPosition.y,
+					round.transform.localPosition.z
+				);
+			}
+
+			if (__instance.extracting) {
+				var round = __instance.rounds[0];
+
+				float x = Mathf.InverseLerp(
+					Vector3.Dot(__instance.slot.transform.Find("barrel/point_round_entering").position, __instance.transform.forward),
+					Vector3.Dot(__instance.round_top.position, __instance.transform.forward),
+					Vector3.Dot(__instance.slot.transform.Find("slide/point_chambered_round").position, __instance.transform.forward)
+				);
+
+				bool left = (__instance.rounds.Count % 2 == 0) != __instance.round_position_params.mirror_double_stack;
+
+				Debug.Log("Progress: " + x);
+
+				round.transform.localPosition = new Vector3(
+					(round.transform.right * round.GetComponent<BoxCollider>().size.x * __instance.round_position_params.param_e * (left ? -1 : 1)).x * x,
+					round.transform.localPosition.y,
+					round.transform.localPosition.z
+				);
+			}
+		}
+		
+		internal static class HarmonyInstances {
+			public static Harmony Core;
+			public static Harmony PopulateItems;
+			public static Harmony DevMenu;
+			public static Harmony GunScript;
+			public static Harmony ModHelpEntry;
+			public static Harmony CustomSounds;
+			public static Harmony TransformDebug;
+		}
+
+		/// <summary>
+		/// Enables Transform debug when used in a scope and while using the debug build of the moddding kit
+		/// Error message will also contain the last Transform.Find() call that failed, possibly simplifying debugging
+		/// </summary>
+		public class TransformDebugScope : IDisposable {
+			public static string last_target {
+				get;
+				private set;
+			}
+			private static bool enabled = false;
+
+			[HarmonyPatch(typeof(Transform), "Find")]
+			[HarmonyPostfix]
+			private static void PatchTransformFind(string n, Transform __result) {
+				if (!enabled) return;
+
+				if (__result == null) last_target = n;
+			}
+
+			public TransformDebugScope() {
+				last_target = "";
+				enabled = true;
+			}
+
+			public void Dispose() {
+				enabled = false;
+			}
+		}
+
+		internal static void UnpatchAll() {
+			foreach(var field in typeof(HarmonyInstances).GetFields()) {
+				Harmony patch = (Harmony) field.GetValue(null);
+				if (field != null) patch.UnpatchSelf();
+			}
+		}
+
 		private static System.Collections.IEnumerator FixLegacySounds() {
 			yield return null; //1 frame of delay
 
-			foreach (var method in CustomSoundsHarmonyInstance.GetPatchedMethods()) {
+			foreach (var method in HarmonyInstances.CustomSounds.GetPatchedMethods()) {
 				Patches patch = Harmony.GetPatchInfo(method); //You look reasonably sane bruv
 
 				if(patch.Owners.Count == 1) yield break; //All is well, no need to do anything
 
-				CustomSoundsHarmonyInstance.Unpatch(method, HarmonyPatchType.Prefix, patch.Owners.First(ownerID => ownerID != CustomSoundsHarmonyInstance.Id));
+				HarmonyInstances.CustomSounds.Unpatch(method, HarmonyPatchType.Prefix, patch.Owners.First(ownerID => ownerID != HarmonyInstances.CustomSounds.Id));
 			}
 		}
 
 		[HarmonyPatch(typeof(CartridgeSpec), "SetFromPreset")]
 		[HarmonyPrefix]
-		static void PatchSetCartridge(CartridgeSpec.Preset preset, ref CartridgeSpec __instance) {
+		private static void PatchSetCartridge(CartridgeSpec.Preset preset, ref CartridgeSpec __instance) {
 			if (ModdingKitCorePlugin.custom_cartridges.ContainsKey((uint) preset)) {
 				CartridgeSpec spec = ModdingKitCorePlugin.custom_cartridges[(uint) preset];
 
@@ -114,15 +196,40 @@ namespace Receiver2ModdingKit {
 			}
 		}
 
-		public static void Initialize() {
-			Harmony.CreateAndPatchAll(typeof(HarmonyManager));
-			Harmony.CreateAndPatchAll(typeof(PopulateItemsTranspiler));
-			Harmony.CreateAndPatchAll(typeof(GunScriptTranspiler));
-			Harmony.CreateAndPatchAll(typeof(ModHelpEntryManager));
-			CustomSoundsHarmonyInstance = Harmony.CreateAndPatchAll(typeof(CustomSounds.ModAudioManager));
-			Harmony.CreateAndPatchAll(typeof(ModLoader));
+		[HarmonyPatch(typeof(ReceiverCoreScript), "Awake")]
+		[HarmonyPostfix]
+		private static void PatchCoreAwake(List<GameObject> ___gun_prefabs_all) {
+			foreach(var gun in ___gun_prefabs_all) {
+				var modGunScript = gun.GetComponent<ModGunScript>();
 
-			ModdingKitCorePlugin.instance.StartCoroutine(FixLegacySounds()); //Calling this method has to be delayed to wait for all patches to get applied
+				if (modGunScript != null) {
+					try {
+						ModLoader.LoadGun(modGunScript);
+					} catch (Exception e) {
+						Debug.LogError("Error happened when loading gun " + modGunScript.InternalName);
+						Debug.LogError(e);
+					}
+				}
+			}
+
+			ModdingKitConfig.Initialize();
+
+			ModdingKitCorePlugin.ExecuteOnStartup.Invoke();
+		}
+
+		internal static void Initialize() {
+			HarmonyInstances.Core = Harmony.CreateAndPatchAll(typeof(HarmonyManager));
+			HarmonyInstances.PopulateItems = Harmony.CreateAndPatchAll(typeof(PopulateItemsTranspiler));
+			HarmonyInstances.DevMenu = Harmony.CreateAndPatchAll(typeof(DevMenuTranspiler));
+			HarmonyInstances.GunScript = Harmony.CreateAndPatchAll(typeof(GunScriptTranspiler));
+			HarmonyInstances.ModHelpEntry = Harmony.CreateAndPatchAll(typeof(ModHelpEntryManager));
+			HarmonyInstances.CustomSounds = Harmony.CreateAndPatchAll(typeof(CustomSounds.ModAudioManager));
+
+			#if DEBUG
+			HarmonyInstances.TransformDebug = Harmony.CreateAndPatchAll(typeof(TransformDebugScope));
+			#endif
+
+			ModdingKitCorePlugin.instance.StartCoroutine(FixLegacySounds()); //Calling this method has to be delayed to wait for patches from all plugins to get applied
 		}
 	}
 }

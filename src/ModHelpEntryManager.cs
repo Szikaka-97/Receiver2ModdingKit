@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace Receiver2ModdingKit {
-	public class ModHelpEntryManager : MonoBehaviour {
+	internal class ModHelpEntryManager : MonoBehaviour {
 		public static Dictionary<string, ModHelpEntry> entries = new Dictionary<string, ModHelpEntry>();
 
 		private static Delegate OnEntryClick;
@@ -26,7 +26,7 @@ namespace Receiver2ModdingKit {
 						typeof(D2),
 						m_help_menu,
 						typeof(EntryDescriptionMenuScript)
-							.GetMethods(System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+							.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
 							.FirstOrDefault( x => x.Name == "OnEntryClick" && x.GetParameters()[0].ParameterType == typeof(string) )
 					);
 				}
@@ -46,6 +46,8 @@ namespace Receiver2ModdingKit {
 				secondary_button_sprite = Sprite.Create(temp_texture, new Rect(0, 0, 64, 64), new Vector2(0.5f, 0.5f));
 			}
 		}
+
+		#region Patches
 
 		[HarmonyPatch(typeof(HelpMenuScript), "CreateMenuEntries")]
 		[HarmonyPrefix]
@@ -116,5 +118,7 @@ namespace Receiver2ModdingKit {
 				gun_help.title.text = string.Format("{0} - {1}/{2}", title, active, gun_help.entries.Count - hidden);
 			}
 		}
+
+		#endregion
 	}
 }

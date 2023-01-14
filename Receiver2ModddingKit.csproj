@@ -4,13 +4,18 @@
     <TargetFramework>net46</TargetFramework>
     <AssemblyName>Receiver2ModdingKit</AssemblyName>
     <Description>Modding Kit Plugin for Receiver 2 Gun Mods</Description>
-    <Version>0.1.0</Version>
+    <Version>1.0.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
     <RootNamespace>Receiver2ModdingKit</RootNamespace>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <BaseOutputPath></BaseOutputPath>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="src\Editor\Tools\**" />
+  </ItemGroup>
+    
   <ItemGroup>
     <None Remove="resources\cog.png" />
   </ItemGroup>
@@ -20,7 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
     <PackageReference Include="BepInEx.Core" Version="5.*" />
     <PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
     <PackageReference Include="UnityEngine.Modules" Version="2019.4.29" IncludeAssets="compile" />
@@ -52,9 +56,8 @@
     <Reference Include="Wolfire.Receiver2">
       <HintPath>lib\Wolfire.Receiver2.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEditor">
+      <HintPath>lib\UnityEditor.dll</HintPath>
+    </Reference>
   </ItemGroup>
-  
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;E:\unity_projekt\Receiver Mods\Assets\DLLs\Injection\ModdingKit&quot; /Y" />
-  </Target>
 </Project>

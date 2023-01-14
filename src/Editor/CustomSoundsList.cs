@@ -5,7 +5,6 @@ using System.Linq;
 using System.IO;
 using UnityEngine;
 using FMODUnity;
-
 using Receiver2ModdingKit.CustomSounds;
 using Receiver2;
 
@@ -52,7 +51,10 @@ namespace Receiver2ModdingKit.Editor {
 			{"sound_trigger_reset", 30}
 		};
 
+		[Tooltip("Prefix used with your sounds")]
 		public string prefix;
+
+		[Tooltip("Path to the folder where your sounds are located starting in game's AppData folder")]
 		public string sound_path;
 
 		public string[] sound_events = new string[31];
@@ -85,7 +87,19 @@ namespace Receiver2ModdingKit.Editor {
 					iterations++;
 				}
 
+				string old_prefix = this.prefix;
+
 				this.prefix = this.prefix + "_" + iterations;
+
+				foreach(var field in sound_fields) {
+					string event_name = (string) field.GetValue(gun);
+
+					if (event_name.Contains(old_prefix)) {
+						event_name.Replace(old_prefix, this.prefix);
+					}
+
+					field.SetValue(gun, event_name);
+				}
 
 				Debug.LogWarning("Tried to load sounds with a duplicate prefix \"" + prev_prefix + "\". They were loaded with \"" + this.prefix + "\" instead");
 

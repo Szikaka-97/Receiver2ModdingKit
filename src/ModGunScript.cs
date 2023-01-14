@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Linq;
 using UnityEngine;
 using Receiver2;
 using SimpleJSON;
-using static Receiver2.Constants;
-using System.Reflection;
 
 namespace Receiver2ModdingKit {
+	/// <summary>
+	/// Base class for all gun mods
+	/// </summary>
+	[RequireComponent(typeof(InventorySlot), typeof(LevelItem))]
 	public abstract class ModGunScript : GunScript {
-
-		private class AwakePatcher {
-
-		}
 
 		protected bool _disconnector_needs_reset {
 			get { return (bool) ReflectionManager.GS_disconnector_needs_reset.GetValue(this); }
@@ -38,14 +35,35 @@ namespace Receiver2ModdingKit {
 			set { ReflectionManager.GS_select_fire.SetValue(this, value); }
 		}
 
-		public bool generate_settings_button;
+		//[Tooltip("Should the game generate a setting button in the help menu?")]
+		//public bool generate_settings_button;
+
+		public bool visible_in_spawnmenu = true;
+		public bool spawns_in_dreaming = true;
+
+		[Tooltip("List of custom audio events used by the gun, created via RMB -> Create -> Receiver 2 Modding -> Custom Sounds List")]
 		public Editor.CustomSoundsList audio;
+
+
 		public PlayerInput player_input {
 			get;
 			protected set;
 		}
 
+		/// <summary>
+		/// Linearly interpolates between time-value pairs provided in curve parameter
+		/// </summary>
+		/// <param name="curve"> Array of timestamp-value pairs </param>
+		/// <param name="time"> Time value to interpolate with </param>
+		/// <returns>
+		/// Interpolated value
+		/// </returns>
 		protected static float InterpCurve(in float[] curve, float time) {
+			if (curve == null || curve.Length < 2) {
+				Debug.LogError("ModGunScript.InterpCurve(): curve parameter must contain at least 2 elements");
+				return 0;
+			}
+
 			if (time <= curve[0]) return curve[1];
 			else if (time >= curve[curve.Length - 2]) return curve[curve.Length - 1];
 			else {
@@ -59,7 +77,15 @@ namespace Receiver2ModdingKit {
 			return curve[1];
 		}
 
-		protected void TryFireBullet(float dry_fire_volume) {
+		/// <summary>
+		/// Try to fire a round using the default method
+		/// </summary>
+		/// <param name="dry_fire_volume"> How loud should the dry fire click be </param>
+		/// <returns>
+		/// True if the bullet was fired
+		/// False if not
+		/// </returns>
+		protected void TryFireBullet(float dry_fire_volume = 1f) {
 			if (round_in_chamber && !round_in_chamber.IsSpent() && slide.amount == 0f) {
 				FireBullet(round_in_chamber);
 				return;
@@ -69,8 +95,18 @@ namespace Receiver2ModdingKit {
 			dry_fired = true;
 			ReceiverEvents.TriggerEvent(ReceiverEventTypeInt.PlayerDryFire, (round_in_chamber != null) ? 2 : 1);
 			AudioManager.PlayOneShotAttached(sound_dry_fire, gameObject, dry_fire_volume);
+			return;
 		}
 
+		/// <summary>
+		/// Try to fire a round using the supplied method. Useful if your gun fires different kinds of projectiles
+		/// </summary>
+		/// <param name="dry_fire_volume"> How loud should the dry fire click be </param>
+		/// <param name="on_fire"> Function firing the bullet </param>
+		/// <returns>
+		/// True if the bullet was fired
+		/// False if not
+		/// </returns>
 		protected void TryFireBullet(float dry_fire_volume, Action<ShellCasingScript> on_fire) {
 			if (round_in_chamber && !round_in_chamber.IsSpent() && slide.amount == 0f) {
 				on_fire.Invoke(round_in_chamber);
@@ -81,6 +117,7 @@ namespace Receiver2ModdingKit {
 			dry_fired = true;
 			ReceiverEvents.TriggerEvent(ReceiverEventTypeInt.PlayerDryFire, (round_in_chamber != null) ? 2 : 1);
 			AudioManager.PlayOneShotAttached(sound_dry_fire, gameObject, dry_fire_volume);
+			return;
 		}
 
 		protected void UpdateAnimatedComponents() {
@@ -89,13 +126,29 @@ namespace Receiver2ModdingKit {
 			}
 		}
 
-		new public void Awake() {
+		new private void Awake() {
 			player_input = new PlayerInput(this);
 
-			try {
-				base.Awake();
-			} catch (NullReferenceException e) {
-				Debug.LogError(e.StackTrace);
+			if (this.spawn_info_sprite == null) {
+				Debug.LogError("Your gun doesn't have a spawn_info_sprite assigned, it may cause problems later");
+				this.spawn_info_sprite = Sprite.Create(Rect.zero, Vector2.zero, 1);
+			}
+
+			using (var debug_scope = new HarmonyManager.TransformDebugScope()) {
+				try {
+					base.Awake();
+				} catch (NullReferenceException e) {
+					Debug.LogError(String.Format("Catched exception during {0}'s Awake", this.InternalName));
+
+					if (!String.IsNullOrEmpty(HarmonyManager.TransformDebugScope.last_target)) {
+						Debug.LogError("You seem to be missing the " + HarmonyManager.TransformDebugScope.last_target + " transform.");
+					}
+					else {
+						Debug.LogError("Carefully check if you've assigned all the fields properly and if there aren't any missing references");
+					}
+
+					Debug.LogError(e);
+				}
 			}
 
 			foreach (var spring in this.update_springs) {
@@ -124,20 +177,66 @@ namespace Receiver2ModdingKit {
 				Debug.LogException(e);
 			}
 		}
-		new public void Update() {
-			base.Update();
+		new private void Update() {
+			using (var debug_scope = new HarmonyManager.TransformDebugScope()) { 
+				try {
+					base.Update();
+				} catch (NullReferenceException e) {
+					Debug.LogError(String.Format("Catched exception during {0}'s Update", this.InternalName));
 
+					if (!String.IsNullOrEmpty(HarmonyManager.TransformDebugScope.last_target)) {
+						Debug.LogError("You seem to be missing the " + HarmonyManager.TransformDebugScope.last_target + " transform.");
+					}
+					else {
+						Debug.LogError("Carefully check if you've assigned all the fields properly and if there aren't any missing references");
+					}
+
+					Debug.LogError(e);
+				}
+			}
+
+			UpdateAnimatedComponents();
 			if (safety.transform) safety.UpdateDisplay();
 		}
 
+		/// <summary>
+		/// Any setup that has to be done before the gun is ever used. It is called only once, right after a gun is loaded from the AssetBundle
+		/// </summary>
 		public virtual void InitializeGun() { }
-		public virtual void AwakeGun() { base.Awake(); }
+
+		/// <summary>
+		/// Setup that has to be done for every gun individually. It is called when the gun is spawned, whether for a campaign or from spawnmenu
+		/// </summary>
+		public virtual void AwakeGun() { }
+
+		/// <summary>
+		/// Get a help entry to use in the help menu.
+		/// See <see cref="ModHelpEntry"/> for additional information
+		/// </summary>
+		/// 
+		/// <returns>
+		/// A ModHelpEntry object containing help menu information, or null if help menu entry shouldn't be created
+		/// </returns>
 		public virtual ModHelpEntry GetGunHelpEntry() {	return null; }
+
+		/// <summary>
+		/// If the gun uses a custom round, override this method to define properties of said round
+		/// </summary>
+		/// <returns>
+		/// A new CartridgeSpec defining custom round's properties
+		/// </returns>
 		public virtual CartridgeSpec GetCustomCartridgeSpec() { 
 			CartridgeSpec spec = new CartridgeSpec();
 			spec.SetFromPreset(CartridgeSpec.Preset._9mm);
 			return spec;
 		}
+
+		/// <summary>
+		/// Get the gun name and trivia visible in the pause menu
+		/// </summary>
+		/// <returns>
+		/// A LocaleTactics object containing info about the gun
+		/// </returns>
 		public virtual LocaleTactics GetGunTactics() {
 			return new LocaleTactics() {
 				gun_internal_name = InternalName,
@@ -145,6 +244,9 @@ namespace Receiver2ModdingKit {
 			};
 		}
 
+		/// <summary>
+		/// A method performed every frame when the gun is active. Control things like firing the bullet within it
+		/// </summary>
 		public abstract void UpdateGun();
 
 		public override string TypeName() { return "ModGunScript"; }
