@@ -57,7 +57,7 @@ namespace Receiver2ModdingKit.ModInstaller {
 
 								    ModdingKitCorePlugin.instance.StartCoroutine(DelayAction(() => {
                                         try {
-                                            obj.AddComponent(type);
+                                            //obj.AddComponent(type); //Stupid
                                         }
                                         catch (Exception e) {
                                             Debug.LogError($"Failed to load plugin {metadata.GUID} because of exception: {e}");

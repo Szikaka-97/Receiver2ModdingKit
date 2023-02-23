@@ -60,11 +60,16 @@ namespace Receiver2ModdingKit.Editor {
 		public string[] sound_events = new string[31];
 		public string[] fallback_events = new string[31];
 
-		[NonSerialized]
+		public List<string> custom_event_names = new List<string>();
+		public List<string> custom_event_values = new List<string>();
+		public List<string> custom_event_fallback_values = new List<string>();
+
 		public ForceOptions force_options = ForceOptions.Nothing;
 
 		private ModGunScript gun;
 		private FieldInfo[] sound_fields;
+		private List<FieldInfo> custom_sound_fields = new List<FieldInfo>();
+		private Dictionary<FieldInfo, string> custom_sound_events_queue = new Dictionary<FieldInfo, string>();
 
 		public void Initialize(ModGunScript gun) {
 			sound_fields = typeof(ModGunScript).GetFields(BindingFlags.Instance | BindingFlags.Public).Where(field => field.GetCustomAttributes<EventRefAttribute>().Count() > 0).ToArray();
@@ -114,6 +119,9 @@ namespace Receiver2ModdingKit.Editor {
 				force_options = ForceOptions.ForceDefaultSounds;
 			}
 
+			if (this.custom_event_names.Count > this.custom_event_values.Count) this.custom_event_values.AddRange(new string[this.custom_event_values.Count - this.custom_event_names.Count]);
+			if (this.custom_event_names.Count > this.custom_event_fallback_values.Count) this.custom_event_fallback_values.AddRange(new string[this.custom_event_fallback_values.Count - this.custom_event_names.Count]);
+
 			if (BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("R2CustomSounds")) {
 				BepInEx.Bootstrap.Chainloader
 					.PluginInfos["R2CustomSounds"].Instance
@@ -130,14 +138,36 @@ namespace Receiver2ModdingKit.Editor {
 				return;
 			}
 
-			if (ReceiverCoreScript.Instance() == null) { //In case of the gun being started in the editor
-				return;
-			}
-
 			bool sound_option = (ModdingKitConfig.use_custom_sounds.Value || force_options == ForceOptions.ForceModdedSounds) && force_options != ForceOptions.ForceDefaultSounds;
 
 			foreach (var sound_pair in sound_event_lookup) {
-				sound_fields.Single(info => info.Name == sound_pair.Key).SetValue(gun, sound_option ? sound_events[sound_pair.Value] : fallback_events[sound_pair.Value]);
+				sound_fields.First(info => info.Name == sound_pair.Key).SetValue(gun, sound_option ? sound_events[sound_pair.Value] : fallback_events[sound_pair.Value]);
+			}
+
+			foreach (var field in custom_sound_fields) {
+				field.SetValue(gun, GetCustomSoundEvent(field.Name));
+			}
+		}
+
+		public string GetCustomSoundEvent(string name) {
+			int index = custom_event_names.IndexOf(name);
+
+			if (index < 0) return "";
+
+			return ModdingKitConfig.use_custom_sounds.Value ? custom_event_values[index] : custom_event_fallback_values[index];
+		}
+
+		internal void BindField(FieldInfo field) {
+
+			int index = custom_event_names.IndexOf(field.Name);
+
+			if (index >= 0) {
+				custom_sound_fields.Add(field);
+
+				custom_sound_events_queue.Add(field, ModdingKitConfig.use_custom_sounds.Value ? custom_event_values[index] : custom_event_fallback_values[index]);
+			}
+			else {
+				Debug.LogError("CustomSoundsList.SetSoundEvents(): No custom sound event with a name \"" + field.Name + "\"");
 			}
 		}
 

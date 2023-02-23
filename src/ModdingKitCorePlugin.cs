@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using BepInEx;
 using Receiver2;
@@ -7,7 +8,7 @@ using Receiver2ModdingKit.ModInstaller;
 using System.IO;
 
 namespace Receiver2ModdingKit {
-	[BepInPlugin("pl.szikaka.receiver_2_modding_kit", "Receiver 2 Modding Kit", "1.0.0")]
+	[BepInPlugin("pl.szikaka.receiver_2_modding_kit", "Receiver 2 Modding Kit", "1.0.1")]
 	[BepInProcess("Receiver2")]
 	public class ModdingKitCorePlugin : BaseUnityPlugin {
 		public static ModdingKitCorePlugin instance {
@@ -32,7 +33,13 @@ namespace Receiver2ModdingKit {
 		internal static StartupAction ExecuteOnStartup = new StartupAction(() => { });
 
 		internal static void UpdateModGuns(GunScript gun) {
-			if (gun is ModGunScript) ((ModGunScript) gun).UpdateGun();
+			if (gun is ModGunScript) {
+				try {
+					((ModGunScript) gun).UpdateGun();
+				} catch (Exception e) {
+					Debug.LogException(e);
+				}
+			}
 		}
 
 		private System.Collections.IEnumerator SetErrorState() {
@@ -85,6 +92,7 @@ namespace Receiver2ModdingKit {
 			if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "PlayerLoadouts"))) Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "PlayerLoadouts"));
 			if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "RankingProgressionCampaigns"))) Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "RankingProgressionCampaigns"));
 			if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "WorldGenerationConfigurations"))) Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "WorldGenerationConfigurations"));
+			if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "Guns"))) Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "Guns"));
 		}
 
 		private void OnDestroy() {

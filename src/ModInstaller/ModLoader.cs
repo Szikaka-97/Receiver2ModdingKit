@@ -5,7 +5,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Receiver2;
 using HarmonyLib;
-
+using System.Reflection;
+using Receiver2ModdingKit.CustomSounds;
 
 namespace Receiver2ModdingKit.ModInstaller {
 	public static class ModLoader {
@@ -16,11 +17,7 @@ namespace Receiver2ModdingKit.ModInstaller {
 		public static void SearchForMod() {
 			mod_installer = ModdingKitCorePlugin.instance.gameObject.AddComponent<ModInstallerObject>();
 		}
-
-		internal static void InstallGunMod(ModInstallerObject.ModDirectoryInfo info) {
-
-		}
-		
+				
 		public static bool IsGunModInstalled(string gunName) {
 			if (Directory.Exists(Path.Combine(Application.persistentDataPath, "Guns", gunName))) {
 				foreach (string file in Directory.GetFiles(Path.Combine(Application.persistentDataPath, "Guns", gunName))) {
@@ -118,7 +115,17 @@ namespace Receiver2ModdingKit.ModInstaller {
 			if (gun.audio != null) { //Loading custom audio
 				gun.audio.Initialize(gun);
 
-				if (!CustomSounds.ModAudioManager.GetAllEvents().Contains(gun.audio.sound_events[0])) gun.audio.force_options = Editor.CustomSoundsList.ForceOptions.ForceDefaultSounds;
+				foreach(var field in gun.GetType().GetFields(BindingFlags.Instance).Where(field => field.FieldType == typeof(string) && field.GetCustomAttribute<CustomEventRef>() != null)) {
+					gun.audio.BindField(field);
+				}
+
+				foreach (var sound in gun.audio.sound_events) {
+					if (sound != "" && !sound.StartsWith("event:/") && !ModAudioManager.GetAllEvents().Contains(sound)) {
+						Debug.LogError("Failed to load sound event \"" + sound + "\", falling back on default sounds");
+						gun.audio.force_options = Editor.CustomSoundsList.ForceOptions.ForceDefaultSounds;
+						break;
+					}
+				}
 			}
 
 			if (gun.GetComponent<PegboardHangableItem>() && gun.GetComponent<PegboardHangableItem>().pegboard_hanger != null) { //Handling guns pegboard collision

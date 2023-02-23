@@ -41,12 +41,15 @@ namespace Receiver2ModdingKit {
 			}
 		}
 
+		private static readonly string left_column_menu_path = "ReceiverCore/Menus/Overlay Menu Canvas/Aspect Ratio Fitter/New Pause Menu/Backdrop1/Sub-Menu Layout Group/New Settings Menu/ScrollableContent Variant/Viewport/Content/Left Column/";
+		private static readonly string right_column_menu_path = "ReceiverCore/Menus/Overlay Menu Canvas/Aspect Ratio Fitter/New Pause Menu/Backdrop1/Sub-Menu Layout Group/New Settings Menu/ScrollableContent Variant/Viewport/Content/Right Column/";
+
         private static GameObject m_label_prefab = null;
         private static GameObject label_prefab {
             get {
                 if (m_label_prefab != null) return m_label_prefab;
 
-                m_label_prefab = GameObject.Instantiate(GameObject.Find("ReceiverCore/Menus/Overlay Menu Canvas/Aspect Ratio Fitter/New Pause Menu/Backdrop1/Sub-Menu Layout Group/New Settings Menu/ScrollableContent Variant/Viewport/Content/Left Column/Audio Device Label"));
+				m_label_prefab = GameObject.Instantiate(GameObject.Find(left_column_menu_path).GetComponentInChildren<CanvasRenderer>().gameObject);
 
                 return m_label_prefab;
             }
@@ -58,9 +61,8 @@ namespace Receiver2ModdingKit {
             get {
                 if (m_button_setting_prefab != null) return m_button_setting_prefab;
 
-                m_button_setting_prefab = GameObject.Instantiate(GameObject.Find("ReceiverCore/Menus/Overlay Menu Canvas/Aspect Ratio Fitter/New Pause Menu/Backdrop1/Sub-Menu Layout Group/New Settings Menu/ScrollableContent Variant/Viewport/Content/Right Column/Keybinds Container"));
-
-				m_button_setting_prefab.transform.Find("Keybinds").name = "Button";
+				m_button_setting_prefab = GameObject.Instantiate(GameObject.Find(right_column_menu_path).GetComponentInChildren<Button>().transform.parent.gameObject);
+				m_button_setting_prefab.GetComponentInChildren<Button>().gameObject.name = "Button";
 
                 return m_button_setting_prefab;
             }
@@ -72,7 +74,7 @@ namespace Receiver2ModdingKit {
             get {
                 if (m_toggle_setting_prefab != null) return m_toggle_setting_prefab;
 
-                m_toggle_setting_prefab = GameObject.Instantiate(GameObject.Find("ReceiverCore/Menus/Overlay Menu Canvas/Aspect Ratio Fitter/New Pause Menu/Backdrop1/Sub-Menu Layout Group/New Settings Menu/ScrollableContent Variant/Viewport/Content/Right Column/Enable Analytics Toggle"));
+				m_toggle_setting_prefab = GameObject.Instantiate(GameObject.Find(right_column_menu_path).GetComponentInChildren(Type.GetType("Receiver2.ToggleComponent, Wolfire.Receiver2, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null")).gameObject);
 
                 return m_toggle_setting_prefab;
             }
@@ -84,7 +86,7 @@ namespace Receiver2ModdingKit {
             get {
                 if (m_dropdown_setting_prefab != null) return m_dropdown_setting_prefab;
 
-                m_dropdown_setting_prefab = GameObject.Instantiate(GameObject.Find("ReceiverCore/Menus/Overlay Menu Canvas/Aspect Ratio Fitter/New Pause Menu/Backdrop1/Sub-Menu Layout Group/New Settings Menu/ScrollableContent Variant/Viewport/Content/Right Column/Audio Device Dropdown"));
+				m_dropdown_setting_prefab = GameObject.Instantiate(GameObject.Find(right_column_menu_path).GetComponentInChildren<DropdownComponent>().gameObject);
 
                 return m_dropdown_setting_prefab;
             }
@@ -96,18 +98,18 @@ namespace Receiver2ModdingKit {
             get {
                 if (m_slider_setting_prefab != null) return m_slider_setting_prefab;
 
-                m_slider_setting_prefab = GameObject.Instantiate(GameObject.Find("ReceiverCore/Menus/Overlay Menu Canvas/Aspect Ratio Fitter/New Pause Menu/Backdrop1/Sub-Menu Layout Group/New Settings Menu/ScrollableContent Variant/Viewport/Content/Right Column/FOV Slider"));
+				m_slider_setting_prefab = GameObject.Instantiate(GameObject.Find(right_column_menu_path).GetComponentInChildren<SliderComponent>().gameObject);
 
                 return m_slider_setting_prefab;
             }
         }
 
-		public static SettingsMenuButton CreateSettingsMenuButton(string name, UnityAction callback, int index = -1) {
+		public static SettingsMenuButton CreateSettingsMenuButton(string name, string button_text, UnityAction callback, int index = -1) {
 			GameObject button = GameObject.Instantiate(button_setting_prefab);
 			button.name = name + " Container";
 
 			Component.DestroyImmediate(button.transform.Find("Button/Text").GetComponent<LocalizedTextMesh>());
-			button.transform.Find("Button/Text").GetComponent<TextMeshProUGUI>().text = name;
+			button.transform.Find("Button/Text").GetComponent<TextMeshProUGUI>().text = button_text;
 
 			var button_event = button.transform.Find("Button").GetComponent<Button>().onClick;
 
@@ -115,8 +117,9 @@ namespace Receiver2ModdingKit {
 			button_event.m_Calls = new InvokableCallList();
 			button_event.AddListener(callback);
 
-			button.transform.SetParent(GameObject.Find("ReceiverCore/Menus/Overlay Menu Canvas/Aspect Ratio Fitter/New Pause Menu/Backdrop1/Sub-Menu Layout Group/New Settings Menu/ScrollableContent Variant/Viewport/Content/Right Column").transform);
+			button.transform.SetParent(GameObject.Find(right_column_menu_path).transform);
 			button.transform.localScale = Vector3.one;
+			button.transform.localPosition = new Vector3(button.transform.localPosition.x, button.transform.localPosition.y, 0);
 			button.transform.Find("Button").GetComponent<RectTransform>().sizeDelta = new Vector2(596, 46);
 
 			if (index >= 0) button.GetComponent<RectTransform>().SetSiblingIndex(index);
@@ -126,10 +129,11 @@ namespace Receiver2ModdingKit {
             label.name = name;
 
 			Component.DestroyImmediate(label.transform.Find("Text").GetComponent<LocalizedTextMesh>());
-			label.transform.Find("Text").GetComponent<TMPro.TextMeshProUGUI>().text = name;
+			label.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = name;
 
 			label.transform.SetParent(button.transform.parent.parent.Find("Left Column"));
 			label.transform.localScale = Vector3.one;
+			label.transform.localPosition = new Vector3(label.transform.localPosition.x, label.transform.localPosition.y, 0);
             if (index >= 0) label.GetComponent<RectTransform>().SetSiblingIndex(index);
 
 			return new SettingsMenuButton(label, button.transform.Find("Button").GetComponent<Button>());
@@ -233,8 +237,9 @@ namespace Receiver2ModdingKit {
 					return null;
 			}
 
-			control.transform.SetParent(GameObject.Find("ReceiverCore/Menus/Overlay Menu Canvas/Aspect Ratio Fitter/New Pause Menu/Backdrop1/Sub-Menu Layout Group/New Settings Menu/ScrollableContent Variant/Viewport/Content/Right Column").transform);
+			control.transform.SetParent(GameObject.Find(right_column_menu_path).transform);
 			control.transform.localScale = Vector3.one;
+			control.transform.localPosition = new Vector3(control.transform.localPosition.x, control.transform.localPosition.y, 0);
 			if (index >= 0) control.GetComponent<RectTransform>().SetSiblingIndex(index);
 
 			GameObject label = GameObject.Instantiate(label_prefab);
@@ -242,10 +247,11 @@ namespace Receiver2ModdingKit {
             label.name = name;
 
 			GameObject.DestroyImmediate(label.transform.Find("Text").GetComponent<LocalizedTextMesh>());
-			label.transform.Find("Text").GetComponent<TMPro.TextMeshProUGUI>().text = name;
+			label.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = name;
 
 			label.transform.SetParent(control.transform.parent.parent.Find("Left Column"));
 			label.transform.localScale = Vector3.one;
+			label.transform.localPosition = new Vector3(label.transform.localPosition.x, label.transform.localPosition.y, 0);
             if (index >= 0) label.GetComponent<RectTransform>().SetSiblingIndex(index);
 
             return new SettingsMenuEntry<T>(config_entry, label, control);

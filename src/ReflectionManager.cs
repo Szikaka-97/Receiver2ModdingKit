@@ -33,6 +33,11 @@ namespace Receiver2ModdingKit {
 			private set;
 		}
 
+		public static FieldInfo GS_yoke_open {
+			get;
+			private set;
+		}
+
 		public static FieldInfo RCS_gun_prefabs_all {
 			get;
 			private set;
@@ -133,6 +138,7 @@ namespace Receiver2ModdingKit {
 			GS_hammer_state = GetFieldInfo(typeof(GunScript), "hammer_state");
 			GS_slide_stop_locked = GetFieldInfo(typeof(GunScript), "slide_stop_locked");
 			GS_select_fire = GetFieldInfo(typeof(GunScript), "select_fire");
+			GS_yoke_open = GetFieldInfo(typeof(GunScript), "yoke_open");
 			PH_bounds = GetFieldInfo(typeof(PegboardHanger), "bounds");
 			RCS_gun_prefabs_all = GetFieldInfo(typeof(ReceiverCoreScript), "gun_prefabs_all");
 

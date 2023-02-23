@@ -115,8 +115,6 @@ namespace Receiver2ModdingKit {
 
 				bool left = (__instance.rounds.Count % 2 == 0) != __instance.round_position_params.mirror_double_stack;
 
-				Debug.Log("Progress: " + x);
-
 				round.transform.localPosition = new Vector3(
 					(round.transform.right * round.GetComponent<BoxCollider>().size.x * __instance.round_position_params.param_e * (left ? -1 : 1)).x * x,
 					round.transform.localPosition.y,
@@ -128,40 +126,11 @@ namespace Receiver2ModdingKit {
 		internal static class HarmonyInstances {
 			public static Harmony Core;
 			public static Harmony PopulateItems;
-			public static Harmony DevMenu;
 			public static Harmony GunScript;
 			public static Harmony ModHelpEntry;
 			public static Harmony CustomSounds;
 			public static Harmony TransformDebug;
-		}
-
-		/// <summary>
-		/// Enables Transform debug when used in a scope and while using the debug build of the moddding kit
-		/// Error message will also contain the last Transform.Find() call that failed, possibly simplifying debugging
-		/// </summary>
-		public class TransformDebugScope : IDisposable {
-			public static string last_target {
-				get;
-				private set;
-			}
-			private static bool enabled = false;
-
-			[HarmonyPatch(typeof(Transform), "Find")]
-			[HarmonyPostfix]
-			private static void PatchTransformFind(string n, Transform __result) {
-				if (!enabled) return;
-
-				if (__result == null) last_target = n;
-			}
-
-			public TransformDebugScope() {
-				last_target = "";
-				enabled = true;
-			}
-
-			public void Dispose() {
-				enabled = false;
-			}
+			public static Harmony DevMenu;
 		}
 
 		internal static void UnpatchAll() {
@@ -212,20 +181,31 @@ namespace Receiver2ModdingKit {
 				}
 			}
 
-			ModdingKitConfig.Initialize();
+			try {
+				ModdingKitConfig.Initialize();
+			} catch {
+				Debug.LogError("An error accured when trying to create settings for the Modding Kit");
+			}
 
-			ModdingKitCorePlugin.ExecuteOnStartup.Invoke();
+			foreach(var ev in ModdingKitCorePlugin.ExecuteOnStartup.GetInvocationList()) {
+				try {
+					ev.DynamicInvoke();
+				} catch (Exception e) {
+					Debug.LogError("Failed invoking startup event for method " + ev.Method.Name + ";\nDumping stack trace:");
+					Debug.LogError(e);
+				}
+			}
 		}
 
 		internal static void Initialize() {
 			HarmonyInstances.Core = Harmony.CreateAndPatchAll(typeof(HarmonyManager));
 			HarmonyInstances.PopulateItems = Harmony.CreateAndPatchAll(typeof(PopulateItemsTranspiler));
-			HarmonyInstances.DevMenu = Harmony.CreateAndPatchAll(typeof(DevMenuTranspiler));
 			HarmonyInstances.GunScript = Harmony.CreateAndPatchAll(typeof(GunScriptTranspiler));
 			HarmonyInstances.ModHelpEntry = Harmony.CreateAndPatchAll(typeof(ModHelpEntryManager));
 			HarmonyInstances.CustomSounds = Harmony.CreateAndPatchAll(typeof(CustomSounds.ModAudioManager));
 
 			#if DEBUG
+			HarmonyInstances.DevMenu = Harmony.CreateAndPatchAll(typeof(DevMenuTranspiler));
 			HarmonyInstances.TransformDebug = Harmony.CreateAndPatchAll(typeof(TransformDebugScope));
 			#endif
 

@@ -31,6 +31,30 @@ namespace Receiver2ModdingKit.ModInstaller {
 		private ModDirectoryInfo mod_dir_info;
 		private bool plugins_loaded;
 
+		private void CopyDirectory(string from, string to) {
+			DirectoryInfo dir = new DirectoryInfo(from);
+
+			if (!dir.Exists) return;
+
+			try {
+				string to_dir = Path.Combine(to, dir.Name);
+
+				if (!Directory.Exists(to_dir)) Directory.CreateDirectory(to_dir);
+
+				foreach (var file in dir.GetFiles()) {
+					file.CopyTo(Path.Combine(to_dir, file.Name), true);
+				}
+
+				foreach (var child in dir.GetDirectories()) {
+					CopyDirectory(child.FullName, to_dir);
+				}
+			} catch (Exception e) {
+				Debug.LogError(e);
+
+				return;
+			}
+		}
+
 		private void ShowPickDirectoryMenu() {
 			if (ImGui.Begin("Path selector", ImGuiWindowFlags.NoCollapse)) {
 				if (current_path == null) {
@@ -75,31 +99,36 @@ namespace Receiver2ModdingKit.ModInstaller {
 						return;
 					}
 
-					int max_length = Mathf.Min(50, current_path.GetDirectories().Max(dir => dir.Name.Length));
+					if (current_path.GetDirectories().Length > 0) {
+						int max_length = Mathf.Min(50, current_path.GetDirectories().Max(dir => dir.Name.Length));
 
-					foreach (var dir in current_path.GetDirectories()) {
+						foreach (var dir in current_path.GetDirectories()) {
 
-						bool locked = false;
-						bool folder_contains_json = false;
+							bool locked = false;
+							bool folder_contains_json = false;
 
-						try {
-							folder_contains_json = dir.GetFiles("modinfo.json").Count() > 0;
-						} catch (UnauthorizedAccessException) {
-							locked = true;
-							folder_contains_json = false;
+							try {
+								folder_contains_json = dir.GetFiles("modinfo.json").Count() > 0;
+							} catch (UnauthorizedAccessException) {
+								locked = true;
+								folder_contains_json = false;
+							}
+
+							if (
+								ImGui.Button(
+									"|" +
+									(locked ? "\uf023 " : "   ") +
+									"\uf07b" + 
+									(folder_contains_json ? " \uf005 " : "   ") + 
+									dir.Name.PadRight(max_length)
+								) && !locked
+							) {
+								current_path = dir;
+							}
 						}
-
-						if (
-							ImGui.Button(
-								"|" +
-								(locked ? "\uf023 " : "   ") +
-								"\uf07b" + 
-								(folder_contains_json ? " \uf005 " : "   ") + 
-								dir.Name.PadRight(max_length)
-							) && !locked
-						) {
-							current_path = dir;
-						}
+					}
+					else {
+						ImGui.Text("No subdirectories present");
 					}
 				}
 
@@ -125,7 +154,6 @@ namespace Receiver2ModdingKit.ModInstaller {
 
 				return;
 			}
-
 
 			var modinfo = mod_dir_info.mod_info;
 
@@ -168,21 +196,30 @@ namespace Receiver2ModdingKit.ModInstaller {
 					try {
 						var plugin_files = new DirectoryInfo(sourcePath).GetFiles("*.dll", SearchOption.AllDirectories);
 
-						if (!Directory.Exists(BepInEx.Paths.PluginPath + modinfo.ModName)) Directory.CreateDirectory(BepInEx.Paths.PluginPath + modinfo.ModName);
+						if (Directory.Exists(Path.Combine(BepInEx.Paths.PluginPath, new DirectoryInfo(sourcePath).Name))) Directory.Delete(Path.Combine(BepInEx.Paths.PluginPath, new DirectoryInfo(sourcePath).Name));
+						CopyDirectory(sourcePath, BepInEx.Paths.PluginPath);
+
+						/*
 						if (!Directory.Exists(ScriptEngine.ScriptDirectory)) Directory.CreateDirectory(ScriptEngine.ScriptDirectory);
 
 						foreach (var file in plugin_files) {
-							file.CopyTo(BepInEx.Paths.PluginPath + modinfo.ModName + "/" + file.Name, true);
+							file.CopyTo(BepInEx.Paths.PluginPath + "/" + modinfo.ModName + "/" + file.Name, true);
 							file.CopyTo(ScriptEngine.ScriptDirectory + "/" + file.Name, true);
 						}
-
-						plugins_loaded = true;
+						ScriptEngine.ReloadPlugins();
+						*/
 					} catch (IOException e) {
 						Debug.LogError("Couldn't copy plugin files for mod: " + modinfo.ModName);
 						Debug.LogError("Error:\n" + e.Message);
+						try {
+							if (Directory.Exists(Path.Combine(BepInEx.Paths.PluginPath, new DirectoryInfo(sourcePath).Name))) Directory.Delete(Path.Combine(BepInEx.Paths.PluginPath, new DirectoryInfo(sourcePath).Name));
+						} catch { }
 					} catch (UnauthorizedAccessException e) {
 						Debug.LogError("Couldn't copy plugin files for mod: " + modinfo.ModName);
 						Debug.LogError("Error:\n" + e.Message);
+						try {
+							if (Directory.Exists(Path.Combine(BepInEx.Paths.PluginPath, new DirectoryInfo(sourcePath).Name))) Directory.Delete(Path.Combine(BepInEx.Paths.PluginPath, new DirectoryInfo(sourcePath).Name));
+						} catch { }
 					}
 				}
 			}
@@ -195,11 +232,14 @@ namespace Receiver2ModdingKit.ModInstaller {
 						var asset_files = new DirectoryInfo(sourcePath).GetFiles("*." + SystemInfo.operatingSystemFamily.ToString().ToLower());
 						var campaign_folders = new DirectoryInfo(sourcePath).GetDirectories();
 
-						Directory.Move(sourcePath, Application.persistentDataPath + "/Guns/" + modinfo.ModName);
+						if (Directory.Exists(Application.persistentDataPath + "/Guns/" + new DirectoryInfo(sourcePath).Name)) Directory.Delete(Application.persistentDataPath + "/Guns/" + new DirectoryInfo(sourcePath).Name, true);
 
+						CopyDirectory(sourcePath, Application.persistentDataPath + "/Guns/");
+
+						//Code from now on does nothing, but I'm keeping it here in case I fix the underlying issue
 						int previous_guns_count = ((List<GameObject>)ReflectionManager.RCS_gun_prefabs_all.GetValue(ReceiverCoreScript.Instance())).Count;
 
-						ReceiverCoreScript.Instance().LoadModGun(Application.persistentDataPath + "/Guns/" + modinfo.ModName, true);
+						ReceiverCoreScript.Instance().LoadModGun(Application.persistentDataPath + "/Guns/" + new DirectoryInfo(sourcePath).Name, true);
 
 						var new_guns = (List<GameObject>) ReflectionManager.RCS_gun_prefabs_all.GetValue(ReceiverCoreScript.Instance());
 
@@ -209,12 +249,20 @@ namespace Receiver2ModdingKit.ModInstaller {
 					} catch (IOException e) {
 						Debug.LogError("Couldn't copy assets for mod: " + modinfo.ModName);
 						Debug.LogError("Error:\n" + e.Message);
+						try {
+							if (Directory.Exists(Application.persistentDataPath + "/Guns/" + new DirectoryInfo(sourcePath).Name)) Directory.Delete(Application.persistentDataPath + "/Guns/" + new DirectoryInfo(sourcePath).Name, true);
+						} catch { }
 					} catch (UnauthorizedAccessException e) {
 						Debug.LogError("Couldn't copy assets for mod: " + modinfo.ModName);
 						Debug.LogError("Error:\n" + e.Message);
+						try {
+							if (Directory.Exists(Application.persistentDataPath + "/Guns/" + new DirectoryInfo(sourcePath).Name)) Directory.Delete(Application.persistentDataPath + "/Guns/" + new DirectoryInfo(sourcePath).Name, true);
+						} catch { }
 					}
 				}
 			}
+
+			current_state = InstallerState.Finishing;
 		}
 
 		private void DisplayPrompt() {
@@ -248,6 +296,7 @@ namespace Receiver2ModdingKit.ModInstaller {
 			if (ImGui.Begin("Installer", ImGuiWindowFlags.NoCollapse)) {
 				if (successful) {
 					ImGui.Text("Installation finished");
+					ImGui.Text("Restart the game to load installed addons");
 				}
 				else {
 					ImGui.Text("Installation aborted");
@@ -256,13 +305,10 @@ namespace Receiver2ModdingKit.ModInstaller {
 				ImGui.Spacing();
 
 				if (plugins_loaded) {
-					ImGui.Separator();
-
 					ImGui.Text("There are plugins waiting to be loaded, do you want to load them now?");
 
 					if (ImGui.Button("Yes")) {
-						ScriptEngine.ReloadPlugins();
-
+						
 						plugins_loaded = false;
 					}
 

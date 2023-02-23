@@ -29,6 +29,13 @@ public class CreateAssetBundles {
 			}
 
 			File.Move(file.FullName, fileNameWithExtension);
+
+			if (File.Exists(file.FullName + ".meta")) {
+				if (File.Exists(fileNameWithExtension + ".meta")) {
+					File.Delete(fileNameWithExtension);
+				}
+				File.Move(file.FullName + ".meta", fileNameWithExtension + ".meta");
+			}
 		}
 
 		foreach (var file in new DirectoryInfo(Path.Combine(assetBundleDirectory, target.Item1.ToString())).GetFiles()) { //Calling twice cuz the filename might have changed

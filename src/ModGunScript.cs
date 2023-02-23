@@ -34,17 +34,17 @@ namespace Receiver2ModdingKit {
 			get { return (LinearMover) ReflectionManager.GS_select_fire.GetValue(this); }
 			set { ReflectionManager.GS_select_fire.SetValue(this, value); }
 		}
-
-		//[Tooltip("Should the game generate a setting button in the help menu?")]
-		//public bool generate_settings_button;
+		protected float _yoke_open {
+			get { return (float) ReflectionManager.GS_yoke_open.GetValue(this); }
+			set { ReflectionManager.GS_yoke_open.SetValue(this, value); }
+		}
 
 		public bool visible_in_spawnmenu = true;
 		public bool spawns_in_dreaming = true;
 
 		[Tooltip("List of custom audio events used by the gun, created via RMB -> Create -> Receiver 2 Modding -> Custom Sounds List")]
 		public Editor.CustomSoundsList audio;
-
-
+		
 		public PlayerInput player_input {
 			get;
 			protected set;
@@ -134,14 +134,14 @@ namespace Receiver2ModdingKit {
 				this.spawn_info_sprite = Sprite.Create(Rect.zero, Vector2.zero, 1);
 			}
 
-			using (var debug_scope = new HarmonyManager.TransformDebugScope()) {
+			using (var debug_scope = new TransformDebugScope()) {
 				try {
 					base.Awake();
 				} catch (NullReferenceException e) {
 					Debug.LogError(String.Format("Catched exception during {0}'s Awake", this.InternalName));
 
-					if (!String.IsNullOrEmpty(HarmonyManager.TransformDebugScope.last_target)) {
-						Debug.LogError("You seem to be missing the " + HarmonyManager.TransformDebugScope.last_target + " transform.");
+					if (!String.IsNullOrEmpty(TransformDebugScope.last_target)) {
+						Debug.LogError("You seem to be missing the " + TransformDebugScope.last_target + " transform.");
 					}
 					else {
 						Debug.LogError("Carefully check if you've assigned all the fields properly and if there aren't any missing references");
@@ -178,14 +178,14 @@ namespace Receiver2ModdingKit {
 			}
 		}
 		new private void Update() {
-			using (var debug_scope = new HarmonyManager.TransformDebugScope()) { 
+			using (var debug_scope = new TransformDebugScope()) { 
 				try {
 					base.Update();
 				} catch (NullReferenceException e) {
 					Debug.LogError(String.Format("Catched exception during {0}'s Update", this.InternalName));
 
-					if (!String.IsNullOrEmpty(HarmonyManager.TransformDebugScope.last_target)) {
-						Debug.LogError("You seem to be missing the " + HarmonyManager.TransformDebugScope.last_target + " transform.");
+					if (!String.IsNullOrEmpty(TransformDebugScope.last_target)) {
+						Debug.LogError("You seem to be missing the " + TransformDebugScope.last_target + " transform.");
 					}
 					else {
 						Debug.LogError("Carefully check if you've assigned all the fields properly and if there aren't any missing references");
