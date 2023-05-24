@@ -21,6 +21,6 @@ A simplistic modding API and a modloader used to create gun mods for Receiver 2
     - Press the **Open** button on the Projects list, select *Add project from disk* and navigate to the unpacked project directory;
 
 ## Credits
-SzikakA#3853 - Code
-Ciarence#6364 - Early testing and feedback
+SzikakA#3853 - Code <br>
+Ciarence#6364 - Early testing and feedback <br>
 Wolfire Games - Game and the ability to make mods for it
