@@ -17,24 +17,23 @@ public class PopulateGunSprings : EditorTool {
 			text = "Populate Gun Update Springs",
 			tooltip = "Use this tool to populate gun's Update Springs list"
 		};
+
+		GunScript gun = (GunScript) target;
+		SerializedObject serializedObject = new SerializedObject(target);
+
+		serializedObject.FindProperty("update_springs").ClearArray();
+		
+		foreach(var spring in gun.GetComponentsInChildren<SpringCompressInstance>()) {
+			serializedObject.FindProperty("update_springs").InsertArrayElementAtIndex(0);
+
+			var serialized_spring = serializedObject.FindProperty("update_springs").GetArrayElementAtIndex(0);
+
+			serialized_spring.FindPropertyRelative("update_direction").boolValue = false;
+			serialized_spring.FindPropertyRelative("spring").objectReferenceValue = spring;
+		}
 	}
 
 	public override GUIContent toolbarIcon {
 		get { return guiContent; }
-	}
-
-	public override void OnToolGUI(EditorWindow window) {
-		GunScript gun = (GunScript) target;
-
-		var springs = gun.GetComponentsInChildren<SpringCompressInstance>();
-
-		gun.update_springs = (
-			from springInstance 
-			in springs 
-			select new UpdatedSpring {
-				update_direction = false,
-				spring = springInstance
-			}
-		).ToArray(); //SQL BITCH
 	}
 }

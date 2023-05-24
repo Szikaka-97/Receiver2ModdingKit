@@ -84,12 +84,25 @@ namespace Receiver2ModdingKit {
 			}
 		}
 
+		[HarmonyPatch(typeof(AudioManager), "Update")]
+		private static class AudioDebugMenuTranspiler {
+			private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase __originalMethod) {
+				CodeMatcher codeMatcher = new CodeMatcher(instructions, generator)
+				.MatchForward(false, 
+					new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(ImGui), "End"))
+				)
+				.InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(CustomSounds.ModAudioManager), "DrawImGUIDebug")));
+
+				return codeMatcher.InstructionEnumeration();
+			}
+		}
+
 		#endregion
 
 
 		[HarmonyPatch(typeof(MagazineScript), "UpdateRoundPositions")]
 		[HarmonyPostfix]
-		private static void PatchMagazineRoundPositions(ref MagazineScript __instance, Vector3 ___orig_follower_local_position) {
+		private static void PatchMagazineRoundPositions(ref MagazineScript __instance) {
 			if (__instance is not DoubleStackMagazine) return;
 
 			for (int i = 0; i < __instance.NumRounds(); i++) {
@@ -122,7 +135,7 @@ namespace Receiver2ModdingKit {
 				);
 			}
 		}
-		
+				
 		internal static class HarmonyInstances {
 			public static Harmony Core;
 			public static Harmony PopulateItems;
@@ -131,6 +144,7 @@ namespace Receiver2ModdingKit {
 			public static Harmony CustomSounds;
 			public static Harmony TransformDebug;
 			public static Harmony DevMenu;
+			public static Harmony FMODDebug;
 		}
 
 		internal static void UnpatchAll() {
@@ -187,6 +201,14 @@ namespace Receiver2ModdingKit {
 				Debug.LogError("An error accured when trying to create settings for the Modding Kit");
 			}
 
+			foreach (var asset_bundle in AssetBundle.GetAllLoadedAssetBundles()) {
+				BankList[] lists = asset_bundle.LoadAllAssets<BankList>();
+
+				if (lists != null) { 
+					CustomSounds.ModAudioManager.LoadBanksFromLists(lists);
+				}
+			}
+
 			foreach(var ev in ModdingKitCorePlugin.ExecuteOnStartup.GetInvocationList()) {
 				try {
 					ev.DynamicInvoke();
@@ -202,11 +224,12 @@ namespace Receiver2ModdingKit {
 			HarmonyInstances.PopulateItems = Harmony.CreateAndPatchAll(typeof(PopulateItemsTranspiler));
 			HarmonyInstances.GunScript = Harmony.CreateAndPatchAll(typeof(GunScriptTranspiler));
 			HarmonyInstances.ModHelpEntry = Harmony.CreateAndPatchAll(typeof(ModHelpEntryManager));
-			HarmonyInstances.CustomSounds = Harmony.CreateAndPatchAll(typeof(CustomSounds.ModAudioManager));
+			HarmonyInstances.CustomSounds = Harmony.CreateAndPatchAll(typeof(CustomSounds.ModAudioPatches));
 
 			#if DEBUG
 			HarmonyInstances.DevMenu = Harmony.CreateAndPatchAll(typeof(DevMenuTranspiler));
 			HarmonyInstances.TransformDebug = Harmony.CreateAndPatchAll(typeof(TransformDebugScope));
+			HarmonyInstances.FMODDebug = Harmony.CreateAndPatchAll(typeof(AudioDebugMenuTranspiler));
 			#endif
 
 			ModdingKitCorePlugin.instance.StartCoroutine(FixLegacySounds()); //Calling this method has to be delayed to wait for patches from all plugins to get applied

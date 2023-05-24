@@ -1,56 +1,86 @@
-using UnityEditor;
-using UnityEngine;
-using System.IO;
 using System;
+using System.IO;
+using UnityEngine;
+using UnityEditor;
 
 public class CreateAssetBundles {
-	static BuildTarget mainTarget = BuildTarget.StandaloneWindows; //Change this if you're on different OS
-	static string assetBundleDirectory = "Assets/AssetBundles";
+	static BuildTarget mainTarget = BuildTarget.StandaloneWindows;
+	static string asset_bundle_directory = "Assets/AssetBundles";
 
 	static Tuple<BuildTarget, OperatingSystemFamily>[] targets = new Tuple<BuildTarget, OperatingSystemFamily>[] {
-		new Tuple<BuildTarget, OperatingSystemFamily>(BuildTarget.StandaloneWindows, OperatingSystemFamily.Windows),
-		new Tuple<BuildTarget, OperatingSystemFamily>(BuildTarget.StandaloneLinux64, OperatingSystemFamily.Linux),
-		new Tuple<BuildTarget, OperatingSystemFamily>(BuildTarget.StandaloneOSX, OperatingSystemFamily.MacOSX)
+		new (BuildTarget.StandaloneWindows, OperatingSystemFamily.Windows),
+		new (BuildTarget.StandaloneLinux64, OperatingSystemFamily.Linux),
+		new (BuildTarget.StandaloneOSX, OperatingSystemFamily.MacOSX)
 	};
 
 	static void buildSystemAssetBundles(Tuple<BuildTarget, OperatingSystemFamily> target) {
-		BuildPipeline.BuildAssetBundles(Path.Combine(assetBundleDirectory, target.Item1.ToString()), 
+		var target_path = Path.Combine(asset_bundle_directory, target.Item2.ToString());
+
+		if (!Directory.Exists(target_path)) Directory.CreateDirectory(target_path);
+
+		var manifest = BuildPipeline.BuildAssetBundles(
+			target_path, 
 	        BuildAssetBundleOptions.UncompressedAssetBundle, 
 	        target.Item1
 	    );
+		
+		string extension = target.Item2.ToString().ToLower();
 
-		foreach (var file in new DirectoryInfo(Path.Combine(assetBundleDirectory, target.Item1.ToString())).GetFiles()) {
-			if (file.Extension.Contains(".meta") || file.Extension.Contains(".manifest")) continue;
+		bool notified = false;
 
-			string fileNameWithExtension = Path.ChangeExtension(file.FullName, target.Item2.ToString().ToLower());
+		foreach (var assetbundle_name in manifest.GetAllAssetBundles()) {
+			var ab_path = Path.Combine(target_path, assetbundle_name);
 
-			if (File.Exists(fileNameWithExtension) && file.Extension != "." + target.Item2.ToString().ToLower()) {
-				File.Delete(fileNameWithExtension);
-			}
+			if (File.Exists(ab_path)) {
 
-			File.Move(file.FullName, fileNameWithExtension);
-		}
+				if (File.Exists(Path.ChangeExtension(ab_path, extension))) File.Delete(Path.ChangeExtension(ab_path, extension));
 
-		foreach (var file in new DirectoryInfo(Path.Combine(assetBundleDirectory, target.Item1.ToString())).GetFiles()) { //Calling twice cuz the filename might have changed
-			if (file.Extension.Contains(".meta") || file.Extension.Contains(".manifest")) continue;
+				if (File.Exists(Path.ChangeExtension(ab_path, "meta"))) File.Delete(Path.ChangeExtension(ab_path, "meta"));
 
-			string fileNameWoutExtension = file.Name.Substring(0, file.Name.IndexOf("."));
+				File.Move(ab_path, ab_path = Path.ChangeExtension(ab_path, extension));
 
-			if (CustomAssetBundleDirectory.directoryList != null && CustomAssetBundleDirectory.directoryList.hasPath(fileNameWoutExtension)) {
-				try {
-					File.Copy(file.FullName, CustomAssetBundleDirectory.directoryList.getPath(fileNameWoutExtension) + "/" + file.Name, true);
-				} catch (Exception e) {
-					Debug.LogError(e.Message);
-					Debug.LogError("Failed to copy bundle " + file.Name);
+				CustomAssetBundleDirectory.Refresh();
+
+				if (CustomAssetBundleDirectory.directory_list != null && CustomAssetBundleDirectory.directory_list.hasPath(assetbundle_name)) {
+					var copy_path = CustomAssetBundleDirectory.directory_list.GetPath(assetbundle_name);
+
+					if (Directory.Exists(copy_path)) {
+						try {
+							File.Copy(ab_path, Path.ChangeExtension(Path.Combine(copy_path, assetbundle_name), extension), true);
+						} catch (Exception e) {
+							Debug.LogError("Failed to copy bundle " + assetbundle_name + " because of exception:");
+							Debug.LogException(e);
+						}
+					}
+					else {
+						Debug.LogError("Directory doesn't exist:\n" + copy_path);
+					}
 				}
-			};
+				else if (!notified) {
+					Debug.Log("No directory list is specified, will not copy bundle " + assetbundle_name);
+
+					notified = true;
+				}
+			}
 		}
 	}
 
 	[MenuItem("Assets/Build AssetBundles")]
 	static void BuildMainAssetBundles() {
-		if(!Directory.Exists(assetBundleDirectory)) {
-			Directory.CreateDirectory(assetBundleDirectory);
+		if(!Directory.Exists(asset_bundle_directory)) {
+			Directory.CreateDirectory(asset_bundle_directory);
+		}
+
+		switch (SystemInfo.operatingSystemFamily) {
+			case OperatingSystemFamily.Windows:
+				mainTarget = BuildTarget.StandaloneWindows;
+				break;
+			case OperatingSystemFamily.Linux:
+				mainTarget = BuildTarget.StandaloneLinux64;
+				break;
+			case OperatingSystemFamily.MacOSX:
+				mainTarget = BuildTarget.StandaloneOSX;
+				break;
 		}
 
 		buildSystemAssetBundles(new Tuple<BuildTarget, OperatingSystemFamily>(mainTarget, SystemInfo.operatingSystemFamily));
@@ -58,8 +88,20 @@ public class CreateAssetBundles {
 	
 	[MenuItem("Assets/Build All AssetBundles")]
 	static void BuildAllAssetBundles() {
-		if(!Directory.Exists(assetBundleDirectory)) {
-			Directory.CreateDirectory(assetBundleDirectory);
+		if(!Directory.Exists(asset_bundle_directory)) {
+			Directory.CreateDirectory(asset_bundle_directory);
+		}
+
+		switch (SystemInfo.operatingSystemFamily) {
+			case OperatingSystemFamily.Windows:
+				mainTarget = BuildTarget.StandaloneWindows;
+				break;
+			case OperatingSystemFamily.Linux:
+				mainTarget = BuildTarget.StandaloneLinux64;
+				break;
+			case OperatingSystemFamily.MacOSX:
+				mainTarget = BuildTarget.StandaloneOSX;
+				break;
 		}
 
 		foreach (var tuple in targets) {

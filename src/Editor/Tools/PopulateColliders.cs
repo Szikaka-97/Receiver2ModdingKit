@@ -16,19 +16,15 @@ public class PopulateColliders : EditorTool {
 			text = "Populate Colliders",
 			tooltip = "Use this tool to populate item's colliders list"
 		};
-	}
 
-	public override GUIContent toolbarIcon {
-		get { return guiContent; }
-	}
-
-	public override void OnToolGUI(EditorWindow window) {
 		InventoryItem item = (InventoryItem) target;
+		SerializedObject serializedObject = new SerializedObject(target);
 
-		item.colliders.Clear();
+		serializedObject.FindProperty("colliders").ClearArray();
 
 		foreach (Collider col in item.GetComponentsInChildren<Collider>()) {
-			item.colliders.Add(col);
+			serializedObject.FindProperty("colliders").InsertArrayElementAtIndex(0);
+			serializedObject.FindProperty("colliders").GetArrayElementAtIndex(0).objectReferenceValue = col;
 
 			if (!col.GetComponent<ItemColliderOwner>()) {
 				ItemColliderOwner ico = col.gameObject.AddComponent<ItemColliderOwner>();
@@ -37,5 +33,11 @@ public class PopulateColliders : EditorTool {
 
 			col.gameObject.layer = 8;
 		}
+
+		serializedObject.ApplyModifiedProperties();
+	}
+
+	public override GUIContent toolbarIcon {
+		get { return guiContent; }
 	}
 }

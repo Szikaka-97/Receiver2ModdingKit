@@ -1,65 +1,66 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
 
 public class CustomAssetBundleDirectory : EditorWindow {
 
 	[MenuItem("Modding/Custom AssetBundle directories")]
 	static void Init() {
-		EditorWindow.GetWindow(typeof(CustomAssetBundleDirectory)).Show();	
+		EditorWindow.GetWindow(typeof(CustomAssetBundleDirectory)).Show();
 	}
 
-	public static AssetBundleDirectoryList directoryList {
-		get {
-			if (m_directoryList == null) {
-				var lists = AssetDatabase.FindAssets("t:AssetBundleDirectoryList");
-				if (lists.Length == 0) {
-					Debug.LogError("No AssetBundle Lists found. Create a new AssetBundleDirectoryList from the context menu to enable automatic copying of assetbundles");
-				}
-				else {
-					m_directoryList = AssetDatabase.LoadAssetAtPath<AssetBundleDirectoryList>(AssetDatabase.GUIDToAssetPath(lists[0]));
-				}
-			}
-
-			return m_directoryList;
-		}
+	public static AssetBundleDirectoryList directory_list {
+		get;
+		private set;
 	}
 
-	private static AssetBundleDirectoryList m_directoryList;
-
-	private void Awake() {
+	private static bool TryFindDirectoryList() {
 		var lists = AssetDatabase.FindAssets("t:AssetBundleDirectoryList");
 		if (lists.Length == 0) {
-			Debug.LogError("No AssetBundle Lists found. Create a new AssetBundleDirectoryList from the context menu to enable automatic copying of assetbundles");
+			return false;
 		}
 		else {
-			m_directoryList = AssetDatabase.LoadAssetAtPath<AssetBundleDirectoryList>(AssetDatabase.GUIDToAssetPath(lists[0]));
+			directory_list = AssetDatabase.LoadAssetAtPath<AssetBundleDirectoryList>(AssetDatabase.GUIDToAssetPath(lists[0]));
+			return true;
 		}
+	}
+
+	public static void Refresh() {
+		TryFindDirectoryList();
+
+		if (directory_list) directory_list.Refresh();
+	}
+
+	void OnFocus() {
+		Refresh();
 	}
 
 	void OnGUI() {
-		if (directoryList == null) {
+		if (directory_list == null) {
 			EditorGUILayout.LabelField("No AssetBundle Directory List present in the editor");
 
 			return;
 		}
 
-		var scriptableObject = new SerializedObject(directoryList);
+		var dir_list = new SerializedObject(directory_list);
 
-		if (scriptableObject.FindProperty("directoryTuples").arraySize == 0) {
-			EditorGUILayout.LabelField("No AssetBundles set in the editor");
+		dir_list.Update();
+
+		var tuple_list = dir_list.FindProperty("directory_tuples");
+
+		if (tuple_list.arraySize == 0) {
+			EditorGUILayout.LabelField("No AssetBundles present in the editor");
 
 			return;
 		}
 
-		IEnumerator enumerator = scriptableObject.FindProperty("directoryTuples").GetEnumerator();
-		while (enumerator.MoveNext()) {
-			var tuple = enumerator.Current as SerializedProperty;
+		//EditorGUILayout.LabelField()
 
-			EditorGUILayout.LabelField("Bundle: " + tuple.FindPropertyRelative("assetBundleName").stringValue);
-			EditorGUILayout.PropertyField(tuple.FindPropertyRelative("path"), new GUIContent());
+		foreach (SerializedProperty tuple in tuple_list) { 
+			EditorGUILayout.LabelField(new GUIContent("Bundle:"), new GUIContent(tuple.FindPropertyRelative("asset_bundle_name").stringValue));
+			EditorGUILayout.PropertyField(tuple.FindPropertyRelative("path"), new GUIContent("Path:"));
+			EditorGUILayout.Separator();
 		}
 
-		scriptableObject.ApplyModifiedProperties();
+		dir_list.ApplyModifiedProperties();
 	}
 }

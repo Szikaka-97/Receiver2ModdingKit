@@ -158,7 +158,6 @@ namespace Receiver2ModdingKit.Editor {
 		}
 
 		internal void BindField(FieldInfo field) {
-
 			int index = custom_event_names.IndexOf(field.Name);
 
 			if (index >= 0) {

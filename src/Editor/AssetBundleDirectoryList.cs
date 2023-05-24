@@ -7,33 +7,33 @@ using UnityEditor;
 public class AssetBundleDirectoryList : ScriptableObject {
     [System.Serializable]
     public class AssetBundleDirectoryTuple {
-        public string assetBundleName;
+        public string asset_bundle_name;
         public string path;
     }
 
-    [HideInInspector]
+    //[HideInInspector]
     [SerializeField]
-    public List<AssetBundleDirectoryTuple> directoryTuples = new List<AssetBundleDirectoryTuple>();
+    public List<AssetBundleDirectoryTuple> directory_tuples = new List<AssetBundleDirectoryTuple>();
 
-    public void OnEnable() {
-        var tempTuples = new List<AssetBundleDirectoryTuple>(directoryTuples);
-
-        foreach (var tuple in tempTuples) {
-            if (!AssetDatabase.GetAllAssetBundleNames().Contains(tuple.assetBundleName)) directoryTuples.Remove(tuple);
-        }
+	public void Refresh() {
+		directory_tuples.RemoveAll(tuple => !AssetDatabase.GetAllAssetBundleNames().Contains(tuple.asset_bundle_name));
 
         foreach (var name in AssetDatabase.GetAllAssetBundleNames()) {
-            if (!directoryTuples.Any(tuple => { return tuple.assetBundleName == name; })) directoryTuples.Add(new AssetBundleDirectoryTuple() { assetBundleName = name });
+            if (!directory_tuples.Any(tuple => { return tuple.asset_bundle_name == name; })) directory_tuples.Add(new AssetBundleDirectoryTuple() { asset_bundle_name = name });
         }
+	}
+
+    public void OnEnable() {
+		Refresh();
     }
 
-    public string getPath(string assetBundleName) {
-        return directoryTuples.First(tuple => { return tuple.assetBundleName == assetBundleName; }).path;
+    public string GetPath(string assetbundle_name) {
+        return directory_tuples.First(tuple => { return tuple.asset_bundle_name == assetbundle_name; }).path;
     }
 
-    public bool hasPath(string assetBundleName) {
-        bool flag = directoryTuples.Any(tuple => { return tuple.assetBundleName == assetBundleName; });
+    public bool hasPath(string assetbundle_name) {
+        bool flag = directory_tuples.Any(tuple => { return tuple.asset_bundle_name == assetbundle_name; });
         if (!flag) return false;
-        else return getPath(assetBundleName) != "";
+        else return GetPath(assetbundle_name) != "";
     }
 }

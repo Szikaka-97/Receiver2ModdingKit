@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="MixerGroup" id="{57c6779d-cf13-4e6c-931d-f61a2e1d509e}">
+		<property name="name">
+			<value>Loud</value>
+		</property>
+		<relationship name="effectChain">
+			<destination>{7754afea-6fd3-4fab-b0d3-0f6be8a943dc}</destination>
+		</relationship>
+		<relationship name="panner">
+			<destination>{d89adff1-8385-4361-a22e-fd41daeb9734}</destination>
+		</relationship>
+		<relationship name="output">
+			<destination>{1e1743df-d877-45a9-a3d1-60691f5dbc9b}</destination>
+		</relationship>
+	</object>
+	<object class="MixerBusEffectChain" id="{7754afea-6fd3-4fab-b0d3-0f6be8a943dc}">
+		<relationship name="effects">
+			<destination>{2b5248b6-08cb-4ddc-824c-eb05f6cbc8c3}</destination>
+		</relationship>
+	</object>
+	<object class="MixerBusPanner" id="{d89adff1-8385-4361-a22e-fd41daeb9734}" />
+	<object class="MixerBusFader" id="{2b5248b6-08cb-4ddc-824c-eb05f6cbc8c3}" />
+</objects>

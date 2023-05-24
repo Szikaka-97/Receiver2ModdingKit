@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="MixerGroup" id="{53ccfd6d-f4d5-470d-821b-5fb0a42a3fda}">
+		<property name="name">
+			<value>balloon</value>
+		</property>
+		<relationship name="effectChain">
+			<destination>{8821b51c-e451-40d5-9636-dbaeb2c748a2}</destination>
+		</relationship>
+		<relationship name="panner">
+			<destination>{ae5089dc-86a5-4b79-80e9-698058592efb}</destination>
+		</relationship>
+		<relationship name="output">
+			<destination>{57c6779d-cf13-4e6c-931d-f61a2e1d509e}</destination>
+		</relationship>
+	</object>
+	<object class="MixerBusEffectChain" id="{8821b51c-e451-40d5-9636-dbaeb2c748a2}">
+		<relationship name="effects">
+			<destination>{f840d979-4241-4c08-92c3-4929fa43cf2a}</destination>
+		</relationship>
+	</object>
+	<object class="MixerBusPanner" id="{ae5089dc-86a5-4b79-80e9-698058592efb}" />
+	<object class="MixerBusFader" id="{f840d979-4241-4c08-92c3-4929fa43cf2a}" />
+</objects>

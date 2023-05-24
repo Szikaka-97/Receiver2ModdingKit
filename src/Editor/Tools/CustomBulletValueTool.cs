@@ -12,8 +12,6 @@ public class CustomBulletValueTool : EditorTool {
 
 	GUIContent guiContent;
 
-	int cartridgeType = -1;
-
 	void OnEnable() {
 		guiContent = new GUIContent()
 		{
@@ -28,9 +26,8 @@ public class CustomBulletValueTool : EditorTool {
 	}
 
 	public override void OnToolGUI(EditorWindow window) {
-		EditorGUI.BeginChangeCheck();
-
 		ShellCasingScript round = (ShellCasingScript) target;
+		var serializedObject = new SerializedObject(target);
 
 		var background_style = new GUIStyle();
 		background_style.normal = new GUIStyleState() { 
@@ -47,24 +44,19 @@ public class CustomBulletValueTool : EditorTool {
 
 		Handles.BeginGUI();
 
-		GUILayout.BeginArea(new Rect(10, 10, 150, 62), background_style);
+		GUILayout.BeginArea(new Rect(10, 10, 150, 42), background_style);
 		GUILayout.Label("Cartridge Type", background_style);
 
-		int cartridgeType_prev = cartridgeType;
-		string cartridgeType_temp = GUILayout.TextField(cartridgeType.ToString());
-		if (!Int32.TryParse(cartridgeType_temp, out cartridgeType) || cartridgeType < 0) cartridgeType = cartridgeType_prev;
-		if (cartridgeType == -1) cartridgeType = (int) round.cartridge_type;
+		var cartridge_type = serializedObject.FindProperty("cartridge_type");
+		int prev_cartridge_type = cartridge_type.intValue;
+		int new_cartridge_type = EditorGUILayout.DelayedIntField(cartridge_type.intValue);
 
-		if (GUILayout.Button("Apply")) {
-			round.cartridge_type = (CartridgeSpec.Preset) cartridgeType;
-		};
+		if (new_cartridge_type >= 0) cartridge_type.intValue = new_cartridge_type;
+
 		GUILayout.EndArea();
-
 
 		Handles.EndGUI();
 
-		if (EditorGUI.EndChangeCheck()) {
-
-		}
+		serializedObject.ApplyModifiedProperties();
 	}
 }

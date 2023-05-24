@@ -26,13 +26,13 @@ namespace Receiver2ModdingKit.CustomSounds {
 		/// </summary>
 		/// <param name="asset"> SoundAsset containing information about InstanceAsset </param>
 		public InstanceAsset(SoundAsset asset) {
-			this.instance = RuntimeManager.CreateInstance(ModAudioManager.TAPE_EVENT);
+			this.instance = RuntimeManager.CreateInstance(asset.type.getEventPath());
 
 			IntPtr userData = GCHandle.ToIntPtr(GCHandle.Alloc(new ModAudioManager.CustomEventInstanceUserData { sound_handle = asset.sound.handle }, GCHandleType.Pinned));
 
 			this.instance.setUserData(userData);
 
-			this.instance.setCallback(ModAudioManager.TAPE_CALLBACK, EVENT_CALLBACK_TYPE.ALL);
+			this.instance.setCallback(ModAudioManager.CUSTOM_SOUNDS_CALLBACK, EVENT_CALLBACK_TYPE.CREATE_PROGRAMMER_SOUND | EVENT_CALLBACK_TYPE.DESTROY_PROGRAMMER_SOUND);
 
 			this.length = asset.length;
 		}

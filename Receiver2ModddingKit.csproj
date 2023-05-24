@@ -4,7 +4,7 @@
     <TargetFramework>net46</TargetFramework>
     <AssemblyName>Receiver2ModdingKit</AssemblyName>
     <Description>Modding Kit Plugin for Receiver 2 Gun Mods</Description>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
     <RootNamespace>Receiver2ModdingKit</RootNamespace>
@@ -22,13 +22,11 @@
   <ItemGroup>
     <Compile Remove="src\Editor\Tools\**" />
   </ItemGroup>
-    
-  <ItemGroup>
-    <None Remove="resources\cog.png" />
-  </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="resources\cog.png" />
+	<EmbeddedResource Include="resources\MainModBank.bank" />
+	<EmbeddedResource Include="resources\MainModBank.strings.bank" />
   </ItemGroup>
 
   <ItemGroup>

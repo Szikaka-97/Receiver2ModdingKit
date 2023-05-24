@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="AudioFile" id="{372e192f-1b06-4f81-bbdc-9e92d039f96a}">
+		<property name="assetPath">
+			<value>Scarlet Fire - Otis McDonald.mp3</value>
+		</property>
+		<property name="isStreaming">
+			<value>true</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>142.94204081632654</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{9e12a249-a368-4cea-a70a-1729a2666683}</destination>
+		</relationship>
+	</object>
+</objects>

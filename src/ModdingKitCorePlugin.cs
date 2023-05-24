@@ -8,7 +8,7 @@ using Receiver2ModdingKit.ModInstaller;
 using System.IO;
 
 namespace Receiver2ModdingKit {
-	[BepInPlugin("pl.szikaka.receiver_2_modding_kit", "Receiver 2 Modding Kit", "1.0.1")]
+	[BepInPlugin("pl.szikaka.receiver_2_modding_kit", "Receiver 2 Modding Kit", "1.1.0")]
 	[BepInProcess("Receiver2")]
 	public class ModdingKitCorePlugin : BaseUnityPlugin {
 		public static ModdingKitCorePlugin instance {
@@ -88,11 +88,17 @@ namespace Receiver2ModdingKit {
 
 			mod_help = gameObject.AddComponent<ModHelpEntryManager>();
 
+			CustomSounds.ModAudioManager.Initialize();
+
 			if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "GlobalBaseConfiguration"))) Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "GlobalBaseConfiguration"));
 			if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "PlayerLoadouts"))) Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "PlayerLoadouts"));
 			if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "RankingProgressionCampaigns"))) Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "RankingProgressionCampaigns"));
 			if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "WorldGenerationConfigurations"))) Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "WorldGenerationConfigurations"));
 			if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "Guns"))) Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "Guns"));
+		}
+
+		private void Update() {
+			CustomSounds.ModAudioManager.Update();
 		}
 
 		private void OnDestroy() {
@@ -103,6 +109,8 @@ namespace Receiver2ModdingKit {
 			if (Directory.Exists(ScriptEngine.ScriptDirectory)) Directory.Delete(ScriptEngine.ScriptDirectory, true);
 
 			if (ModLoader.mod_installer != null) DestroyImmediate(ModLoader.mod_installer);
+
+			CustomSounds.ModAudioManager.Release();
 		}
 	}
 }

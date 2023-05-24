@@ -1,9 +1,7 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using Receiver2ModdingKit.Editor;
-using System.Collections.Generic;
-using ImGuiNET;
-using System.Linq;
 
 [CustomEditor(typeof(CustomSoundsList))]
 public class CustomSoundsListEditor : Editor {
