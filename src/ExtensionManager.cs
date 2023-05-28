@@ -3,7 +3,7 @@ using UnityEngine;
 using Receiver2;
 
 namespace Receiver2ModdingKit {
-	static class Extensions {
+	public static class Extensions {
 		/// <summary>
 		/// Fetch a round with of a specified type from player's inventory
 		/// </summary>
@@ -93,6 +93,6 @@ namespace Receiver2ModdingKit {
 			}
 
 			return ((Spring) ReflectionManager.LAH_pose_springs[spring].GetValue(lah)).state;
-		}
-	}
+        }
+    }
 }

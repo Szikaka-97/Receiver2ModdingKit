@@ -523,13 +523,23 @@ namespace Receiver2ModdingKit.CustomSounds {
 			instance.release();
 		}
 
-		/// <summary>
-		/// Play the specified event attached to the specified GameObject and then release it
-		/// </summary>
-		/// <param name="sound_event"> Event to play, custom events start with "custom:/" </param>
-		/// <param name="obj"> Game object the sound should be attached to </param>
-		/// <param name="volume"> Volume to play the event at </param>
-		public static void PlayOneShotAttached(string sound_event, GameObject obj, float volume) {
+        /// <summary>
+        /// Play the specified event attached to the specified Transform's GameObject and then release it
+        /// </summary>
+        /// <param name="sound_event"> Event to play, custom events start with "custom:/" </param>
+        /// <param name="transform"> Transform whose Game object the sound should be attached to </param>
+        public static void PlayOneShotAttached(string sound_event, Transform transform)
+        {
+            PlayOneShotAttached(sound_event, transform.gameObject);
+        }
+
+        /// <summary>
+        /// Play the specified event attached to the specified GameObject and then release it
+        /// </summary>
+        /// <param name="sound_event"> Event to play, custom events start with "custom:/" </param>
+        /// <param name="obj"> Game object the sound should be attached to </param>
+        /// <param name="volume"> Volume to play the event at </param>
+        public static void PlayOneShotAttached(string sound_event, GameObject obj, float volume) {
 			if (sound_event == "") {
 				Debug.LogWarning("ModAudioManager.PlayOneShotAttached(string, GameObject, float): Tried to pass an empty string as event name");
 				return;
@@ -562,6 +572,17 @@ namespace Receiver2ModdingKit.CustomSounds {
 			instance.setPaused(false);
 			instance.start();
 			instance.release();
-		}
-	}
+        }       
+
+		/// <summary>
+        /// Play the specified event attached to the specified Transform's GameObject and then release it
+        /// </summary>
+        /// <param name="sound_event"> Event to play, custom events start with "custom:/" </param>
+        /// <param name="transform"> Transform whose Game object the sound should be attached to </param>
+        /// <param name="volume"> Volume to play the event at </param>
+        public static void PlayOneShotAttached(string sound_event, Transform transform, float volume)
+        {
+            PlayOneShotAttached(sound_event, transform.gameObject, volume);
+        }
+    }
 }
