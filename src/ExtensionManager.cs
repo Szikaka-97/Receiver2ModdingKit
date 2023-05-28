@@ -93,6 +93,20 @@ namespace Receiver2ModdingKit {
 			}
 
 			return ((Spring) ReflectionManager.LAH_pose_springs[spring].GetValue(lah)).state;
-		}
-	}
+        }
+		
+		/// <summary>
+        /// Move towards the specified target value, at the speed set by the user.
+        /// </summary>
+        /// <param name="current"> Current value of the float </param>
+        /// <param name="target"> Target value that the float will gradually move towards </param>
+        /// <param name="maxDelta"> Speed at which the float will move towards its target </param>
+        /// <returns>
+        /// Value at which the float currently is
+        /// </returns>
+        public static float MoveTowards(this float current, float target, float maxDelta)
+        {
+            return Mathf.MoveTowards(current, target, maxDelta);
+        }
+    }
 }
