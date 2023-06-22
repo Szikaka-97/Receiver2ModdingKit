@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using UnityEngine;
 using Receiver2;
+using System.IO;
 
 namespace Receiver2ModdingKit {
 	public static class Extensions {
@@ -94,5 +95,25 @@ namespace Receiver2ModdingKit {
 
 			return ((Spring) ReflectionManager.LAH_pose_springs[spring].GetValue(lah)).state;
         }
+
+		/// <summary>
+		/// Helper method designed to use for the Thunderstore mod loading system
+		/// </summary>
+		/// <param name="dir"> The base directory </param>
+		/// <param name="child_directory_name"> Name of the child directory </param>
+		/// <param name="child_directory"> The child directory info, if it's not present child_directory.Exists will return false </param>
+		/// <returns> True if a child directory is present, false otherwise </returns>
+		public static bool TryGetChild(this DirectoryInfo dir, string child_directory_name, out DirectoryInfo child_directory) {
+			string path = Path.Combine(dir.FullName, child_directory_name);
+
+			child_directory = new DirectoryInfo(path);
+
+			return Directory.Exists(path);
+		}
+
+		public static void MoveTo(this FileInfo source_file, string destination_file, bool overwrite) {
+			if (overwrite && File.Exists(destination_file)) File.Delete(destination_file);
+			source_file.MoveTo(destination_file);
+		}
     }
 }

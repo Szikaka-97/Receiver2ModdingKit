@@ -6,6 +6,7 @@ using Receiver2;
 using TMPro;
 using Receiver2ModdingKit.ModInstaller;
 using System.IO;
+using System.Threading;
 
 namespace Receiver2ModdingKit {
 	[BepInPlugin("pl.szikaka.receiver_2_modding_kit", "Receiver 2 Modding Kit", "1.1.0")]
@@ -73,6 +74,29 @@ namespace Receiver2ModdingKit {
 		private void Awake() {
 			instance = this;
 
+			#if THUNDERSTORE
+
+			try {
+				if (Thunderstore.Thunderstore.LaunchedWithR2ModMan) {
+					Debug.Log("Launched Receiver 2 Modding Kit with r2modman");
+
+					Thunderstore.Thunderstore.InstallMods();
+				}
+			} catch (Exception e) {
+				Debug.LogError("Error while loading mods");
+				Debug.LogException(e);
+			} finally {
+				if (!Thunderstore.Thunderstore.LaunchedWithR2ModMan) {
+					Debug.Log("Launched Receiver 2 Modding Kit standalone");	
+				}
+			}
+
+			#else
+
+			Debug.Log("Launched Receiver 2 Modding Kit");
+
+			#endif
+
 			try {
 				HarmonyManager.Initialize();
 				ReflectionManager.Initialize();
@@ -95,6 +119,8 @@ namespace Receiver2ModdingKit {
 			if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "RankingProgressionCampaigns"))) Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "RankingProgressionCampaigns"));
 			if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "WorldGenerationConfigurations"))) Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "WorldGenerationConfigurations"));
 			if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "Guns"))) Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "Guns"));
+			if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "Tiles"))) Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "Tiles"));
+			if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "Tapes"))) Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "Tapes"));
 		}
 
 		private void Update() {
@@ -111,6 +137,12 @@ namespace Receiver2ModdingKit {
 			if (ModLoader.mod_installer != null) DestroyImmediate(ModLoader.mod_installer);
 
 			CustomSounds.ModAudioManager.Release();
+
+			#if THUNDERSTORE
+
+			Thunderstore.Thunderstore.CleanupMods();
+
+			#endif
 		}
 	}
 }

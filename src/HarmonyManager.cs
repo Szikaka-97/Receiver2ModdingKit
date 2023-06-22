@@ -1,18 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Collections.Generic;
 using System.Reflection.Emit;
+using System.Reflection;
+using System.Linq;
+using System;
 using UnityEngine;
 using HarmonyLib;
+using ImGuiNET;
 using Receiver2;
-using System.Linq;
 using Receiver2ModdingKit.ModInstaller;
 using Receiver2ModdingKit.Editor;
-using ImGuiNET;
-using Wolfire;
+using System.IO;
 
 namespace Receiver2ModdingKit {
     public static class HarmonyManager {
+		internal static class HarmonyInstances {
+			public static Harmony Core;
+			public static Harmony PopulateItems;
+			public static Harmony GunScript;
+			public static Harmony ModHelpEntry;
+			public static Harmony CustomSounds;
+			public static Harmony TransformDebug;
+			public static Harmony DevMenu;
+			public static Harmony FMODDebug;
+			public static Harmony Thunderstore;
+		}
 
 		#region Transpilers
 
@@ -97,8 +108,66 @@ namespace Receiver2ModdingKit {
 			}
 		}
 
+		#if THUNDERSTORE
+		private static class R2ModManTranspilers {
+			[HarmonyPatch(typeof(Locale), nameof(Locale.GetTapeSubtitle), new Type[] { typeof(string), typeof(LocaleID)})]
+			[HarmonyPostfix]
+			public static void PatchLocaleSubtitles(string tape_id, LocaleID locale_id, ref TapeSubtitles __result) {
+				ModTapeManager.TryReplaceSubtitles(tape_id, ref __result);
+			}
+
+			[HarmonyPatch(typeof(ReceiverCoreScript), "Awake")]
+			public static class R2MMCoreTranspiler {
+				private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator) {
+					CodeMatcher codeMatcher = new CodeMatcher(instructions, generator)
+					.MatchForward(false, 
+						new CodeMatch(OpCodes.Ldarg_0),
+						new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(ReceiverCoreScript), "LoadPersistentData"))
+					)
+					.Insert(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Thunderstore.Thunderstore), "InstallGuns")));
+
+					return codeMatcher.InstructionEnumeration();
+				}
+			}
+
+			[HarmonyPatch(typeof(TapeManager), "OnEnable")]
+			public static class R2MMTapesTranspiler {
+				private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator) {
+					CodeMatcher codeMatcher = new CodeMatcher(instructions, generator)
+					.MatchForward(true, 
+						new CodeMatch(OpCodes.Ldarg_0),
+						new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(TapeManager), "tape_prefabs_all")),
+						new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(List<GameObject>), "get_Count"))
+					)
+					.InsertAndAdvance(new CodeInstruction(OpCodes.Ldarg_0, null))
+					.Insert(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Thunderstore.Thunderstore), "InstallTapes")));
+
+					return codeMatcher.InstructionEnumeration();
+				}
+			}
+
+			[HarmonyPatch(typeof(ModulePrefabsList), "OnEnable")]
+			public static class R2MMTilesTranspiler {
+				private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator) {
+					CodeMatcher codeMatcher = new CodeMatcher(instructions, generator)
+					.MatchForward(false, 
+						new CodeMatch(OpCodes.Ldloc_1),
+						new CodeMatch(OpCodes.Ldlen),
+						new CodeMatch(OpCodes.Conv_I4),
+						new CodeMatch(OpCodes.Blt_S)
+					)
+					.InsertAndAdvance(new CodeInstruction(OpCodes.Ldarg_0, null))
+					.Insert(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Thunderstore.Thunderstore), "InstallTiles")));
+
+					return codeMatcher.InstructionEnumeration();
+				}
+			}
+		}
+		#endif
+
 		#endregion
 
+		#region General Patches
 
 		[HarmonyPatch(typeof(MagazineScript), "UpdateRoundPositions")]
 		[HarmonyPostfix]
@@ -135,35 +204,32 @@ namespace Receiver2ModdingKit {
 				);
 			}
 		}
-				
-		internal static class HarmonyInstances {
-			public static Harmony Core;
-			public static Harmony PopulateItems;
-			public static Harmony GunScript;
-			public static Harmony ModHelpEntry;
-			public static Harmony CustomSounds;
-			public static Harmony TransformDebug;
-			public static Harmony DevMenu;
-			public static Harmony FMODDebug;
-		}
 
-		internal static void UnpatchAll() {
-			foreach(var field in typeof(HarmonyInstances).GetFields()) {
-				Harmony patch = (Harmony) field.GetValue(null);
-				if (field != null) patch.UnpatchSelf();
+		[HarmonyPatch(typeof(TapesMenuScript), "OnLoad")]
+        [HarmonyPrefix]
+		private static void PatchTapeMenuLoad() {
+			if (ReceiverCoreScript.Instance().game_mode.GetGameMode() == GameMode.ReceiverMall) {
+				ModTapeManager.PrepareTapesForCompound();
+			}
+			else {
+				ModTapeManager.PrepareTapesForGame();
 			}
 		}
 
-		private static System.Collections.IEnumerator FixLegacySounds() {
-			yield return null; //1 frame of delay
+		[HarmonyPatch(typeof(TapesMenuScript), "CreateMenuEntries")]
+        [HarmonyPrefix]
+        private static void PrePatchTapeCreateMenuEntries(TapesMenuScript __instance) {
+			ModTapeManager.Init();
 
-			foreach (var method in HarmonyInstances.CustomSounds.GetPatchedMethods()) {
-				Patches patch = Harmony.GetPatchInfo(method); //You look reasonably sane bruv
+			GameObject entry_prefab = UnityEngine.Object.Instantiate(GameObject.Find("ReceiverCore/Menus/Overlay Menu Canvas/Aspect Ratio Fitter/New Pause Menu/Backdrop1/Sub-Menu Layout Group/New Tape Menu/Entries Layout/ScrollableContent Variant/Viewport/Content/Standard/Invalid"));
 
-				if(patch.Owners.Count == 1) yield break; //All is well, no need to do anything
+			__instance.ecsPrefab = entry_prefab;
+        }
 
-				HarmonyInstances.CustomSounds.Unpatch(method, HarmonyPatchType.Prefix, patch.Owners.First(ownerID => ownerID != HarmonyInstances.CustomSounds.Id));
-			}
+		[HarmonyPatch(typeof(TapesMenuScript), "CreateMenuEntries")]
+        [HarmonyPostfix]
+		private static void PostPatchTapeCreateMenuEntries(TapesMenuScript __instance) {
+			ModTapeManager.CreateModTapes(__instance);
 		}
 
 		[HarmonyPatch(typeof(CartridgeSpec), "SetFromPreset")]
@@ -198,6 +264,12 @@ namespace Receiver2ModdingKit {
 			//doing this prevents stocks for some guns from clipping into the camera.
 			ReceiverCoreScript.Instance().player_prefab.GetComponent<PlayerScript>().main_camera_prefab.GetComponent<Camera>().nearClipPlane = 0.02f;
 
+			foreach (var subtitle_file in Directory.GetFiles(Path.Combine(Application.persistentDataPath, "Tapes"), "*.srt", SearchOption.AllDirectories)) {
+				FileInfo subtitle_file_info = new FileInfo(subtitle_file);
+
+				ModTapeManager.RegisterSubtitles(subtitle_file_info.Name.Replace(".srt", ""), subtitle_file_info);
+			}
+
 			try {
 				ModdingKitConfig.Initialize();
 			} catch {
@@ -212,6 +284,15 @@ namespace Receiver2ModdingKit {
 				}
 			}
 
+			foreach (var tape in ReceiverCoreScript.Instance().tape_loadout_asset.GetModTapes()) {
+				LocaleTapeMenuEntry entry = new LocaleTapeMenuEntry();
+				entry.name = "Invalid"; //the name is always "Invalid", for all entries. At least those that I checked.
+				entry.id_string = tape.tape_id_string;
+				entry.title = tape.title;
+				entry.description = tape.text;
+				Locale.active_locale_tape_menu_entries_string.Add(tape.tape_id_string, entry);
+			}
+
 			foreach(var ev in ModdingKitCorePlugin.ExecuteOnStartup.GetInvocationList()) {
 				try {
 					ev.DynamicInvoke();
@@ -221,6 +302,29 @@ namespace Receiver2ModdingKit {
 				}
 			}
 		}
+
+		#endregion
+
+		internal static void UnpatchAll() {
+			foreach(var field in typeof(HarmonyInstances).GetFields()) {
+				Harmony patch = (Harmony) field.GetValue(null);
+				if (patch != null) patch.UnpatchSelf();
+			}
+		}
+
+		private static System.Collections.IEnumerator FixLegacySounds() {
+			yield return null; //1 frame of delay
+
+			foreach (var method in HarmonyInstances.CustomSounds.GetPatchedMethods()) {
+				Patches patch = Harmony.GetPatchInfo(method); //You look reasonably sane bruv
+
+				if(patch.Owners.Count == 1) yield break; //All is well, no need to do anything
+
+				HarmonyInstances.CustomSounds.Unpatch(method, HarmonyPatchType.Prefix, patch.Owners.First(ownerID => ownerID != HarmonyInstances.CustomSounds.Id));
+			}
+		}
+
+		
 
 		internal static void Initialize() {
 			HarmonyInstances.Core = Harmony.CreateAndPatchAll(typeof(HarmonyManager));
@@ -233,6 +337,16 @@ namespace Receiver2ModdingKit {
 			HarmonyInstances.DevMenu = Harmony.CreateAndPatchAll(typeof(DevMenuTranspiler));
 			HarmonyInstances.TransformDebug = Harmony.CreateAndPatchAll(typeof(TransformDebugScope));
 			HarmonyInstances.FMODDebug = Harmony.CreateAndPatchAll(typeof(AudioDebugMenuTranspiler));
+			#endif
+
+			#if THUNDERSTORE
+			if (Thunderstore.Thunderstore.LaunchedWithR2ModMan) {
+				HarmonyInstances.Thunderstore = Harmony.CreateAndPatchAll(typeof(R2ModManTranspilers));
+
+				foreach (var clazz in typeof(R2ModManTranspilers).GetNestedTypes()) {
+					HarmonyInstances.Thunderstore.PatchAll(clazz);
+				}
+			}
 			#endif
 
 			ModdingKitCorePlugin.instance.StartCoroutine(FixLegacySounds()); //Calling this method has to be delayed to wait for patches from all plugins to get applied

@@ -1,68 +1,82 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net46</TargetFramework>
-    <AssemblyName>Receiver2ModdingKit</AssemblyName>
-    <Description>Modding Kit Plugin for Receiver 2 Gun Mods</Description>
-    <Version>1.1.0</Version>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <LangVersion>latest</LangVersion>
-    <RootNamespace>Receiver2ModdingKit</RootNamespace>
-    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net46</TargetFramework>
+		<AssemblyName>Receiver2ModdingKit</AssemblyName>
+		<Description>Modding Kit Plugin for Receiver 2 Gun Mods</Description>
+		<Version>1.2.0</Version>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<LangVersion>latest</LangVersion>
+		<RootNamespace>Receiver2ModdingKit</RootNamespace>
+		<RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+		<Configurations>Standalone;Thunderstore</Configurations>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DebugType>portable</DebugType>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DebugType>portable</DebugType>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="src\Editor\Tools\**" />
-  </ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Thunderstore|AnyCPU'">
+		<DefineConstants>THUNDERSTORE</DefineConstants>
+	</PropertyGroup>
+	
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DefineConstants>THUNDERSTORE; DEBUG</DefineConstants>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="resources\cog.png" />
-	<EmbeddedResource Include="resources\MainModBank.bank" />
-	<EmbeddedResource Include="resources\MainModBank.strings.bank" />
-  </ItemGroup>
+	<ItemGroup Condition="$(Configuration)=='Standalone'">
+		<Compile Remove="src\Thunderstore\**" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="BepInEx.Core" Version="5.*" />
-    <PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
-    <PackageReference Include="UnityEngine.Modules" Version="2019.4.29" IncludeAssets="compile" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="src\Editor\Tools\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="resources\cog.png" />
+		<EmbeddedResource Include="resources\tape.png" />
+		<EmbeddedResource Include="resources\MainModBank.bank" />
+		<EmbeddedResource Include="resources\MainModBank.strings.bank" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="BepInEx.Core" Version="5.*" />
+		<PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
+		<PackageReference Include="UnityEngine.Modules" Version="2019.4.29" IncludeAssets="compile" />
+	 </ItemGroup>
   
-  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
-  </ItemGroup>
+	 <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
+		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
+	 </ItemGroup>
   
-  <ItemGroup>
-    <Reference Include="FMODDef">
-      <HintPath>lib\FMODDef.dll</HintPath>
-    </Reference>
-    <Reference Include="ImGui">
-      <HintPath>lib\ImGui.dll</HintPath>
-    </Reference>
-    <Reference Include="R2CustomSounds">
-      <HintPath>lib\R2CustomSounds.dll</HintPath>
-    </Reference>
-    <Reference Include="SimpleJSON">
-      <HintPath>lib\SimpleJSON.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.TextMeshPro">
-      <HintPath>lib\Unity.TextMeshPro.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>lib\UnityEngine.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="Wolfire.Receiver2">
-      <HintPath>lib\Wolfire.Receiver2.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEditor">
-      <HintPath>lib\UnityEditor.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+	 <ItemGroup>
+		<Reference Include="FMODDef">
+			<HintPath>lib\FMODDef.dll</HintPath>
+		</Reference>
+		<Reference Include="ImGui">
+			<HintPath>lib\ImGui.dll</HintPath>
+		</Reference>
+		<Reference Include="R2CustomSounds">
+			<HintPath>lib\R2CustomSounds.dll</HintPath>
+		</Reference>
+		<Reference Include="SimpleJSON">
+			<HintPath>lib\SimpleJSON.dll</HintPath>
+		</Reference>
+		<Reference Include="Unity.TextMeshPro">
+			<HintPath>lib\Unity.TextMeshPro.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.UI">
+			<HintPath>lib\UnityEngine.UI.dll</HintPath>
+		</Reference>
+		<Reference Include="Wolfire.Receiver2">
+			<HintPath>lib\Wolfire.Receiver2.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEditor">
+			<HintPath>lib\UnityEditor.dll</HintPath>
+		</Reference>
+	</ItemGroup>
 </Project>

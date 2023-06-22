@@ -15,7 +15,6 @@ namespace Receiver2ModdingKit {
 		private delegate void D2(string s); //I'm going to shoot the person who documented delegates for Microsoft
 		private static HelpMenuScript m_help_menu;
 		private static Sprite secondary_button_sprite;
-		private static readonly int IMAGE_SIZE = 4501; // Cog sprite has a known size, makes loading the texture easier
 
 		private static HelpMenuScript help_menu {
 			get {
@@ -36,9 +35,9 @@ namespace Receiver2ModdingKit {
 
 		void Awake() {
 			using (var image_stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Receiver2ModdingKit.resources.cog.png")) {
-				byte[] data = new byte[IMAGE_SIZE];
+				byte[] data = new byte[image_stream.Length];
 
-				image_stream.Read(data, 0, IMAGE_SIZE);
+				image_stream.Read(data, 0, (int) image_stream.Length);
 
 				var temp_texture = new Texture2D(64, 64);
 				temp_texture.LoadImage(data);

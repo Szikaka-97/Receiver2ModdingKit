@@ -9,12 +9,15 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		Thunderstore|Any CPU = Thunderstore|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B8E7DCB7-1415-4D24-92F9-714F11F8CC9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B8E7DCB7-1415-4D24-92F9-714F11F8CC9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B8E7DCB7-1415-4D24-92F9-714F11F8CC9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B8E7DCB7-1415-4D24-92F9-714F11F8CC9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8E7DCB7-1415-4D24-92F9-714F11F8CC9F}.Debug|Any CPU.ActiveCfg = Thunderstore|Any CPU
+		{B8E7DCB7-1415-4D24-92F9-714F11F8CC9F}.Debug|Any CPU.Build.0 = Thunderstore|Any CPU
+		{B8E7DCB7-1415-4D24-92F9-714F11F8CC9F}.Release|Any CPU.ActiveCfg = Standalone|Any CPU
+		{B8E7DCB7-1415-4D24-92F9-714F11F8CC9F}.Release|Any CPU.Build.0 = Standalone|Any CPU
+		{B8E7DCB7-1415-4D24-92F9-714F11F8CC9F}.Thunderstore|Any CPU.ActiveCfg = Thunderstore|Any CPU
+		{B8E7DCB7-1415-4D24-92F9-714F11F8CC9F}.Thunderstore|Any CPU.Build.0 = Thunderstore|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
