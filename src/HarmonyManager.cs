@@ -10,6 +10,7 @@ using Receiver2;
 using Receiver2ModdingKit.ModInstaller;
 using Receiver2ModdingKit.Editor;
 using System.IO;
+using Receiver2ModdingKit.CustomSounds;
 
 namespace Receiver2ModdingKit {
     public static class HarmonyManager {
@@ -23,6 +24,7 @@ namespace Receiver2ModdingKit {
 			public static Harmony DevMenu;
 			public static Harmony FMODDebug;
 			public static Harmony Thunderstore;
+			public static Harmony CustomCartridgeImpactSound;
 		}
 
 		#region Transpilers
@@ -106,6 +108,38 @@ namespace Receiver2ModdingKit {
 
 				return codeMatcher.InstructionEnumeration();
 			}
+		}
+
+		[HarmonyPatch(typeof(ShellCasingScript), nameof(ShellCasingScript.CollisionSound))]
+		private static class ShellCasingSoundTranspiler {
+			private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase __originalMethod) {
+                CodeMatcher codeMatcher = new CodeMatcher(instructions, generator)
+                .MatchForward(false,
+                    new CodeMatch(OpCodes.Ldstr)
+                )
+				.SetOpcodeAndAdvance(OpCodes.Ldarg_0)
+				.InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Transform), "get_transform")))
+                .Insert(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(CustomSounds.CustomBulletImpactSounds), nameof(CustomBulletImpactSounds.GetShellCasingImpactHardSoundEvent), new[] { typeof(Transform) })));
+
+                codeMatcher
+					.MatchForward(false,
+                    new CodeMatch(OpCodes.Ldstr)
+                )
+                .SetOpcodeAndAdvance(OpCodes.Ldarg_0)
+                .InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Transform), "get_transform")))
+                .Insert(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(CustomSounds.CustomBulletImpactSounds), nameof(CustomBulletImpactSounds.GetBulletFallHardSoundEvent), new[] { typeof(Transform) })));
+
+                codeMatcher
+					.MatchForward(false,
+                    new CodeMatch(OpCodes.Ldstr)
+                )
+                .SetOpcodeAndAdvance(OpCodes.Ldarg_0)
+                .InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Transform), "get_transform")))
+                .Insert(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(CustomSounds.CustomBulletImpactSounds), nameof(CustomBulletImpactSounds.GetShellCasingImpactSoftSoundEvent), new[] { typeof(Transform) })));
+
+                return codeMatcher.InstructionEnumeration();
+
+            }
 		}
 
 		#if THUNDERSTORE
@@ -332,6 +366,7 @@ namespace Receiver2ModdingKit {
 			HarmonyInstances.GunScript = Harmony.CreateAndPatchAll(typeof(GunScriptTranspiler));
 			HarmonyInstances.ModHelpEntry = Harmony.CreateAndPatchAll(typeof(ModHelpEntryManager));
 			HarmonyInstances.CustomSounds = Harmony.CreateAndPatchAll(typeof(CustomSounds.ModAudioPatches));
+			HarmonyInstances.CustomCartridgeImpactSound = Harmony.CreateAndPatchAll(typeof(ShellCasingSoundTranspiler));
 
 			#if DEBUG
 			HarmonyInstances.DevMenu = Harmony.CreateAndPatchAll(typeof(DevMenuTranspiler));
