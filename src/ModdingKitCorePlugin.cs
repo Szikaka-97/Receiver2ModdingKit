@@ -18,6 +18,7 @@ namespace Receiver2ModdingKit {
 		}
 
 		private static ModHelpEntryManager mod_help;
+		private static ModTapeManager mod_tapes;
 		internal static Dictionary<uint, CartridgeSpec> custom_cartridges = new Dictionary<uint, CartridgeSpec>(); 
 
 		public static readonly string supportedVersion = "2.2.4";
@@ -111,6 +112,7 @@ namespace Receiver2ModdingKit {
 			}
 
 			mod_help = gameObject.AddComponent<ModHelpEntryManager>();
+			mod_tapes = gameObject.AddComponent<ModTapeManager>();
 
 			CustomSounds.ModAudioManager.Initialize();
 

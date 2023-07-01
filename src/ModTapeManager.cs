@@ -4,15 +4,18 @@ using System.Linq;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
+using ImGuiNET;
 using Receiver2;
 
 namespace Receiver2ModdingKit {
-	internal static class ModTapeManager {
+	internal class ModTapeManager : MonoBehaviour {
 		private static List<ModTape> tapes = new List<ModTape>();
 		private static GameObject instantiate_tape_button_prefab;
 		private static Sprite instantiate_tape_sprite;
 
 		private static TapesMenuScript tapes_menu;
+
+		private static bool tapes_debug_window_open;
 
 		private static Dictionary<string, FileInfo> tape_subtitles {
 			get;
@@ -21,8 +24,6 @@ namespace Receiver2ModdingKit {
 		internal static void Init() {
 			instantiate_tape_button_prefab = Object.Instantiate(GameObject.Find("ReceiverCore/Menus/Overlay Menu Canvas/Aspect Ratio Fitter/New Pause Menu/Backdrop1/Sub-Menu Layout Group/New Tape Menu/Entries Layout/ScrollableContent Variant/Viewport/Content/Standard/Invalid/Secondary Button"));
 			
-			tapes_menu = Object.FindObjectOfType<TapesMenuScript>();
-
 			using (var image_stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Receiver2ModdingKit.resources.tape.png")) {
 				byte[] data = new byte[image_stream.Length];
 
@@ -42,7 +43,6 @@ namespace Receiver2ModdingKit {
 		}
 
 		internal static void CreateModTapes(TapesMenuScript tapes_menu) {
-
 			foreach(var mod_tape in ReceiverCoreScript.Instance().tape_loadout_asset.GetModTapes()) {
 				var entry_category = tapes_menu.category_string_id_dict[mod_tape.tape_id_string];
 
@@ -108,8 +108,53 @@ namespace Receiver2ModdingKit {
 			}
 		}
 
-		internal static void DrawTapesImGUI() {
-			//TODO
+		private static void SwitchMenuVisible() {
+			tapes_debug_window_open = !tapes_debug_window_open;
+		}
+
+		private static void DrawTapesImGUI() {
+			if (tapes_menu == null && GameObject.Find("ReceiverCore/Menus/Overlay Menu Canvas/Aspect Ratio Fitter/New Pause Menu/Backdrop1/Sub-Menu Layout Group/New Tape Menu") != null) tapes_menu = GameObject.Find("ReceiverCore/Menus/Overlay Menu Canvas/Aspect Ratio Fitter/New Pause Menu/Backdrop1/Sub-Menu Layout Group/New Tape Menu").GetComponent<TapesMenuScript>();
+
+			if (tapes_menu != null && tapes_debug_window_open) {
+				ImGui.SetNextWindowSize(new Vector2(240f, 600f), ImGuiCond.FirstUseEver);
+
+				ImGuiWindowFlags window_flags = ImGuiWindowFlags.None;
+				if (!ReceiverGlobals.window_interactive)
+				{
+					window_flags |= ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar;
+					ImGui.SetNextWindowBgAlpha(0f);
+					ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0f);
+				}
+
+				if (ImGui.Begin("Unlocked Tapes", ref tapes_debug_window_open, window_flags)) {
+					foreach (var tape_category in tapes_menu.categories) {
+						ImGui.Separator();
+						ImGui.Text(tape_category.category_id.ToString());
+						ImGui.Separator();
+
+						foreach (var entry in tape_category.entries) {
+							bool unlocked = ReceiverCoreScript.Instance().PlayerData.picked_up_tape_ids_string.Contains(entry.string_id);
+
+							if (ImGui.Checkbox(entry.string_id, ref unlocked)) {
+								if (unlocked) { //Add tape
+									ReceiverCoreScript.Instance().PlayerData.picked_up_tape_ids_string.Add(entry.string_id);
+								}
+								else {
+									ReceiverCoreScript.Instance().PlayerData.picked_up_tape_ids_string.Remove(entry.string_id);
+								}
+
+								tapes_menu.OnEnable();
+							}
+						}
+					}
+
+					ImGui.End();
+				}
+			}
+		}
+
+		private void Update() {
+			DrawTapesImGUI();
 		}
 	}
 }

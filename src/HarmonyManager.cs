@@ -77,7 +77,23 @@ namespace Receiver2ModdingKit {
 		private static class DevMenuTranspiler {
 			private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase __originalMethod) {
 				CodeMatcher codeMatcher = new CodeMatcher(instructions, generator)
-				.MatchForward(false, 
+				.MatchForward(false,
+					new CodeMatch(OpCodes.Ldstr, "Subtitles")
+				);
+
+				if (!codeMatcher.ReportFailure(__originalMethod, Debug.LogError)) {
+					codeMatcher
+						.SetAndAdvance(OpCodes.Ldstr, "Tapes Unlock Debug")
+						.InsertAndAdvance(new CodeInstruction(OpCodes.Ldstr, ""))
+						.InsertAndAdvance(new CodeInstruction(OpCodes.Ldsfld, AccessTools.Field(typeof(ModTapeManager), "tapes_debug_window_open")))
+						.InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ImGui), "MenuItem", new Type[] { typeof(string), typeof(string), typeof(bool) })))
+						.InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModTapeManager), "SwitchMenuVisible")))
+						.Insert(new CodeInstruction(OpCodes.Ldstr, "Subtitles"))
+						.Advance(-1)
+						.InsertBranch(OpCodes.Brfalse, codeMatcher.Pos + 1);
+				}
+
+				codeMatcher.MatchForward(false, 
 					new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(ImGui), "EndMainMenuBar"))
 				);
 

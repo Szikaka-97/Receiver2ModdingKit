@@ -105,11 +105,11 @@ namespace Receiver2ModdingKit.Thunderstore {
 		public void InstallCampaign() {
 			if (Installed) return;
 
-			DirectoryInfo	game_data_dir = new DirectoryInfo(Application.persistentDataPath),
-							gbc_dir,
-							rpc_dir,
-							loadouts_dir,
-							wgc_dir;
+			DirectoryInfo game_data_dir = new DirectoryInfo(Application.persistentDataPath),
+			              gbc_dir,
+			              rpc_dir,
+			              loadouts_dir,
+			              wgc_dir;
 
 			// These folders are already created at the startup of the plugin, but it's best to check anyway
 			if (!game_data_dir.TryGetChild("GlobalBaseConfiguration", out gbc_dir))
