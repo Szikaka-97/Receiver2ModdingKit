@@ -6,15 +6,22 @@ A simplistic modding API and a modloader used to create gun mods for Receiver 2
 
 ### Playing Mods
 
- - Download the *Receiver2ModdingKit - Release* archive from the *Releases* menu;
+#### Standalone
+
+ - Download the *Receiver2ModdingKit - Standalone Release* archive from the *Releases* menu;
  - Extract the .zip into your BepInEx plugins directory;
  - If you don't have BepInEx installed, you'll have to install it from its [official GitHub repo](https://github.com/BepInEx/BepInEx);
  
+ #### Using Thunderstore
+
+ - Download the *Receiver2ModdingKit - Thunderstore Release* archive from the *Releases* menu;
+ - Extract the .zip into your BepInEx plugins directory or R2ModMan's plugin directory in %AppData%/Roaming;
+
  ### Creating Mods
  
-  - Download the *Receiver2ModdingKit - Debug* archive from the *Releases* menu. <br> The debug build contains some features that simplify debugging, but can negatively impact performance;
+  - Download the *Receiver2ModdingKit - Debug Build* archive from the *Releases* menu. <br> The debug build contains some features that simplify debugging, but can negatively impact performance;
   - Copy it to your BepInEx directory, like stated in a previous section
-  - Download the *Receiver2ModdingKit - Project* archive from the *Releases* menu. <br> It contains a Unity project you can create guns with;
+  - Download the *Receiver2ModdingKit - Unity Project* archive from the *Releases* menu. <br> It contains a Unity project you can create guns with;
   - Extract the project somewhere in your computer and import it into Unity.\
     - Download Unity from [their website](https://unity.com);
     - In Unity Hub, download Unity version 2019.4.29;
