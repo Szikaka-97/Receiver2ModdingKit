@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Reflection;
 using System.Linq;
+using System.Reflection;
+using System.Collections.Generic;
 using UnityEngine;
 using Receiver2;
-using System.Collections.Generic;
-using HarmonyLib;
 
 namespace Receiver2ModdingKit {
 	internal static class ReflectionManager {

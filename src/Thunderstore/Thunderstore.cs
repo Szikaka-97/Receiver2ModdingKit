@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using UnityEngine;
 using BepInEx;
 using Receiver2;
-using System.Runtime.Remoting.Messaging;
 
 namespace Receiver2ModdingKit.Thunderstore {
 	internal static class Thunderstore {
@@ -89,7 +88,9 @@ namespace Receiver2ModdingKit.Thunderstore {
 				#endif
 
 				foreach (var mod in installed_mods) {
-					mod.InstallGuns();
+					try {
+						mod.InstallGuns();
+					} catch (NullReferenceException) { }
 				}
 			}
 		}
@@ -101,7 +102,9 @@ namespace Receiver2ModdingKit.Thunderstore {
 				#endif
 
 				foreach (var mod in installed_mods) {
-					mod.InstallTapes(instance);
+					try {
+						mod.InstallTapes(instance);
+					} catch (NullReferenceException) { }
 				}
 			}
 		}
@@ -113,7 +116,9 @@ namespace Receiver2ModdingKit.Thunderstore {
 				#endif
 
 				foreach (var mod in installed_mods) {
-					mod.InstallTiles(instance);
+					try {
+						mod.InstallTiles(instance);
+					} catch (NullReferenceException) { }
 				}
 			}
 		}

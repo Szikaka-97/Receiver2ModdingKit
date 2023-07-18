@@ -9,7 +9,6 @@ namespace Receiver2ModdingKit {
 	/// </summary>
 	[RequireComponent(typeof(InventorySlot), typeof(LevelItem))]
 	public abstract class ModGunScript : GunScript {
-
 		protected bool _disconnector_needs_reset {
 			get { return (bool) ReflectionManager.GS_disconnector_needs_reset.GetValue(this); }
 			set { ReflectionManager.GS_disconnector_needs_reset.SetValue(this, value); }
@@ -125,9 +124,24 @@ namespace Receiver2ModdingKit {
 			return;
 		}
 
+		/// <summary>
+		/// Update the position of all components in animated_components list
+		/// </summary>
 		protected void UpdateAnimatedComponents() {
 			foreach (var component in this.animated_components) {
 				ApplyTransform(component.anim_path, component.mover.amount, component.component);
+			}
+		}
+
+		/// <summary>
+		/// Set whether the gun should pierce basic turret armor
+		/// </summary>
+		/// <param name="armor_piercing"> AP value to be set </param>
+		protected void SetArmorPiercing(bool armor_piercing) {
+			if (armor_piercing != this.armor_piercing) {
+				this.armor_piercing = armor_piercing;
+
+				foreach (var armor_component in FindObjectsOfType<TurretArmor>()) armor_component.SendMessage("UpdateMaterial", this);
 			}
 		}
 
@@ -253,6 +267,16 @@ namespace Receiver2ModdingKit {
 		/// A method performed every frame when the gun is active. Control things like firing the bullet within it
 		/// </summary>
 		public abstract void UpdateGun();
+
+		internal static void UpdateModGun(GunScript gun) {
+			if (gun is ModGunScript) {
+				try {
+					((ModGunScript) gun).UpdateGun();
+				} catch (Exception e) {
+					Debug.LogException(e);
+				}
+			}
+		}
 
 		public override string TypeName() { return "ModGunScript"; }
 		public override JSONObject GetPersistentData() { return base.GetPersistentData(); }

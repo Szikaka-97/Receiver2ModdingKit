@@ -1,6 +1,6 @@
-﻿using HarmonyLib;
-using System;
+﻿using System;
 using UnityEngine;
+using HarmonyLib;
 
 namespace Receiver2ModdingKit {
 	/// <summary>

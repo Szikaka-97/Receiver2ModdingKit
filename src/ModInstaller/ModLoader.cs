@@ -58,20 +58,41 @@ namespace Receiver2ModdingKit.ModInstaller {
 			else if (gun.loaded_cartridge_prefab) {
 				ShellCasingScript round = gun.loaded_cartridge_prefab.GetComponent<ShellCasingScript>();
 
-				if (!ModdingKitCorePlugin.custom_cartridges.ContainsKey((uint) round.cartridge_type)) {
-					if (round.glint_renderer && round.glint_renderer.material.name != "ItemGlint (Instance)") {
-						round.glint_renderer.material = prefab_9mm.GetComponent<ShellCasingScript>().glint_renderer.material;
+				if (!ModShellCasingScript.mod_cartridges.ContainsKey(round.cartridge_type)) {
+					if ((int) round.cartridge_type > (int) Enum.GetValues(typeof(CartridgeSpec.Preset)).Cast<CartridgeSpec.Preset>().Max()) {
+						if (round.glint_renderer && round.glint_renderer.material.name != "ItemGlint (Instance)") {
+							round.glint_renderer.material = prefab_9mm.GetComponent<ShellCasingScript>().glint_renderer.material;
+						}
+
+						if (round is ModShellCasingScript) {
+							ModShellCasingScript.mod_cartridges.Add(
+								round.cartridge_type,
+								((ModShellCasingScript) round).spec.CreateSpec()
+							);
+						}
+						else {
+							Debug.LogWarning("Gun " + gun.InternalName + " adds a cartridge via ModGunScript.GetCustomCartridgeSpec(); Consider using ModShellCasingScript instead");
+
+							ModShellCasingScript.mod_cartridges.Add(
+								round.cartridge_type,
+								gun.GetCustomCartridgeSpec()
+							);
+						}
+
+						items.Add(round);
+					}
+					else {
+						Debug.LogError("Gun " + gun.InternalName + " tried to overwrite cartridge " + round.cartridge_type + "; Inbuilt cartridge will be used instead");
 					}
 
-					ModdingKitCorePlugin.custom_cartridges.Add(
-						(uint) round.cartridge_type,
-						gun.GetCustomCartridgeSpec()
-					);
-
-					items.Add(round);
+				}
+				else {
+					Debug.LogWarning("Possible redefinition of cartridge with type " + round.cartridge_type);
 				}
 			}
 			else {
+				Debug.LogWarning("Gun " + gun.InternalName + " doesn't specify a cartridge and doesn't contain an InBuiltCartridge component and will use a defaul 9mm round");
+
 				gun.loaded_cartridge_prefab = prefab_9mm;
 			}
 

@@ -51,7 +51,7 @@ namespace Receiver2ModdingKit {
 				return null;
 			}
 
-			var bullet_inventory = ReflectionManager.LAH_Get_Last_Bullet.Invoke(lah, cartridge_dimensions.Cast<object>().ToArray());
+			var bullet_inventory = ReflectionManager.LAH_Get_Last_Bullet.Invoke(lah, new object[] { cartridge_dimensions });
 
 			if (bullet_inventory == null) return null;
 

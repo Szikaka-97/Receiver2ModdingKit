@@ -27,17 +27,17 @@ namespace Receiver2ModdingKit {
 
 		#region Transpilers
 
-		[HarmonyPatch(typeof(RuntimeTileLevelGenerator), "PopulateItems")]
+		[HarmonyPatch(typeof(RuntimeTileLevelGenerator), nameof(RuntimeTileLevelGenerator.PopulateItems))]
 		private static class PopulateItemsTranspiler {
 			private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, MethodBase __originalMethod) {
 				CodeMatcher codeMatcher = new CodeMatcher(instructions).MatchForward(false, 
-					new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(GunScript), "gun_type")),
+					new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(GunScript), nameof(GunScript.gun_type))),
 					new CodeMatch(OpCodes.Ldc_I4_1)
 				);
 
 				if (!codeMatcher.ReportFailure(__originalMethod, Debug.Log)) {
 					codeMatcher.SetOperandAndAdvance(
-						AccessTools.Field(typeof(GunScript), "magazine_root_types")
+						AccessTools.Field(typeof(GunScript), nameof(GunScript.magazine_root_types))
 					).InsertAndAdvance(
 						new CodeInstruction(OpCodes.Ldlen)
 					).SetOpcodeAndAdvance(
@@ -57,7 +57,7 @@ namespace Receiver2ModdingKit {
 				CodeMatcher codeMatcher = new CodeMatcher(instructions)
 				.MatchForward(false, 
 					new CodeMatch(OpCodes.Ldarg_0),
-					new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(GunScript), "gun_model")),
+					new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(GunScript), nameof(GunScript.gun_model))),
 					new CodeMatch(OpCodes.Ldc_I4_1),
 					new CodeMatch(OpCodes.Bne_Un)
 				);
@@ -66,7 +66,7 @@ namespace Receiver2ModdingKit {
 					codeMatcher
 						.Advance(1)
 						.InsertAndAdvance(new CodeInstruction(OpCodes.Ldarg_0))
-						.InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModdingKitCorePlugin), "UpdateModGuns")));
+						.InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModGunScript), nameof(ModGunScript.UpdateModGun))));
 				}
 				
 				return codeMatcher.InstructionEnumeration();
@@ -85,26 +85,26 @@ namespace Receiver2ModdingKit {
 					codeMatcher
 						.SetAndAdvance(OpCodes.Ldstr, "Tapes Unlock Debug")
 						.InsertAndAdvance(new CodeInstruction(OpCodes.Ldstr, ""))
-						.InsertAndAdvance(new CodeInstruction(OpCodes.Ldsfld, AccessTools.Field(typeof(ModTapeManager), "tapes_debug_window_open")))
-						.InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ImGui), "MenuItem", new Type[] { typeof(string), typeof(string), typeof(bool) })))
-						.InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModTapeManager), "SwitchMenuVisible")))
+						.InsertAndAdvance(new CodeInstruction(OpCodes.Ldsfld, AccessTools.Field(typeof(ModTapeManager), nameof(ModTapeManager.tapes_debug_window_open))))
+						.InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ImGui), nameof(ImGui.MenuItem), new Type[] { typeof(string), typeof(string), typeof(bool) })))
+						.InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModTapeManager), nameof(ModTapeManager.SwitchMenuVisible))))
 						.Insert(new CodeInstruction(OpCodes.Ldstr, "Subtitles"))
 						.Advance(-1)
 						.InsertBranch(OpCodes.Brfalse, codeMatcher.Pos + 1);
 				}
 
 				codeMatcher.MatchForward(false, 
-					new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(ImGui), "EndMainMenuBar"))
+					new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(ImGui), nameof(ImGui.EndMainMenuBar)))
 				);
 
 				if (!codeMatcher.ReportFailure(__originalMethod, Debug.LogError)) {
 					codeMatcher
 						.SetAndAdvance(OpCodes.Ldstr, "Modding")
-						.InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ImGui), "BeginMenu", new Type[] { typeof(string) })))
-						.Insert(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ImGui), "EndMainMenuBar")))
+						.InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ImGui), nameof(ImGui.BeginMenu), new Type[] { typeof(string) })))
+						.Insert(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ImGui), nameof(ImGui.EndMainMenuBar))))
 						.InsertBranchAndAdvance(OpCodes.Brfalse, codeMatcher.Pos)
-						.InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModInfoAsset), "DisplayImGuiControls")))
-						.InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ImGui), "EndMenu")));
+						.InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModInfoAsset), nameof(ModInfoAsset.DisplayImGuiControls))))
+						.InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ImGui), nameof(ImGui.EndMenu))));
 				}
 								
 				return codeMatcher.InstructionEnumeration();
@@ -116,9 +116,12 @@ namespace Receiver2ModdingKit {
 			private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase __originalMethod) {
 				CodeMatcher codeMatcher = new CodeMatcher(instructions, generator)
 				.MatchForward(false, 
-					new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(ImGui), "End"))
-				)
-				.InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(CustomSounds.ModAudioManager), "DrawImGUIDebug")));
+					new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(ImGui), nameof(ImGui.End)))
+				);
+
+				if (!codeMatcher.ReportFailure(__originalMethod, Debug.LogError)) {
+					codeMatcher.InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(CustomSounds.ModAudioManager), nameof(CustomSounds.ModAudioManager.DrawImGUIDebug))));
+				}
 
 				return codeMatcher.InstructionEnumeration();
 			}
@@ -134,13 +137,16 @@ namespace Receiver2ModdingKit {
 
 			[HarmonyPatch(typeof(ReceiverCoreScript), "Awake")]
 			public static class R2MMCoreTranspiler {
-				private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator) {
+				private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase __originalMethod) {
 					CodeMatcher codeMatcher = new CodeMatcher(instructions, generator)
 					.MatchForward(false, 
 						new CodeMatch(OpCodes.Ldarg_0),
-						new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(ReceiverCoreScript), "LoadPersistentData"))
-					)
-					.Insert(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Thunderstore.Thunderstore), "InstallGuns")));
+						new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(ReceiverCoreScript), nameof(ReceiverCoreScript.LoadPersistentData)))
+					);
+
+					if (!codeMatcher.ReportFailure(__originalMethod, Debug.LogError)) {
+						codeMatcher.Insert(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Thunderstore.Thunderstore), nameof(Thunderstore.Thunderstore.InstallGuns))));
+					}
 
 					return codeMatcher.InstructionEnumeration();
 				}
@@ -148,15 +154,19 @@ namespace Receiver2ModdingKit {
 
 			[HarmonyPatch(typeof(TapeManager), "OnEnable")]
 			public static class R2MMTapesTranspiler {
-				private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator) {
+				private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase __originalMethod) {
 					CodeMatcher codeMatcher = new CodeMatcher(instructions, generator)
 					.MatchForward(true, 
 						new CodeMatch(OpCodes.Ldarg_0),
 						new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(TapeManager), "tape_prefabs_all")),
-						new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(List<GameObject>), "get_Count"))
-					)
-					.InsertAndAdvance(new CodeInstruction(OpCodes.Ldarg_0, null))
-					.Insert(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Thunderstore.Thunderstore), "InstallTapes")));
+						new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(List<GameObject>), "get_" + nameof(List<GameObject>.Count)))
+					);
+
+					if (!codeMatcher.ReportFailure(__originalMethod, Debug.LogError)) {
+						codeMatcher
+							.InsertAndAdvance(new CodeInstruction(OpCodes.Ldarg_0, null))
+							.Insert(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Thunderstore.Thunderstore), nameof(Thunderstore.Thunderstore.InstallTapes))));
+					}
 
 					return codeMatcher.InstructionEnumeration();
 				}
@@ -164,16 +174,22 @@ namespace Receiver2ModdingKit {
 
 			[HarmonyPatch(typeof(ModulePrefabsList), "OnEnable")]
 			public static class R2MMTilesTranspiler {
-				private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator) {
+				private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase __originalMethod) {
 					CodeMatcher codeMatcher = new CodeMatcher(instructions, generator)
-					.MatchForward(false, 
+					.MatchForward(true,
+						new CodeMatch(OpCodes.Ldloc_2),
 						new CodeMatch(OpCodes.Ldloc_1),
 						new CodeMatch(OpCodes.Ldlen),
 						new CodeMatch(OpCodes.Conv_I4),
-						new CodeMatch(OpCodes.Blt_S)
-					)
-					.InsertAndAdvance(new CodeInstruction(OpCodes.Ldarg_0, null))
-					.Insert(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Thunderstore.Thunderstore), "InstallTiles")));
+						new CodeMatch(OpCodes.Blt)
+					);
+
+					if (!codeMatcher.ReportFailure(__originalMethod, Debug.LogError)) {
+						codeMatcher
+							.Advance(2)
+							.InsertAndAdvance(new CodeInstruction(OpCodes.Ldarg_0, null))
+							.Insert(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Thunderstore.Thunderstore), nameof(Thunderstore.Thunderstore.InstallTiles))));
+					}
 
 					return codeMatcher.InstructionEnumeration();
 				}
@@ -234,7 +250,7 @@ namespace Receiver2ModdingKit {
 
 		[HarmonyPatch(typeof(TapesMenuScript), "CreateMenuEntries")]
         [HarmonyPrefix]
-        private static void PrePatchTapeCreateMenuEntries(TapesMenuScript __instance) {
+        private static void PrePatchTapeCreateMenuEntries(ref TapesMenuScript __instance) {
 			ModTapeManager.Init();
 
 			GameObject entry_prefab = UnityEngine.Object.Instantiate(GameObject.Find("ReceiverCore/Menus/Overlay Menu Canvas/Aspect Ratio Fitter/New Pause Menu/Backdrop1/Sub-Menu Layout Group/New Tape Menu/Entries Layout/ScrollableContent Variant/Viewport/Content/Standard/Invalid"));
@@ -248,17 +264,15 @@ namespace Receiver2ModdingKit {
 			ModTapeManager.CreateModTapes(__instance);
 		}
 
-		[HarmonyPatch(typeof(CartridgeSpec), "SetFromPreset")]
+		[HarmonyPatch(typeof(CartridgeSpec), nameof(CartridgeSpec.SetFromPreset))]
 		[HarmonyPrefix]
-		private static void PatchSetCartridge(CartridgeSpec.Preset preset, ref CartridgeSpec __instance) {
-			if (ModdingKitCorePlugin.custom_cartridges.ContainsKey((uint) preset)) {
-				CartridgeSpec spec = ModdingKitCorePlugin.custom_cartridges[(uint) preset];
+		private static bool PatchSetCartridge(CartridgeSpec.Preset preset, ref CartridgeSpec __instance) {
+			if (ModShellCasingScript.mod_cartridges.ContainsKey(preset)) {
+				__instance = ModShellCasingScript.mod_cartridges[preset];
 
-				__instance.extra_mass = spec.extra_mass;
-				__instance.mass = spec.mass;
-				__instance.speed = spec.speed;
-				__instance.diameter = spec.diameter;
+				return false;
 			}
+			return true;
 		}
 
 		[HarmonyPatch(typeof(ReceiverCoreScript), "Awake")]
@@ -319,6 +333,49 @@ namespace Receiver2ModdingKit {
 			}
 		}
 
+		[HarmonyPatch(typeof(ShellCasingScript), nameof(ShellCasingScript.CollisionSound))]
+		[HarmonyPrefix]
+		private static bool PatchCollisionSound(BallisticMaterial material, ref ShellCasingScript __instance) {
+			if (__instance.physics_collided || __instance is not ModShellCasingScript) return true;
+    
+			ModShellCasingScript bullet = (ModShellCasingScript) __instance;
+    
+			bullet.physics_collided = true;
+
+			if (!bullet.IsSpent()) {
+				AudioManager.PlayOneShot3D(bullet.sound_bullet_fall_hard, bullet.transform.position, 1f, 1f);
+        
+				return false;
+			}
+    
+			switch (material.material_label) {
+				case BallisticMaterial.MaterialLabel.Glass:
+				case BallisticMaterial.MaterialLabel.Metal:
+				case BallisticMaterial.MaterialLabel.Concrete:
+				case BallisticMaterial.MaterialLabel.Wood:
+				case BallisticMaterial.MaterialLabel.Tile:
+				case BallisticMaterial.MaterialLabel.Drywall:
+				case BallisticMaterial.MaterialLabel.HardMetal:
+				case BallisticMaterial.MaterialLabel.CardboardBox:
+				case BallisticMaterial.MaterialLabel.GlassBulletproof:
+					AudioManager.PlayOneShot3D(bullet.sound_shell_casing_impact_hard, bullet.transform.position, 1f, 1f);
+            
+					break;
+				case BallisticMaterial.MaterialLabel.Flesh:
+				case BallisticMaterial.MaterialLabel.Pillow:
+				case BallisticMaterial.MaterialLabel.Plant:
+				case BallisticMaterial.MaterialLabel.Thick_Metal:
+				case BallisticMaterial.MaterialLabel.Plastic:
+				case BallisticMaterial.MaterialLabel.Cloth:
+				case BallisticMaterial.MaterialLabel.Paper:
+					AudioManager.PlayOneShot3D(bullet.sound_shell_casing_impact_soft, bullet.transform.position, 1f, 1f);
+            
+					break;
+			}
+    
+			return false;
+		}
+
 		#endregion
 
 		internal static void UnpatchAll() {
@@ -339,8 +396,6 @@ namespace Receiver2ModdingKit {
 				HarmonyInstances.CustomSounds.Unpatch(method, HarmonyPatchType.Prefix, patch.Owners.First(ownerID => ownerID != HarmonyInstances.CustomSounds.Id));
 			}
 		}
-
-		
 
 		internal static void Initialize() {
 			HarmonyInstances.Core = Harmony.CreateAndPatchAll(typeof(HarmonyManager));

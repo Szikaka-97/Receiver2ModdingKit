@@ -15,7 +15,7 @@ namespace Receiver2ModdingKit {
 
 		private static TapesMenuScript tapes_menu;
 
-		private static bool tapes_debug_window_open;
+		internal static bool tapes_debug_window_open;
 
 		private static Dictionary<string, FileInfo> tape_subtitles {
 			get;
@@ -108,7 +108,7 @@ namespace Receiver2ModdingKit {
 			}
 		}
 
-		private static void SwitchMenuVisible() {
+		internal static void SwitchMenuVisible() {
 			tapes_debug_window_open = !tapes_debug_window_open;
 		}
 

@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
+using TMPro;
 using BepInEx;
 using Receiver2;
-using TMPro;
 using Receiver2ModdingKit.ModInstaller;
-using System.IO;
-using System.Threading;
 
 namespace Receiver2ModdingKit {
-	[BepInPlugin("pl.szikaka.receiver_2_modding_kit", "Receiver 2 Modding Kit", "1.1.0")]
+	[BepInPlugin("pl.szikaka.receiver_2_modding_kit", "Receiver 2 Modding Kit", "1.3.0")]
 	[BepInProcess("Receiver2")]
 	public class ModdingKitCorePlugin : BaseUnityPlugin {
 		public static ModdingKitCorePlugin instance {
@@ -19,7 +17,6 @@ namespace Receiver2ModdingKit {
 
 		private static ModHelpEntryManager mod_help;
 		private static ModTapeManager mod_tapes;
-		internal static Dictionary<uint, CartridgeSpec> custom_cartridges = new Dictionary<uint, CartridgeSpec>(); 
 
 		public static readonly string supportedVersion = "2.2.4";
 
@@ -33,16 +30,6 @@ namespace Receiver2ModdingKit {
 			ExecuteOnStartup += action;
 		}
 		internal static StartupAction ExecuteOnStartup = new StartupAction(() => { });
-
-		internal static void UpdateModGuns(GunScript gun) {
-			if (gun is ModGunScript) {
-				try {
-					((ModGunScript) gun).UpdateGun();
-				} catch (Exception e) {
-					Debug.LogException(e);
-				}
-			}
-		}
 
 		private System.Collections.IEnumerator SetErrorState() {
 			while (ReceiverCoreScript.Instance() == null) yield return null;
@@ -133,6 +120,7 @@ namespace Receiver2ModdingKit {
 			HarmonyManager.UnpatchAll();
 
 			if (mod_help != null) DestroyImmediate(mod_help);
+			if (mod_tapes != null) DestroyImmediate(mod_tapes);
 
 			if (Directory.Exists(ScriptEngine.ScriptDirectory)) Directory.Delete(ScriptEngine.ScriptDirectory, true);
 
