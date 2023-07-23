@@ -34,7 +34,7 @@ namespace Receiver2ModdingKit.ModInstaller {
 				return;
 			}
 
-			List<InventoryItem> items = new List<InventoryItem>( //Loading gun
+			List<InventoryItem> items = new List<InventoryItem>(
 				ReceiverCoreScript.Instance().generic_prefabs
 			);
 
@@ -73,10 +73,12 @@ namespace Receiver2ModdingKit.ModInstaller {
 						else {
 							Debug.LogWarning("Gun " + gun.InternalName + " adds a cartridge via ModGunScript.GetCustomCartridgeSpec(); Consider using ModShellCasingScript instead");
 
+#pragma warning disable CS0618 // Type or member is obsolete
 							ModShellCasingScript.mod_cartridges.Add(
 								round.cartridge_type,
 								gun.GetCustomCartridgeSpec()
 							);
+#pragma warning restore CS0618 // Type or member is obsolete
 						}
 
 						items.Add(round);
@@ -165,7 +167,12 @@ namespace Receiver2ModdingKit.ModInstaller {
 				ReflectionManager.PH_bounds.SetValue(hanger, gunBounds);
 			}
 
-			gun.InitializeGun();
+			try {
+				gun.InitializeGun();
+			} catch (Exception e) {
+				Debug.LogError("Error accured while initializing gun " + gun.InternalName + ":");
+				Debug.LogException(e);
+			}
 
 			if (gun.spawns_in_dreaming) {
 				ReceiverCoreScript.Instance().PlayerData.unlocked_gun_names.Add(gun.InternalName);

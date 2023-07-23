@@ -53,30 +53,30 @@ namespace Receiver2ModdingKit {
 		private static void PatchHelpCreateMenuEntries(HelpMenuScript __instance) {
 
 			foreach (var mod_entry in entries.Values) {
-				if (!Locale.active_locale_help_menu_entries_string.ContainsKey(mod_entry.id)) {
+				if (!Locale.active_locale_help_menu_entries_string.ContainsKey(mod_entry.name)) {
 					var entry = new LocaleHelpMenuEntry();
 					entry.title = mod_entry.title;
 					entry.description = mod_entry.description;
-					entry.id_string = mod_entry.id;
-					entry.name = mod_entry.id;
+					entry.id_string = mod_entry.name;
+					entry.name = mod_entry.name;
 
-					Locale.active_locale_help_menu_entries_string.Add(mod_entry.id, entry);
+					Locale.active_locale_help_menu_entries_string.Add(mod_entry.name, entry);
 				}
 
 				EntryDescriptionMenuScript.Category gun_help = __instance.categories[4];
 
-				if (!gun_help.entry_string_id_dict.ContainsKey(mod_entry.id)) {
+				if (!gun_help.entry_string_id_dict.ContainsKey(mod_entry.name)) {
 					GameObject entry_button = Instantiate(help_menu.ecsPrefab);
-					entry_button.name = mod_entry.id;
+					entry_button.name = mod_entry.name;
 					entry_button.transform.SetParent(gun_help.root_object.transform, true);
 					entry_button.transform.Find("Button").localPosition += (Vector3.left * 37);
 					RectTransform button_transform = entry_button.GetComponent<RectTransform>();
 					button_transform.localScale = new Vector3(1f, 1f, 1f);
 					EntryComponentScript entry_script = entry_button.GetComponent<EntryComponentScript>();
-					entry_script.string_id = mod_entry.id;
-					entry_script.title.text = mod_entry.id;
+					entry_script.string_id = mod_entry.name;
+					entry_script.title.text = mod_entry.name;
 					entry_script.button.onClick.AddListener( delegate {
-						OnEntryClick.DynamicInvoke(mod_entry.id);
+						OnEntryClick.DynamicInvoke(mod_entry.name);
 					});
 					entry_script.default_enabled = true;
 					if (mod_entry.info_sprite != null) {
@@ -84,8 +84,8 @@ namespace Receiver2ModdingKit {
 						help_menu.sprites.Add(mod_entry.info_sprite);
 					}
 					gun_help.entries.Add(entry_script);
-					gun_help.entry_string_id_dict.Add(mod_entry.id, entry_script);
-					__instance.category_string_id_dict.Add(mod_entry.id, gun_help);
+					gun_help.entry_string_id_dict.Add(mod_entry.name, entry_script);
+					__instance.category_string_id_dict.Add(mod_entry.name, gun_help);
 
 					if (mod_entry.settings_button_active) {
 						GameObject secondary_button = Instantiate(GameObject.Find("ReceiverCore/Menus/Overlay Menu Canvas/Aspect Ratio Fitter/New Pause Menu/Backdrop1/Sub-Menu Layout Group/New Help Menu/Entries Layout/ScrollableContent Variant/Viewport/Content/Guns/StovePipe/Secondary Button"));

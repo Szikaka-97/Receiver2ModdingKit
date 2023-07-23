@@ -2,13 +2,29 @@
 using UnityEngine;
 using Receiver2;
 using SimpleJSON;
+using BepInEx;
 
 namespace Receiver2ModdingKit {
 	/// <summary>
 	/// Base class for all gun mods
 	/// </summary>
 	[RequireComponent(typeof(InventorySlot), typeof(LevelItem))]
-	public abstract class ModGunScript : GunScript {
+	public abstract class ModGunScript : GunScript, ISerializationCallbackReceiver {
+		[Serializable]
+		public class ModLocaleTactics {
+			public string title;
+			[TextArea]
+			public string description;
+
+			public LocaleTactics GetLocaleTactics(GunScript gun) {
+				return new LocaleTactics() {
+					gun_internal_name = gun.InternalName,
+					title = this.title.IsNullOrWhiteSpace() ? gun.InternalName : this.title,
+					text = description
+				};
+			}
+		}
+
 		protected bool _disconnector_needs_reset {
 			get { return (bool) ReflectionManager.GS_disconnector_needs_reset.GetValue(this); }
 			set { ReflectionManager.GS_disconnector_needs_reset.SetValue(this, value); }
@@ -45,6 +61,30 @@ namespace Receiver2ModdingKit {
 
 		public bool visible_in_spawnmenu = true;
 		public bool spawns_in_dreaming = true;
+		public ModHelpEntry help_entry;
+		public ModLocaleTactics locale_tactics;
+
+		[SerializeField]
+		[HideInInspector]
+		private bool help_entry_generate;
+		[SerializeField]
+		[HideInInspector]
+		private string help_entry_name;
+		[SerializeField]
+		[HideInInspector]
+		private Sprite help_entry_info_sprite;
+		[SerializeField]
+		[HideInInspector]
+		private string help_entry_title;
+		[SerializeField]
+		[HideInInspector]
+		private string help_entry_description;
+		[SerializeField]
+		[HideInInspector]
+		private string locale_tactics_title;
+		[SerializeField]
+		[HideInInspector]
+		private string locale_tactics_description;
 
 		[Tooltip("List of custom audio events used by the gun, created via RMB -> Create -> Receiver 2 Modding -> Custom Sounds List")]
 		public Editor.CustomSoundsList audio;
@@ -236,7 +276,7 @@ namespace Receiver2ModdingKit {
 		/// <returns>
 		/// A ModHelpEntry object containing help menu information, or null if help menu entry shouldn't be created
 		/// </returns>
-		public virtual ModHelpEntry GetGunHelpEntry() {	return null; }
+		public virtual ModHelpEntry GetGunHelpEntry() {	return this.help_entry != null && this.help_entry.generate ? this.help_entry : null; }
 
 		/// <summary>
 		/// If the gun uses a custom round, override this method to define properties of said round
@@ -244,6 +284,7 @@ namespace Receiver2ModdingKit {
 		/// <returns>
 		/// A new CartridgeSpec defining custom round's properties
 		/// </returns>
+		[Obsolete("This method makes gun loading unnecessarily complicated, use ModShellCasingScript instead")]
 		public virtual CartridgeSpec GetCustomCartridgeSpec() { 
 			CartridgeSpec spec = new CartridgeSpec();
 			spec.SetFromPreset(CartridgeSpec.Preset._9mm);
@@ -257,10 +298,7 @@ namespace Receiver2ModdingKit {
 		/// A LocaleTactics object containing info about the gun
 		/// </returns>
 		public virtual LocaleTactics GetGunTactics() {
-			return new LocaleTactics() {
-				gun_internal_name = InternalName,
-				title = gameObject.name
-			};
+			return locale_tactics.GetLocaleTactics(this);
 		}
 
 		/// <summary>
@@ -281,5 +319,35 @@ namespace Receiver2ModdingKit {
 		public override string TypeName() { return "ModGunScript"; }
 		public override JSONObject GetPersistentData() { return base.GetPersistentData(); }
 		public override void SetPersistentData(JSONObject data) { base.SetPersistentData(data); }
+
+		// Serialization shenanigans
+		// BepInEx injected classes don't get serialized correctly, this is an attempt to remedy it
+		public void OnBeforeSerialize() {
+			this.help_entry_generate = help_entry.generate;
+			this.help_entry_name = help_entry.name;
+			this.help_entry_info_sprite = help_entry.info_sprite;
+			this.help_entry_title = help_entry.title;
+			this.help_entry_description = help_entry.description;
+
+			this.locale_tactics_title = locale_tactics.title;
+			this.locale_tactics_description = locale_tactics.description;
+		}
+
+		public void OnAfterDeserialize() {
+			if (this.help_entry == null) {
+				this.help_entry = new ModHelpEntry(help_entry_name) {
+					generate = help_entry_generate,
+					info_sprite = help_entry_info_sprite,
+					title = help_entry_title,
+					description = help_entry_description
+				};
+			}
+			if (this.locale_tactics == null) {
+				this.locale_tactics = new ModLocaleTactics() {
+					title = locale_tactics_title,
+					description = locale_tactics_description
+				};
+			}
+		}
 	}
 }

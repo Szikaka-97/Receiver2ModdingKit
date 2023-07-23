@@ -5,7 +5,7 @@ using Receiver2;
 using UnityEngine;
 
 namespace Receiver2ModdingKit {
-	public class ModShellCasingScript : ShellCasingScript {
+	public class ModShellCasingScript : ShellCasingScript, ISerializationCallbackReceiver {
 		internal static Dictionary<CartridgeSpec.Preset, CartridgeSpec> mod_cartridges = new Dictionary<CartridgeSpec.Preset, CartridgeSpec>();
 
 		[Serializable]
@@ -44,5 +44,41 @@ namespace Receiver2ModdingKit {
         public string sound_shell_casing_impact_soft;
 
 		public ModCartridgeSpec spec;
+
+		[SerializeField]
+		[HideInInspector]
+		private float spec_casing_mass;
+		[SerializeField]
+		[HideInInspector]
+		private float spec_bullet_mass;
+		[SerializeField]
+		[HideInInspector]
+		private float spec_speed;
+		[SerializeField]
+		[HideInInspector]
+		private float spec_diameter;
+		[SerializeField]
+		[HideInInspector]
+		private float spec_density;
+
+		public void OnBeforeSerialize() {
+			this.spec_casing_mass = spec.casing_mass;
+			this.spec_bullet_mass = spec.bullet_mass;
+			this.spec_speed = spec.speed;
+			this.spec_diameter = spec.diameter;
+			this.spec_density = spec.density;
+		}
+
+		public void OnAfterDeserialize() {
+			if (this.spec == null) {
+				this.spec = new ModCartridgeSpec() {
+					casing_mass = spec_casing_mass,
+					bullet_mass = spec_bullet_mass,
+					speed = spec_speed,
+					diameter = spec_diameter,
+					density = spec_density
+				};
+			}
+		}
 	}
 }
