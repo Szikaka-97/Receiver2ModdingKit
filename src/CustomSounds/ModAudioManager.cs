@@ -38,8 +38,8 @@ namespace Receiver2ModdingKit.CustomSounds {
 
 		public class CustomEventInstanceUserData { public IntPtr sound_handle; }
 
-		private static Dictionary<string, SoundAsset> customEvents = new();
-		private static List<string> prefixes = new();
+		private static Dictionary<string, SoundAsset> customEvents = new Dictionary<string, SoundAsset>();
+		private static List<string> prefixes = new List<string>();
 		private static Bus[] busList;
 
 		/// <summary>

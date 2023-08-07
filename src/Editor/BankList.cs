@@ -17,6 +17,7 @@ namespace Receiver2ModdingKit.Editor {
 		public Queue<string> bank_load_queue = new Queue<string>();
 
 		public async void LoadBanks() {
+#if UNITY_EDITOR
 			ready = false;
 
 			if (bank_load_queue.Count == 0) {
@@ -35,9 +36,11 @@ namespace Receiver2ModdingKit.Editor {
 			bank_data.AddRange(buffer);
 
 			LoadBanks();
+#endif
 		}
 
 		public void ReloadBanks() {
+#if UNITY_EDITOR
 			bank_data.Clear();
 			offsets.Clear();
 
@@ -51,6 +54,7 @@ namespace Receiver2ModdingKit.Editor {
 				}
 			}
 			LoadBanks();
+#endif
 		}
 
 		public List<byte[]> GetBanks() {

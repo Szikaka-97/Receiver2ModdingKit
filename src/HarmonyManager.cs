@@ -204,7 +204,7 @@ namespace Receiver2ModdingKit {
 		[HarmonyPatch(typeof(MagazineScript), "UpdateRoundPositions")]
 		[HarmonyPostfix]
 		private static void PatchMagazineRoundPositions(ref MagazineScript __instance) {
-			if (__instance is not DoubleStackMagazine) return;
+			if (!(__instance is DoubleStackMagazine)) return;
 
 			for (int i = 0; i < __instance.NumRounds(); i++) {
 				var round = __instance.rounds[i];
@@ -336,7 +336,7 @@ namespace Receiver2ModdingKit {
 		[HarmonyPatch(typeof(ShellCasingScript), nameof(ShellCasingScript.CollisionSound))]
 		[HarmonyPrefix]
 		private static bool PatchCollisionSound(BallisticMaterial material, ref ShellCasingScript __instance) {
-			if (__instance.physics_collided || __instance is not ModShellCasingScript) return true;
+			if (__instance.physics_collided || !(__instance is ModShellCasingScript)) return true;
     
 			ModShellCasingScript bullet = (ModShellCasingScript) __instance;
     

@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.EditorTools;
@@ -34,3 +36,5 @@ public class PopulateGunPartMaterials : EditorTool {
 		get { return guiContent; }
 	}
 }
+
+#endif

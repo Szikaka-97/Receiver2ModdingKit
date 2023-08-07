@@ -190,7 +190,7 @@ namespace Receiver2ModdingKit {
 
 			if (this.spawn_info_sprite == null) {
 				Debug.LogError("Your gun doesn't have a spawn_info_sprite assigned, it may cause problems later");
-				this.spawn_info_sprite = Sprite.Create(Rect.zero, Vector2.zero, 1);
+				this.spawn_info_sprite = Sprite.Create(Texture2D.blackTexture, Rect.zero, Vector2.zero);
 			}
 
 			using (var debug_scope = new TransformDebugScope()) {

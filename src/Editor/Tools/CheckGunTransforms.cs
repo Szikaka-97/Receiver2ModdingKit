@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.EditorTools;
@@ -249,3 +251,5 @@ namespace Receiver2ModdingKit.Editor.Tools {
 		}
 	}
 }
+
+#endif

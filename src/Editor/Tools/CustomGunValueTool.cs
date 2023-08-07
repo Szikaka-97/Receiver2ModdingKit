@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+
+using System;
 using System.Text;
 using UnityEngine;
 using UnityEditor;
@@ -119,3 +121,5 @@ public class CustomGunValueTool : EditorTool {
 		serializedObject.ApplyModifiedProperties();
 	}
 }
+
+#endif

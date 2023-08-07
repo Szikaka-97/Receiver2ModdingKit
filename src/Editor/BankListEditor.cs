@@ -1,4 +1,6 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
+
+using UnityEditor;
 using FMOD.Studio;
 using Receiver2ModdingKit.Editor;
 using System.Collections.Generic;
@@ -92,3 +94,5 @@ public class BankListEditor : Editor {
 		studio_system.release();
 	}
 }
+
+#endif

@@ -9,7 +9,22 @@ using Receiver2;
 
 namespace Receiver2ModdingKit.ModInstaller {
 	internal class ModInstallerObject : MonoBehaviour {
-		internal record struct ModDirectoryInfo (DirectoryInfo directory, ModInfoAsset mod_info);
+		internal class ModDirectoryInfo {
+			public DirectoryInfo directory {
+				get;
+				private set;
+			}
+
+			public ModInfoAsset mod_info {
+				get;
+				private set;
+			}
+
+			public ModDirectoryInfo(DirectoryInfo directory, ModInfoAsset mod_info) {
+				this.directory = directory;
+				this.mod_info = mod_info;
+			}
+		}
 
 		internal enum InstallerState {
 			PickingDirectory,
@@ -157,9 +172,9 @@ namespace Receiver2ModdingKit.ModInstaller {
 
 			var modinfo = mod_dir_info.mod_info;
 
-			if (modinfo.ModdingKitVersion != PluginInfo.PLUGIN_VERSION) {
+			if (modinfo.ModdingKitVersion != ModdingKitCorePlugin.instance.Info.Metadata.Version.ToString()) {
 				if (prompt_result != null) {
-					if (prompt_result == true) modinfo.ModdingKitVersion = PluginInfo.PLUGIN_VERSION;
+					if (prompt_result == true) modinfo.ModdingKitVersion = ModdingKitCorePlugin.instance.Info.Metadata.Version.ToString();
 					else {
 						current_state = InstallerState.Finishing;
 						return;

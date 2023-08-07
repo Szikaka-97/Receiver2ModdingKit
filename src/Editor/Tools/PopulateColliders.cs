@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+
+using UnityEngine;
 using UnityEditor;
 using UnityEditor.EditorTools;
 using Receiver2;
@@ -41,3 +43,5 @@ public class PopulateColliders : EditorTool {
 		get { return guiContent; }
 	}
 }
+
+#endif

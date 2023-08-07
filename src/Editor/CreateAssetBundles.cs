@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using System;
 using System.IO;
 using UnityEngine;
@@ -8,9 +10,9 @@ public class CreateAssetBundles {
 	static string asset_bundle_directory = "Assets/AssetBundles";
 
 	static Tuple<BuildTarget, OperatingSystemFamily>[] targets = new Tuple<BuildTarget, OperatingSystemFamily>[] {
-		new (BuildTarget.StandaloneWindows, OperatingSystemFamily.Windows),
-		new (BuildTarget.StandaloneLinux64, OperatingSystemFamily.Linux),
-		new (BuildTarget.StandaloneOSX, OperatingSystemFamily.MacOSX)
+		new Tuple<BuildTarget, OperatingSystemFamily>(BuildTarget.StandaloneWindows, OperatingSystemFamily.Windows),
+		new Tuple<BuildTarget, OperatingSystemFamily>(BuildTarget.StandaloneLinux64, OperatingSystemFamily.Linux),
+		new Tuple<BuildTarget, OperatingSystemFamily>(BuildTarget.StandaloneOSX, OperatingSystemFamily.MacOSX)
 	};
 
 	static void buildSystemAssetBundles(Tuple<BuildTarget, OperatingSystemFamily> target) {
@@ -109,3 +111,5 @@ public class CreateAssetBundles {
 		}
 	}
 }
+
+#endif

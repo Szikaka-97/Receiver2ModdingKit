@@ -63,8 +63,7 @@ namespace Receiver2ModdingKit {
 
 				m_button_setting_prefab = GameObject.Instantiate(GameObject.Find(right_column_menu_path).GetComponentInChildren<Button>().transform.parent.gameObject);
 				m_button_setting_prefab.GetComponentInChildren<Button>().gameObject.name = "Button";
-				m_button_setting_prefab.GetComponentInChildren<Button>().onClick.m_PersistentCalls.Clear();
-				m_button_setting_prefab.GetComponentInChildren<Button>().onClick.m_Calls.Clear();
+				m_button_setting_prefab.GetComponentInChildren<Button>().onClick.RemoveAllListeners();
 
                 return m_button_setting_prefab;
             }
@@ -116,8 +115,8 @@ namespace Receiver2ModdingKit {
 
 			var button_event = button.transform.Find("Button").GetComponent<Button>().onClick;
 
-			button_event.m_PersistentCalls.Clear();
-			button_event.m_Calls = new InvokableCallList();
+			button_event.RemoveAllListeners();
+			// button_event.m_Calls = new InvokableCallList();
 			button_event.AddListener(callback);
 
 			button.transform.SetParent(GameObject.Find(right_column_menu_path).transform);
@@ -157,8 +156,8 @@ namespace Receiver2ModdingKit {
 
 					var toggle_component = control.GetComponent(Type.GetType("Receiver2.ToggleComponent, Wolfire.Receiver2, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"));
 					UnityEvent<T> toggle_event = toggle_component.GetType().GetField("OnChange").GetValue(toggle_component) as UnityEvent<T>;
-					toggle_event.m_PersistentCalls.Clear();
-					toggle_event.m_Calls.Clear();
+					toggle_event.RemoveAllListeners();
+					toggle_event.RemoveAllListeners();
 
 					toggle_event.AddListener(value => { config_entry.Value = value; });
 					config_entry.SettingChanged += new EventHandler((caller, args) => {
@@ -170,7 +169,7 @@ namespace Receiver2ModdingKit {
 
 					break;
 				case "String":
-					if(config_entry.Description.AcceptableValues is not AcceptableValueList<string>) {
+					if(!(config_entry.Description.AcceptableValues is AcceptableValueList<string>)) {
 						throw new ArgumentException("SettingsMenuManager.CreateSettingsManuOption(): Config entry must have an AcceptableValueList<string> in its description to use the dropdown");
 					}
 
@@ -185,8 +184,8 @@ namespace Receiver2ModdingKit {
 
 					var dropdown_event = dropdown_component.OnChange;
 
-					dropdown_event.m_PersistentCalls.Clear();
-					dropdown_event.m_Calls.Clear();
+					dropdown_event.RemoveAllListeners();
+					dropdown_event.RemoveAllListeners();
 					dropdown_event.AddListener(value => { config_entry.Value = (T) Convert.ChangeType(((AcceptableValueList<string>) config_entry.Description.AcceptableValues).AcceptableValues[value], typeof(T)); });
 
 					config_entry.SettingChanged += new EventHandler((caller, args) => {
@@ -197,7 +196,7 @@ namespace Receiver2ModdingKit {
 
 					break;
 				case "Single":
-					if(config_entry.Description.AcceptableValues is not AcceptableValueRange<float>) {
+					if(!(config_entry.Description.AcceptableValues is AcceptableValueRange<float>)) {
 						throw new ArgumentException("SettingsMenuManager.CreateSettingsManuOption(): Config entry must have an AcceptableValueRange<float> in its description to use the slider");
 					}
 
@@ -227,8 +226,8 @@ namespace Receiver2ModdingKit {
 
 					var slider_event = slider_component.OnChange;
 
-					slider_event.m_PersistentCalls.Clear();
-					slider_event.m_Calls.Clear();
+					slider_event.RemoveAllListeners();
+					slider_event.RemoveAllListeners();
 					slider_event.AddListener(value => { config_entry.Value = (T) Convert.ChangeType(value, typeof(T)); });
 
 					config_entry.SettingChanged += new EventHandler((caller, args) => {

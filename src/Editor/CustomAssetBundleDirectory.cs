@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+
+using UnityEngine;
 using UnityEditor;
 
 public class CustomAssetBundleDirectory : EditorWindow {
@@ -64,3 +66,5 @@ public class CustomAssetBundleDirectory : EditorWindow {
 		dir_list.ApplyModifiedProperties();
 	}
 }
+
+#endif

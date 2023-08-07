@@ -7,7 +7,7 @@ using Receiver2;
 using Receiver2ModdingKit.ModInstaller;
 
 namespace Receiver2ModdingKit {
-	[BepInPlugin("pl.szikaka.receiver_2_modding_kit", "Receiver 2 Modding Kit", "1.3.0")]
+	[BepInPlugin("pl.szikaka.receiver_2_modding_kit", "Receiver 2 Modding Kit", "1.3.2")]
 	[BepInProcess("Receiver2")]
 	public class ModdingKitCorePlugin : BaseUnityPlugin {
 		public static ModdingKitCorePlugin instance {
@@ -52,7 +52,7 @@ namespace Receiver2ModdingKit {
 			error_text.faceColor = new Color32(255, 50, 50, 255);
 			error_text.text = 
 				"An error happened within the Modding Kit:\n" +
-				"   Modding Kit version " + PluginInfo.PLUGIN_VERSION + "\n" +
+				"   Modding Kit version " + Info.Metadata.Version.ToString() + "\n" +
 				"   Was made to support game version " + supportedVersion + "\n" +
 				"   And will not work for this version (" + ReceiverCoreScript.Instance().build_info.version + ")\n" +
 				"   Please update your game and/or plugin"

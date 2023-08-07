@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿#if UNITY_EDITOR
+
+using System.Linq;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.EditorTools;
@@ -37,3 +39,5 @@ public class PopulateGunSprings : EditorTool {
 		get { return guiContent; }
 	}
 }
+
+#endif

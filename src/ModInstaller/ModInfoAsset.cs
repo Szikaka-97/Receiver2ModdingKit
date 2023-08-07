@@ -88,7 +88,7 @@ namespace Receiver2ModdingKit.ModInstaller {
 				edited_asset.OperatingSystem = operating_systems[os_index];
 
 				edited_asset.GameVersion = ReceiverCoreScript.Instance().build_info.version;
-				edited_asset.ModdingKitVersion = PluginInfo.PLUGIN_VERSION;
+				edited_asset.ModdingKitVersion = ModdingKitCorePlugin.instance.Info.Metadata.Version.ToString();
 
 				if (ImGui.Button("Clear")) {
 					edited_asset = new ModInfoAsset();
@@ -141,9 +141,9 @@ namespace Receiver2ModdingKit.ModInstaller {
 				return null;
 			}
 
-			asset.ModName = jsonFile.HasKey("modName") ? jsonFile["modName"] : defaultName;
-			asset.CreatorName = jsonFile.HasKey("creatorName") ? jsonFile["creatorName"] : "";
-			asset.Version = jsonFile.HasKey("version") ? jsonFile["version"] : "";
+			asset.ModName = jsonFile.HasKey("modName") ? (string) jsonFile["modName"] : defaultName;
+			asset.CreatorName = jsonFile.HasKey("creatorName") ? (string) jsonFile["creatorName"] : "";
+			asset.Version = jsonFile.HasKey("version") ? (string) jsonFile["version"] : "";
 
 			if (jsonFile.HasKey("operatingSystem")) {
 				if (Enum.TryParse(jsonFile["operatingSystem"], out OperatingSystemFamily operatingSystem)) {
@@ -160,8 +160,8 @@ namespace Receiver2ModdingKit.ModInstaller {
 				asset.OperatingSystem = OperatingSystemFamily.Windows;
 			}
 
-			asset.GameVersion = jsonFile.HasKey("gameVersion") ? jsonFile["gameVersion"] : "2.2.3";
-			asset.ModdingKitVersion = jsonFile.HasKey("moddingKitVersion") ? jsonFile["moddingKitVersion"] : "0.0.0";
+			asset.GameVersion = jsonFile.HasKey("gameVersion") ? (string) jsonFile["gameVersion"] : "2.2.3";
+			asset.ModdingKitVersion = jsonFile.HasKey("moddingKitVersion") ? (string) jsonFile["moddingKitVersion"] : "0.0.0";
 			return asset;
 		}
 
