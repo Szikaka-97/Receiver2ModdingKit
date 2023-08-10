@@ -236,7 +236,7 @@ namespace Receiver2ModdingKit {
 				Debug.LogException(e);
 			}
 		}
-		new private void Update() {
+		new protected void Update() {
 			using (var debug_scope = new TransformDebugScope()) { 
 				try {
 					base.Update();

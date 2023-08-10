@@ -18,6 +18,7 @@ namespace Receiver2ModdingKit.Editor {
 
 		public async void LoadBanks() {
 #if UNITY_EDITOR
+#pragma warning disable CS1998
 			ready = false;
 
 			if (bank_load_queue.Count == 0) {
@@ -36,6 +37,7 @@ namespace Receiver2ModdingKit.Editor {
 			bank_data.AddRange(buffer);
 
 			LoadBanks();
+#pragma warning restore CS1998
 #endif
 		}
 

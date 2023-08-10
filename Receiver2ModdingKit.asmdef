@@ -1,8 +1,6 @@
 {
     "name": "Receiver2ModdingKit",
-    "references": [
-        "GUID:6055be8ebefd69e48b49212b09b47b2f"
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
@@ -14,7 +12,9 @@
         "ImGui.dll",
         "SimpleJSON.dll",
         "BepInEx.dll",
-        "Mono.Cecil.dll"
+        "Mono.Cecil.dll",
+        "UnityEngine.UI.dll",
+        "Unity.TextMeshPro.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],

@@ -43,7 +43,7 @@ public class CheckMagazineRoundPositionsTool : EditorTool {
 
 		Handles.BeginGUI();
 
-		GUILayout.BeginArea(new Rect(10, 10, 150, 102), background_style);
+		GUILayout.BeginArea(new Rect(10, 10, 150, 202), background_style);
 		GUILayout.Label("Magazine", background_style);
 
 		if (round_count == -1) {
@@ -66,6 +66,12 @@ public class CheckMagazineRoundPositionsTool : EditorTool {
 		if (GUILayout.Button("Update")) {
 			UpdateRounds();
 		}
+
+		magazine.round_position_params.param_a = GUILayout.HorizontalSlider(magazine.round_position_params.param_a, 0, 1, GUILayout.Height(20));
+		magazine.round_position_params.param_b = GUILayout.HorizontalSlider(magazine.round_position_params.param_b, 0, 1, GUILayout.Height(20));
+		magazine.round_position_params.param_c = GUILayout.HorizontalSlider(magazine.round_position_params.param_c, 0, 1, GUILayout.Height(20));
+		magazine.round_position_params.param_d = GUILayout.HorizontalSlider(magazine.round_position_params.param_d, 0, 1, GUILayout.Height(20));
+		magazine.round_position_params.param_e = GUILayout.HorizontalSlider(magazine.round_position_params.param_e, 0, 1, GUILayout.Height(20));
 
 		GUILayout.EndArea();
 
@@ -146,8 +152,10 @@ public class CheckMagazineRoundPositionsTool : EditorTool {
 			}
 			else {
 				for (int i = 0; i < round_count; i++) {
-					Debug.Log(magazine.AddRound());
+					magazine.AddRound();
 				}
+
+				magazine.UpdateRoundPositions();
 			}
 		} catch (NullReferenceException e) {
 			Debug.LogError("Error Happened:" + e.StackTrace);

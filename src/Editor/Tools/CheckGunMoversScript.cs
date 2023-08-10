@@ -1,8 +1,11 @@
-﻿using System.Collections;
+﻿#if UNITY_EDITOR
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.EditorTools;
+using Receiver2;
 
 namespace Receiver2ModdingKit.Editor.Tools {
 	[EditorTool("Check Gun Transforms", typeof(GunScript))]
@@ -164,3 +167,5 @@ namespace Receiver2ModdingKit.Editor.Tools {
 			}
 			ImGui.End();
 */
+
+#endif
