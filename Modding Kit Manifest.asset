@@ -17,7 +17,7 @@ MonoBehaviour:
   Author: Szikaka
   Name: Receiver 2 Modding Kit
   Description: 
-  Version: 1.2.9
+  Version: 1.3.2
   Dependencies: []
 --- !u!114 &-779784125055682449
 MonoBehaviour:
@@ -31,13 +31,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b243ff405b33b94dbf5b6775dd9aa33, type: 3}
   m_Name: Files
   m_EditorClassIdentifier: 
-  StagingPaths: []
+  StagingPaths:
+  - D:\Gry\Steam\steamapps\common\Receiver 2\BepInEx\plugins\Receiver2ModdingKit
   includeMetaFiles: 0
   files:
-  - {fileID: 2800000, guid: 90061860590a8774daade1050ebed3e5, type: 3}
-  - {fileID: 102900000, guid: de34cb332ee71d14fb6fd9fe797be60f, type: 3}
-  - {fileID: 102900000, guid: f13675bf64855ba4eb3ba01d24ecdb63, type: 3}
-  - {fileID: 2800000, guid: 697a985fa585a63468d43e35bdc8c52c, type: 3}
+  - {fileID: 2800000, guid: cce70fca3163cde4d98f84fc13dfdc10, type: 3}
+  - {fileID: 102900000, guid: ddb80bdf67cbe074da3d2da333cb89b3, type: 3}
+  - {fileID: 102900000, guid: 48ab137a757cbfb4e897e8bec755eb2c, type: 3}
+  - {fileID: 2800000, guid: 9b56e72cb4bd5864e9e0d794ffabab40, type: 3}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -66,10 +67,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2b7e13dda513544419a89926bd12ad8a, type: 3}
-  m_Name: AssemblyDefinitions
+  m_Name: Modding Kit Manifest
   m_EditorClassIdentifier: 
   StagingPaths:
   - D:\Gry\Steam\steamapps\common\Receiver 2\BepInEx\plugins\Receiver2ModdingKit
   definitions:
-  - {fileID: 5897886265953266890, guid: 3c145d048ff854a418f4aaa92d0b246a, type: 3}
-  - {fileID: 5897886265953266890, guid: 295c8dc7bd2ac81469499efa03e1c693, type: 3}
+  - {fileID: 5897886265953266890, guid: 041edb9e43e1cd140a16ecbcf83eaffa, type: 3}

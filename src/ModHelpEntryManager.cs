@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Collections.Generic;
 using Receiver2;
 using HarmonyLib;
 using UnityEngine;
@@ -34,15 +35,20 @@ namespace Receiver2ModdingKit {
 		}
 
 		void Awake() {
-			using (var image_stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Receiver2ModdingKit.resources.cog.png")) {
-				byte[] data = new byte[image_stream.Length];
+			using (var image_stream = ModdingKitCorePlugin.GetResourceStream("cog.png")) {
+				if (image_stream.Length > 0) {
+					byte[] data = new byte[image_stream.Length];
 
-				image_stream.Read(data, 0, (int) image_stream.Length);
+					image_stream.Read(data, 0, (int) image_stream.Length);
 
-				var temp_texture = new Texture2D(64, 64);
-				temp_texture.LoadImage(data);
+					var temp_texture = new Texture2D(64, 64);
+					temp_texture.LoadImage(data);
 
-				secondary_button_sprite = Sprite.Create(temp_texture, new Rect(0, 0, 64, 64), new Vector2(0.5f, 0.5f));
+					secondary_button_sprite = Sprite.Create(temp_texture, new Rect(0, 0, 64, 64), new Vector2(0.5f, 0.5f));
+				}
+				else {
+					secondary_button_sprite = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 64, 64), new Vector2(0.5f, 0.5f));
+				}
 			}
 		}
 

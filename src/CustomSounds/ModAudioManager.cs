@@ -59,10 +59,10 @@ namespace Receiver2ModdingKit.CustomSounds {
 
 			FMOD.Studio.Bank master_bank, master_strings_bank;
 
-			using (var master_bank_strean = Assembly.GetExecutingAssembly().GetManifestResourceStream("Receiver2ModdingKit.resources.MainModBank.bank")) {
-				var master_bank_bytes = new byte[master_bank_strean.Length];
+			using (var master_bank_stream = ModdingKitCorePlugin.GetResourceStream("MainModBank.bank")) {
+				var master_bank_bytes = new byte[master_bank_stream.Length];
 
-				master_bank_strean.Read(master_bank_bytes, 0, master_bank_bytes.Length);
+				master_bank_stream.Read(master_bank_bytes, 0, master_bank_bytes.Length);
 
 				if (
 					Utility.IsError(mod_system.loadBankMemory(master_bank_bytes, LOAD_BANK_FLAGS.UNENCRYPTED, out master_bank), "FMOD load master bank")
@@ -72,7 +72,7 @@ namespace Receiver2ModdingKit.CustomSounds {
 					return;
 				}
 			}
-			using (var strings_bank_stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Receiver2ModdingKit.resources.MainModBank.strings.bank")) {
+			using (var strings_bank_stream = ModdingKitCorePlugin.GetResourceStream("MainModBank.strings.bank")) {
 				var strings_bank_bytes = new byte[strings_bank_stream.Length];
 
 				strings_bank_stream.Read(strings_bank_bytes, 0, strings_bank_bytes.Length);

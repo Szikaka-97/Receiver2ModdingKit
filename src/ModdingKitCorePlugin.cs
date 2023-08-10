@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using UnityEngine;
 using TMPro;
 using BepInEx;
@@ -30,6 +31,16 @@ namespace Receiver2ModdingKit {
 			ExecuteOnStartup += action;
 		}
 		internal static StartupAction ExecuteOnStartup = new StartupAction(() => { });
+
+		public static Stream GetResourceStream(string resource_name) {
+			if(Assembly.GetExecutingAssembly().GetManifestResourceInfo("Receiver2ModdingKit.resources." + resource_name) != null) {
+				return Assembly.GetExecutingAssembly().GetManifestResourceStream("Receiver2ModdingKit.resources." + resource_name);
+			}
+			else if (File.Exists(Path.Combine(Path.GetDirectoryName(instance.Info.Location), resource_name))) {
+				return File.OpenRead(Path.Combine(Path.GetDirectoryName(ModdingKitCorePlugin.instance.Info.Location), resource_name));
+			}
+			return Stream.Null;
+		}
 
 		private System.Collections.IEnumerator SetErrorState() {
 			while (ReceiverCoreScript.Instance() == null) yield return null;

@@ -24,15 +24,22 @@ namespace Receiver2ModdingKit {
 		internal static void Init() {
 			instantiate_tape_button_prefab = Object.Instantiate(GameObject.Find("ReceiverCore/Menus/Overlay Menu Canvas/Aspect Ratio Fitter/New Pause Menu/Backdrop1/Sub-Menu Layout Group/New Tape Menu/Entries Layout/ScrollableContent Variant/Viewport/Content/Standard/Invalid/Secondary Button"));
 			
-			using (var image_stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Receiver2ModdingKit.resources.tape.png")) {
-				byte[] data = new byte[image_stream.Length];
+			Debug.Log(Assembly.GetExecutingAssembly().GetManifestResourceInfo("Receiver2ModdingKit.resources.tape.png"));
 
-				image_stream.Read(data, 0, (int) image_stream.Length);
+			using (var image_stream = ModdingKitCorePlugin.GetResourceStream("tape.png")) {
+				if (image_stream.Length > 0) {
+					byte[] data = new byte[image_stream.Length];
 
-				var temp_texture = new Texture2D(64, 64);
-				temp_texture.LoadImage(data);
+					image_stream.Read(data, 0, (int) image_stream.Length);
 
-				instantiate_tape_sprite = Sprite.Create(temp_texture, new Rect(0, 0, 64, 64), new Vector2(0.5f, 0.5f));
+					var temp_texture = new Texture2D(64, 64);
+					temp_texture.LoadImage(data);
+
+					instantiate_tape_sprite = Sprite.Create(temp_texture, new Rect(0, 0, 64, 64), new Vector2(0.5f, 0.5f));
+				}
+				else {
+					instantiate_tape_sprite = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 64, 64), new Vector2(0.5f, 0.5f));
+				}
 			}
 
 			instantiate_tape_button_prefab.name = "Instantiate Tape ";

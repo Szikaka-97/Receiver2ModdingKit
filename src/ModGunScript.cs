@@ -18,7 +18,7 @@ namespace Receiver2ModdingKit {
 
 			public LocaleTactics GetLocaleTactics(GunScript gun) {
 				return new LocaleTactics() {
-					gun_internal_name = gun.InternalName,
+					gun_internal_name = gun.weapon_group_name,
 					title = this.title.IsNullOrWhiteSpace() ? gun.InternalName : this.title,
 					text = description
 				};
