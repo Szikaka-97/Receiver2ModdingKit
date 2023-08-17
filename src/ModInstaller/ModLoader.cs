@@ -126,13 +126,13 @@ namespace Receiver2ModdingKit.ModInstaller {
 				items.AddRange( magazines );
 			}
 
-			if (!Locale.active_locale_tactics.ContainsKey(gun.InternalName)) { //Loading pause menu description
-				Locale.active_locale_tactics.Add(gun.InternalName, gun.GetGunTactics());
+			if (!Locale.active_locale_tactics.ContainsKey(gun.weapon_group_name)) { //Loading pause menu description
+				Locale.active_locale_tactics.Add(gun.weapon_group_name, gun.GetGunTactics());
 			}
 
 			ModHelpEntry entry = gun.GetGunHelpEntry(); //Loading help menu entry
-			if (entry != null && !ModHelpEntryManager.entries.ContainsKey(gun.InternalName)) {
-				ModHelpEntryManager.entries.Add(gun.InternalName, entry);
+			if (entry != null && !ModHelpEntryManager.entries.ContainsKey(gun.weapon_group_name)) {
+				ModHelpEntryManager.entries.Add(gun.weapon_group_name, entry);
 			}
 
 			if (gun.audio != null) { //Loading custom audio

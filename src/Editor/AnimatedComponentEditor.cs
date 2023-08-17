@@ -80,6 +80,8 @@ namespace Receiver2ModdingKit.Editor {
 				Undo.RecordObject(target, "Move point");
 
 				foreach (var animated_component in animated_components) {
+					if (animated_component.mover_name != anim.mover_name) continue;
+
 					ApplyMovement(animated_component, out var new_position, out var new_euler_angles);
 
 					animated_component.transform.localPosition = new_position;
@@ -87,6 +89,12 @@ namespace Receiver2ModdingKit.Editor {
 				}
 
 				moved_by_slider = true;
+			}
+
+			if (GUILayout.Button("Apply")) {
+				moved_by_slider = false;
+
+				PrefabUtility.RecordPrefabInstancePropertyModifications(anim.transform);
 			}
 		}
 
@@ -178,6 +186,5 @@ namespace Receiver2ModdingKit.Editor {
 		}
 	}
 }
-
 
 #endif

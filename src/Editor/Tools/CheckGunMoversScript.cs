@@ -8,7 +8,7 @@ using UnityEditor.EditorTools;
 using Receiver2;
 
 namespace Receiver2ModdingKit.Editor.Tools {
-	[EditorTool("Check Gun Transforms", typeof(GunScript))]
+	[EditorTool("Check Gun Movers", typeof(GunScript))]
     public class CheckGunMoversScript : EditorTool {
         public override void OnToolGUI(EditorWindow window) {
 

@@ -19,20 +19,28 @@ public class PopulateGunSprings : EditorTool {
 			text = "Populate Gun Update Springs",
 			tooltip = "Use this tool to populate gun's Update Springs list"
 		};
+	}
 
-		GunScript gun = (GunScript) target;
-		SerializedObject serializedObject = new SerializedObject(target);
+	public override void OnToolGUI(EditorWindow window) {
+		GUILayout.BeginArea(new Rect(10, 10, 170, 100));
 
-		serializedObject.FindProperty("update_springs").ClearArray();
-		
-		foreach(var spring in gun.GetComponentsInChildren<SpringCompressInstance>()) {
-			serializedObject.FindProperty("update_springs").InsertArrayElementAtIndex(0);
+		if (GUILayout.Button("Populate Springs")) {
+			GunScript gun = (GunScript) target;
+			SerializedObject serializedObject = new SerializedObject(target);
 
-			var serialized_spring = serializedObject.FindProperty("update_springs").GetArrayElementAtIndex(0);
+			serializedObject.FindProperty("update_springs").ClearArray();
+			
+			foreach(var spring in gun.GetComponentsInChildren<SpringCompressInstance>()) {
+				serializedObject.FindProperty("update_springs").InsertArrayElementAtIndex(0);
 
-			serialized_spring.FindPropertyRelative("update_direction").boolValue = false;
-			serialized_spring.FindPropertyRelative("spring").objectReferenceValue = spring;
+				var serialized_spring = serializedObject.FindProperty("update_springs").GetArrayElementAtIndex(0);
+
+				serialized_spring.FindPropertyRelative("update_direction").boolValue = false;
+				serialized_spring.FindPropertyRelative("spring").objectReferenceValue = spring;
+			}
 		}
+
+		GUILayout.EndArea();
 	}
 
 	public override GUIContent toolbarIcon {
