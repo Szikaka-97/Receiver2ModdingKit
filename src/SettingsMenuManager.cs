@@ -195,6 +195,9 @@ namespace Receiver2ModdingKit {
 					dropdown_component.Select(value_list.IndexOf((string) Convert.ChangeType(config_entry.Value, typeof(string))));
 
 					break;
+				case "Int32":
+				case "Int64":
+				case "Double":
 				case "Single":
 					if(!(config_entry.Description.AcceptableValues is AcceptableValueRange<float>)) {
 						throw new ArgumentException("SettingsMenuManager.CreateSettingsManuOption(): Config entry must have an AcceptableValueRange<float> in its description to use the slider");
@@ -210,19 +213,21 @@ namespace Receiver2ModdingKit {
 					if (config_entry.Description.Tags.Contains("format: percent")) {
 						slider_component.format = "P0";
 					}
-					else if (config_entry.Description.Tags.Any( tag => 
-						tag is string && Regex.IsMatch((string) tag, "format: [a-Z0-9]{1,2}$")
-					)) {
-						slider_component.format = ((string) config_entry.Description.Tags.First( tag => 
-							tag is string && Regex.IsMatch((string) tag, "format: [a-Z0-9]{1,2}$")
-						)).Substring(8);
+					else {
+						string format = (string) config_entry.Description.Tags.FirstOrDefault( 
+							tag => tag is string && Regex.IsMatch((string) tag, "format: [a-Z0-9]{1,2}$")
+						);
+
+						if (format != null) {
+							slider_component.format = format.Substring(8);
+						}
+						else slider_component.format = "0";
 					}
-					else slider_component.format = "0";
 
 					slider_component.format = config_entry.Description.Tags.Contains("format: percent") ? "P0" : "0";
 
-					slider_component.slider.minValue = (float) value_range.MinValue;
-					slider_component.slider.maxValue = (float) value_range.MaxValue;
+					slider_component.slider.minValue = value_range.MinValue;
+					slider_component.slider.maxValue = value_range.MaxValue;
 
 					var slider_event = slider_component.OnChange;
 
@@ -230,11 +235,20 @@ namespace Receiver2ModdingKit {
 					slider_event.RemoveAllListeners();
 					slider_event.AddListener(value => { config_entry.Value = (T) Convert.ChangeType(value, typeof(T)); });
 
-					config_entry.SettingChanged += new EventHandler((caller, args) => {
-						slider_component.Value = (float) Convert.ChangeType(config_entry.Value, typeof(float));
-					});
+					if (typeof(T).Name.StartsWith("Int")) {
+						config_entry.SettingChanged += new EventHandler((caller, args) => {
+							slider_component.Value = Mathf.Floor((float) Convert.ChangeType(config_entry.Value, typeof(float)));
+						});
 
-					slider_component.Value = (float) Convert.ChangeType(config_entry.Value, typeof(float));
+						slider_component.Value = Mathf.Floor((float) Convert.ChangeType(config_entry.Value, typeof(float)));
+					}
+					else {
+						config_entry.SettingChanged += new EventHandler((caller, args) => {
+							slider_component.Value = (float) Convert.ChangeType(config_entry.Value, typeof(float));
+						});
+
+						slider_component.Value = (float) Convert.ChangeType(config_entry.Value, typeof(float));
+					}
 
 					break;
 				default:

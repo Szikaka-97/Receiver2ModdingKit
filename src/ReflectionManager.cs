@@ -43,6 +43,11 @@ namespace Receiver2ModdingKit {
 			private set;
 		}
 
+		public static FieldInfo GS_firing_pin {
+			get;
+			private set;
+		}
+
 		public static FieldInfo RCS_gun_prefabs_all {
 			get;
 			private set;
@@ -144,6 +149,7 @@ namespace Receiver2ModdingKit {
 			GS_select_fire = GetFieldInfo(typeof(GunScript), "select_fire");
 			GS_yoke_open = GetFieldInfo(typeof(GunScript), "yoke_open");
 			GS_current_firing_mode_index = GetFieldInfo(typeof(GunScript), "current_firing_mode_index");
+			GS_firing_pin = GetFieldInfo(typeof(GunScript), "firing_pin");
 			PH_bounds = GetFieldInfo(typeof(PegboardHanger), "bounds");
 			RCS_gun_prefabs_all = GetFieldInfo(typeof(ReceiverCoreScript), "gun_prefabs_all");
 

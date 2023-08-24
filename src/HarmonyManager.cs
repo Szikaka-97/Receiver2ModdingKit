@@ -22,6 +22,7 @@ namespace Receiver2ModdingKit {
 			public static Harmony TransformDebug;
 			public static Harmony DevMenu;
 			public static Harmony FMODDebug;
+			public static Harmony LocalAimHandler;
 			public static Harmony Thunderstore;
 		}
 
@@ -121,6 +122,30 @@ namespace Receiver2ModdingKit {
 
 				if (!codeMatcher.ReportFailure(__originalMethod, Debug.LogError)) {
 					codeMatcher.InsertAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(CustomSounds.ModAudioManager), nameof(CustomSounds.ModAudioManager.DrawImGUIDebug))));
+				}
+
+				return codeMatcher.InstructionEnumeration();
+			}
+		}
+
+		//This method should patch the HandleGunControls, decoupling the slide lock logic from the hardcoded HiPoint check
+		//For some reason, it makes the player drop any magazine they unload from gun and as such, has been temporarily banned to the transpiler jail
+		[HarmonyPatch(typeof(LocalAimHandler), "HandleGunControls")]
+		private static class LAHGunControlsTranspiler {
+			private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase __originalMethod) {
+				CodeMatcher codeMatcher = new CodeMatcher(instructions, generator)
+				.MatchForward(false, 
+					new CodeMatch(OpCodes.Ldarg_1),
+					new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(GunScript), nameof(GunScript.gun_model))),
+					new CodeMatch(OpCodes.Ldc_I4_5),
+					new CodeMatch(OpCodes.Bne_Un)
+				);
+
+				if (!codeMatcher.ReportFailure(__originalMethod, Debug.LogError)) {
+					codeMatcher
+					.Advance(1)
+					.SetOperandAndAdvance(AccessTools.Field(typeof(GunScript), nameof(GunScript.slide_lock_is_safety)))
+					.SetOpcodeAndAdvance(OpCodes.Ldc_I4_1);
 				}
 
 				return codeMatcher.InstructionEnumeration();
@@ -376,6 +401,24 @@ namespace Receiver2ModdingKit {
 			return false;
 		}
 
+		[HarmonyPatch(typeof(MagazineScript), nameof(MagazineScript.Awake))]
+		[HarmonyPrefix]
+		private static void PatchMagazineAwake(MagazineScript __instance) {
+			foreach (var spring in __instance.GetComponentsInChildren<SpringCompressInstance>()) {
+				if (spring == null) {
+					Debug.LogError("Null spring in magazine \"" + __instance.InternalName + "\"");
+					continue;
+				}
+
+				if (spring.orig_center.magnitude > 0) {
+					continue;
+				}
+				spring.orig_center = (spring.transform.InverseTransformPoint(spring.new_top.position) + spring.transform.InverseTransformPoint(spring.new_bottom.position)) / 2;
+				spring.orig_dist = Vector3.Distance(spring.new_top.position, spring.new_bottom.position);
+
+			}
+		}
+
 		#endregion
 
 		internal static void UnpatchAll() {
@@ -403,6 +446,7 @@ namespace Receiver2ModdingKit {
 			HarmonyInstances.GunScript = Harmony.CreateAndPatchAll(typeof(GunScriptTranspiler));
 			HarmonyInstances.ModHelpEntry = Harmony.CreateAndPatchAll(typeof(ModHelpEntryManager));
 			HarmonyInstances.CustomSounds = Harmony.CreateAndPatchAll(typeof(CustomSounds.ModAudioPatches));
+			// HarmonyInstances.LocalAimHandler = Harmony.CreateAndPatchAll(typeof(LAHGunControlsTranspiler));
 
 			#if DEBUG
 			HarmonyInstances.DevMenu = Harmony.CreateAndPatchAll(typeof(DevMenuTranspiler));

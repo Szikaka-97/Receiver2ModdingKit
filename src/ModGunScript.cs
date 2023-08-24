@@ -59,6 +59,11 @@ namespace Receiver2ModdingKit {
 			set { ReflectionManager.GS_current_firing_mode_index.SetValue(this, value); }
 		}
 
+		protected LinearMover _firing_pin {
+			get { return (LinearMover) ReflectionManager.GS_firing_pin.GetValue(this); }
+			set { ReflectionManager.GS_firing_pin.SetValue(this, value); }
+		}
+
 		public bool visible_in_spawnmenu = true;
 		public bool spawns_in_dreaming = true;
 		public ModHelpEntry help_entry;
