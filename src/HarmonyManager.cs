@@ -10,6 +10,7 @@ using Receiver2;
 using Receiver2ModdingKit.ModInstaller;
 using Receiver2ModdingKit.Editor;
 using System.IO;
+using System.Text;
 
 namespace Receiver2ModdingKit {
     public static class HarmonyManager {
@@ -128,12 +129,12 @@ namespace Receiver2ModdingKit {
 			}
 		}
 
-		//This method should patch the HandleGunControls, decoupling the slide lock logic from the hardcoded HiPoint check
-		//For some reason, it makes the player drop any magazine they unload from gun and as such, has been temporarily banned to the transpiler jail
 		[HarmonyPatch(typeof(LocalAimHandler), "HandleGunControls")]
 		private static class LAHGunControlsTranspiler {
 			private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase __originalMethod) {
-				CodeMatcher codeMatcher = new CodeMatcher(instructions, generator)
+				CodeMatcher codeMatcher = new CodeMatcher(instructions, generator);
+
+				codeMatcher
 				.MatchForward(false, 
 					new CodeMatch(OpCodes.Ldarg_1),
 					new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(GunScript), nameof(GunScript.gun_model))),
@@ -146,6 +147,15 @@ namespace Receiver2ModdingKit {
 					.Advance(1)
 					.SetOperandAndAdvance(AccessTools.Field(typeof(GunScript), nameof(GunScript.slide_lock_is_safety)))
 					.SetOpcodeAndAdvance(OpCodes.Ldc_I4_1);
+				}
+
+				codeMatcher
+				.MatchForward(false, new CodeMatch(OpCodes.Leave));
+
+				if (!codeMatcher.ReportFailure(__originalMethod, Debug.LogError)) {
+					codeMatcher
+					.Advance(1)
+					.Insert(new CodeInstruction(OpCodes.Nop));
 				}
 
 				return codeMatcher.InstructionEnumeration();
@@ -348,7 +358,7 @@ namespace Receiver2ModdingKit {
 				Locale.active_locale_tape_menu_entries_string.Add(tape.tape_id_string, entry);
 			}
 
-			foreach(var ev in ModdingKitCorePlugin.ExecuteOnStartup.GetInvocationList()) {
+			foreach(var ev in ModdingKitEvents.ExecuteOnStartup.GetInvocationList()) {
 				try {
 					ev.DynamicInvoke();
 				} catch (Exception e) {
@@ -446,7 +456,7 @@ namespace Receiver2ModdingKit {
 			HarmonyInstances.GunScript = Harmony.CreateAndPatchAll(typeof(GunScriptTranspiler));
 			HarmonyInstances.ModHelpEntry = Harmony.CreateAndPatchAll(typeof(ModHelpEntryManager));
 			HarmonyInstances.CustomSounds = Harmony.CreateAndPatchAll(typeof(CustomSounds.ModAudioPatches));
-			// HarmonyInstances.LocalAimHandler = Harmony.CreateAndPatchAll(typeof(LAHGunControlsTranspiler));
+			HarmonyInstances.LocalAimHandler = Harmony.CreateAndPatchAll(typeof(LAHGunControlsTranspiler));
 
 			#if DEBUG
 			HarmonyInstances.DevMenu = Harmony.CreateAndPatchAll(typeof(DevMenuTranspiler));

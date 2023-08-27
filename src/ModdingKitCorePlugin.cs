@@ -27,10 +27,10 @@ namespace Receiver2ModdingKit {
 		/// Add a task to be executed after ReceiverCoreScript awakes, eliminating the need for a patch
 		/// </summary>
 		/// <param name="action"> Function to be executed after ReceiverCoreScript awakes </param>
+		[Obsolete("Use methods from ModdingKitEvents class instead")]
 		public static void AddTaskAtCoreStartup(StartupAction action) {
-			ExecuteOnStartup += action;
+			ModdingKitEvents.ExecuteOnStartup += () => action.DynamicInvoke();
 		}
-		internal static StartupAction ExecuteOnStartup = new StartupAction(() => { });
 
 		public static Stream GetResourceStream(string resource_name) {
 			if(Assembly.GetExecutingAssembly().GetManifestResourceInfo("Receiver2ModdingKit.resources." + resource_name) != null) {
