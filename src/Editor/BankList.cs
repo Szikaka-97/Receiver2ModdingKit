@@ -6,7 +6,7 @@ using UnityEditor;
 
 namespace Receiver2ModdingKit.Editor {
 	[CreateAssetMenu(fileName = "Custom Bank list", menuName = "Receiver 2 Modding/Custom Bank List")]
-	public class BankList : ScriptableObject {
+	public class BankList : ScriptableObject, INotifiedByAssetbundleBuild {
 		public UnityEngine.Object[] banks;
 
 		public List<byte> bank_data = new List<byte>();
@@ -16,7 +16,7 @@ namespace Receiver2ModdingKit.Editor {
 
 		public Queue<string> bank_load_queue = new Queue<string>();
 
-		public async void LoadBanks() {
+        public async void LoadBanks() {
 #if UNITY_EDITOR
 #pragma warning disable CS1998
 			ready = false;
@@ -59,6 +59,27 @@ namespace Receiver2ModdingKit.Editor {
 #endif
 		}
 
+		public void ReloadBanksSynchronous() {
+#if UNITY_EDITOR
+			bank_data.Clear();
+			offsets.Clear();
+
+			foreach (var bank in banks) { 
+				if (!bank) continue;
+
+				string path = Path.Combine(new DirectoryInfo(Application.dataPath).Parent.FullName, AssetDatabase.GetAssetPath(bank));
+
+				byte[] buffer = new byte[new FileInfo(path).Length];
+
+				File.OpenRead(path).Read(buffer, 0, (int) new FileInfo(path).Length);
+
+				offsets.Add(bank_data.Count);
+
+				bank_data.AddRange(buffer);
+			}
+#endif
+		}
+
 		public List<byte[]> GetBanks() {
 			List<byte[]> banks_data = new List<byte[]>();
 
@@ -88,6 +109,10 @@ namespace Receiver2ModdingKit.Editor {
 			}
 
 			return banks_data;
+		}
+
+		public void PreAssetbundleBuild() {
+			ReloadBanksSynchronous();
 		}
 	}
 }
