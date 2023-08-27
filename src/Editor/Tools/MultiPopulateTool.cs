@@ -1,15 +1,61 @@
 #if UNITY_EDITOR
 
+using System.Linq;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEditor;
 using UnityEditor.EditorTools;
 using Receiver2;
 using System;
-using UnityEngine;
 
-namespace Receiver2ModdingKit.Editor.Tools {
-	[EditorTool("Populate Gun Animations", typeof(GunScript))]
-    public class PopulateGunAnimations : EditorTool {
+namespace Receiver2ModdingKit.Editor {
+    [EditorTool("Populate Gun Lists", typeof(GunScript))]
+    public class MultiPopulateTool : EditorTool {
+        [SerializeField]
+        Texture2D icon;
+
+        GUIContent guiContent;
+
+        private GunScript target_gun;
+        private SerializedObject serialized_gun;
+
+        private bool x_ray_on;
+
+        void OnEnable() {
+            guiContent = new GUIContent() {
+                image = icon,
+                text = "Populate Gun Lists",
+                tooltip = "Combination tool for filling up various gun lists"
+            };
+
+            target_gun = target as GunScript;
+            serialized_gun = new SerializedObject(target_gun);
+
+            x_ray_on = 
+                target_gun != null
+                &&
+                target_gun.gun_part_materials.Length > 0
+                &&
+                target_gun.gun_part_materials[0].xray_material != null
+                &&
+                target_gun.gun_part_materials[0].GetComponent<Renderer>() != null
+                &&
+                target_gun.gun_part_materials[0].GetComponent<Renderer>().sharedMaterial == target_gun.gun_part_materials[0].xray_material;
+        }
+
+        private void PopulateSprings() {
+            serialized_gun.FindProperty("update_springs").ClearArray();
+            
+            foreach(var spring in target_gun.GetComponentsInChildren<SpringCompressInstance>()) {
+                serialized_gun.FindProperty("update_springs").InsertArrayElementAtIndex(0);
+
+                var serialized_spring = serialized_gun.FindProperty("update_springs").GetArrayElementAtIndex(0);
+
+                serialized_spring.FindPropertyRelative("update_direction").boolValue = false;
+                serialized_spring.FindPropertyRelative("spring").objectReferenceValue = spring;
+            }
+        }
+
         private float[] KeyframeArrayToFloatArray(AnimatedComponent.Keyframe[] keyframes) {
             List<float> float_array = new List<float>();
 
@@ -21,7 +67,7 @@ namespace Receiver2ModdingKit.Editor.Tools {
             return float_array.ToArray();
         }
 
-        private void Apply() {
+        private void PopulateKeyframes() {
             GunScript gun = target as GunScript;
 
             Dictionary<string, float[]> animations = new Dictionary<string, float[]>();
@@ -114,17 +160,97 @@ namespace Receiver2ModdingKit.Editor.Tools {
                     mover_property.FindPropertyRelative("component_name").stringValue = animated_mover.component_name;
                 }
             }
+        }        
 
-            serialized_gun.ApplyModifiedProperties();
+        private void PopulateGunPartMaterials() {
+			serialized_gun.FindProperty("gun_part_materials").ClearArray();
+
+			foreach (GunPartMaterial material in (target as GunScript).GetComponentsInChildren<GunPartMaterial>()) {
+				serialized_gun.FindProperty("gun_part_materials").InsertArrayElementAtIndex(0);
+				serialized_gun.FindProperty("gun_part_materials").GetArrayElementAtIndex(0).objectReferenceValue = material;
+			}
+        }
+
+        private void ToggleXray(bool on) {
+            GunScript gun = (GunScript) target;
+
+            foreach (GunPartMaterial gun_part_material in gun.GetComponentsInChildren<GunPartMaterial>()) {
+                if (gun_part_material && gun_part_material.TryGetComponent(out Renderer renderer)) {
+                    renderer.sharedMaterial = on ? gun_part_material.xray_material : gun_part_material.material;
+                }
+            }
+        }
+
+        private void PopulateColliders() {           
+            serialized_gun.FindProperty("colliders").ClearArray();
+
+            foreach (var collider in target_gun.GetComponentsInChildren<Collider>()) {
+                serialized_gun.FindProperty("colliders").InsertArrayElementAtIndex(0);
+				serialized_gun.FindProperty("colliders").GetArrayElementAtIndex(0).objectReferenceValue = collider;
+
+                var collider_owner = new SerializedObject(collider.gameObject.AddComponent<ItemColliderOwner>());
+
+                collider_owner.FindProperty("item_owner").objectReferenceValue = serialized_gun.targetObject;
+
+                collider_owner.ApplyModifiedProperties();
+
+                if (collider.gameObject.layer != 8) {
+                    var serialized_collider_go = new SerializedObject(collider.gameObject);
+
+                    serialized_collider_go.FindProperty("layer").intValue = 8;
+
+                    serialized_collider_go.ApplyModifiedProperties();
+                }
+            }
         }
 
         public override void OnToolGUI(EditorWindow window) {
-            GUILayout.BeginArea(new Rect(10, 10, 170, 100));
+            var background_style = new GUIStyle(EditorStyles.helpBox);
 
-            if (GUILayout.Button("Populate Animations")) Apply();
+            Handles.BeginGUI();
 
-            GUILayout.EndArea();
-        }
+            using (new GUILayout.VerticalScope(background_style, GUILayout.Width(180))) {
+                if (GUILayout.Button("Populate Springs")) {
+                    PopulateSprings();
+                }
+
+                GUILayout.Space(2);
+                GUILayout.Box(Texture2D.blackTexture, GUILayout.Height(2), GUILayout.Width(180));
+                GUILayout.Space(2);
+
+                if (GUILayout.Button("Populate Animations")) {
+                    PopulateKeyframes();
+                }
+
+                GUILayout.Space(2);
+                GUILayout.Box(Texture2D.blackTexture, GUILayout.Height(2), GUILayout.Width(180));
+                GUILayout.Space(2);
+
+                if (GUILayout.Button("Populate Gun Part Materials")) {
+                    PopulateGunPartMaterials();
+                }
+
+                EditorGUI.BeginChangeCheck();
+
+                x_ray_on = GUILayout.Toggle(x_ray_on, "Toggle X-Ray");
+
+                if (EditorGUI.EndChangeCheck()) {
+                    ToggleXray(x_ray_on);
+                }
+
+                GUILayout.Space(2);
+                GUILayout.Box(Texture2D.blackTexture, GUILayout.Height(2), GUILayout.Width(180));
+                GUILayout.Space(2);
+
+                if (GUILayout.Button("Populate Gun Colliders")) {
+                    PopulateColliders();
+                }
+            }
+
+            serialized_gun.ApplyModifiedProperties();
+
+            Handles.EndGUI();
+	    }
     }
 }
 
