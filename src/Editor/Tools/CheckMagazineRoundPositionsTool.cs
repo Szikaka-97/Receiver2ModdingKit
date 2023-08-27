@@ -13,6 +13,8 @@ public class CheckMagazineRoundPositionsTool : EditorTool {
 
 	GUIContent guiContent;
 
+	float follower_pos = 0;
+
 	float round_count = -1;
 	bool check_chambering = false;
 
@@ -29,7 +31,44 @@ public class CheckMagazineRoundPositionsTool : EditorTool {
 		get { return guiContent; }
 	}
 
-	public override void OnToolGUI(EditorWindow window) {
+	private void DebugFollower() {
+		var background_style = new GUIStyle();
+		background_style.normal = new GUIStyleState() { 
+			background = Texture2D.whiteTexture,
+		};
+		background_style.fontStyle = FontStyle.Bold;
+		background_style.fontSize = 15;
+
+		GUILayout.BeginArea(new Rect(10, 50, 150, 70), background_style);
+		GUILayout.Label("Follower Position", background_style);
+
+		Transform follower_transform = (target as MagazineScript).transform.Find("follower");
+
+		var follower_offset = (target as MagazineScript).transform.Find("round_top").position - (target as MagazineScript).transform.Find("follower_under_round_top").position;
+
+		var start_pos = (target as MagazineScript).transform.Find("round_top").position - follower_offset;
+		var end_pos = (target as MagazineScript).transform.Find("round_bottom").position - follower_offset;
+
+		follower_pos = GUILayout.HorizontalSlider(follower_pos, 0, 1);
+
+		GUILayout.Space(20);
+
+		var spring = (target as MagazineScript).transform.Find("magazine/magazine_spring").GetComponent<SpringCompressInstance>();
+
+		if (spring.orig_dist == 0) {
+			spring.orig_center = (spring.transform.InverseTransformPoint(spring.new_top.position) + spring.transform.InverseTransformPoint(spring.new_bottom.position)) / 2;
+			spring.orig_dist = Vector3.Distance(spring.new_top.position, spring.new_bottom.position);
+		}
+
+		follower_transform.position = Vector3.Lerp(start_pos, end_pos, follower_pos);
+
+		spring.UpdateDirection();
+		spring.UpdateScale();
+
+		GUILayout.EndArea();
+	}
+
+	private void DebugMagazine() {
 		EditorGUI.BeginChangeCheck();
 
 		MagazineScript magazine = (MagazineScript) target;
@@ -131,6 +170,21 @@ public class CheckMagazineRoundPositionsTool : EditorTool {
 
 		if (EditorGUI.EndChangeCheck()) {
 			UpdateRounds();
+		}
+	}
+
+	public override void OnToolGUI(EditorWindow window) {
+		if ((target as MagazineScript).round_prefab == null) {
+			GUILayout.BeginArea(new Rect(10, 10, 180, 60));
+
+			GUILayout.Label("Fill the round_prefab field to \nhave access to more options", new GUIStyle(GUI.skin.label) { normal = new GUIStyleState() { textColor = Color.red } });
+
+			GUILayout.EndArea();
+
+			DebugFollower();
+		}
+		else {
+			DebugMagazine();
 		}
 	}
 
