@@ -12,7 +12,10 @@ namespace Receiver2ModdingKit.ModInstaller {
 	public static class ModLoader {
 
 		private static GameObject prefab_9mm;
+
 		internal static ModInstallerObject mod_installer;
+		internal static bool rcs_prefab_list_locked;
+		internal static List<InventoryItem> prefab_list_queue = new List<InventoryItem>();
 
 		public static void SearchForMod() {
 			mod_installer = ModdingKitCorePlugin.instance.gameObject.AddComponent<ModInstallerObject>();
@@ -33,6 +36,8 @@ namespace Receiver2ModdingKit.ModInstaller {
 				Debug.Log("Gun " + gun.InternalName + " is already loaded");
 				return;
 			}
+
+			rcs_prefab_list_locked = true;
 
 			List<InventoryItem> items = new List<InventoryItem>(
 				ReceiverCoreScript.Instance().generic_prefabs
@@ -176,6 +181,14 @@ namespace Receiver2ModdingKit.ModInstaller {
 
 			if (gun.spawns_in_dreaming) {
 				ReceiverCoreScript.Instance().PlayerData.unlocked_gun_names.Add(gun.InternalName);
+			}
+
+			rcs_prefab_list_locked = false;
+
+			if (prefab_list_queue.Count > 0) {
+				items.AddRange(prefab_list_queue);
+				
+				prefab_list_queue.Clear();
 			}
 
 			ReceiverCoreScript.Instance().generic_prefabs = items.ToArray();

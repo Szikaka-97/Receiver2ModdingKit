@@ -425,7 +425,23 @@ namespace Receiver2ModdingKit {
 				}
 				spring.orig_center = (spring.transform.InverseTransformPoint(spring.new_top.position) + spring.transform.InverseTransformPoint(spring.new_bottom.position)) / 2;
 				spring.orig_dist = Vector3.Distance(spring.new_top.position, spring.new_bottom.position);
+			}
+		}
 
+		[HarmonyPatch(typeof(RuntimeTileLevelGenerator), "SpawnMagazine")]
+		[HarmonyPostfix]
+		private static void PatchSpawnMagazine(ref ActiveItem __result) {
+			if (LocalAimHandler.player_instance.TryGetGun(out var gun) && ModdingKitEvents.ItemSpawnHandlers.ContainsKey(gun.InternalName)) {
+				foreach (var spawn_event in ModdingKitEvents.ItemSpawnHandlers[gun.InternalName]) {
+					try {
+						if (spawn_event.Invoke(ref __result)) {
+							break;
+						}
+					} catch (Exception e) {
+						Debug.LogError("Failed invoking item spawn event method " + spawn_event.Method.Name + " for gun " + gun.InternalName + ";\nDumping stack trace:");
+						Debug.LogError(e);
+					}
+				}
 			}
 		}
 

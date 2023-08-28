@@ -2,6 +2,9 @@
 using UnityEngine;
 using Receiver2;
 using System.IO;
+using SimpleJSON;
+using Receiver2ModdingKit.ModInstaller;
+using System.Collections.Generic;
 
 namespace Receiver2ModdingKit {
 	public static class Extensions {
@@ -109,6 +112,58 @@ namespace Receiver2ModdingKit {
 			child_directory = new DirectoryInfo(path);
 
 			return Directory.Exists(path);
+		}
+
+		/// <summary>
+		/// Cause the item to not spawn
+		/// </summary>
+		/// <param name="active_item"> Item to be disabled </param>
+		public static void Disable(this ActiveItem active_item) {
+			active_item.item_type = InventoryItem.Type.Unused;
+		}
+
+		/// <summary>
+		/// Cause the item to spawn specified InventoryItem instead
+		/// </summary>
+		/// <param name="active_item"> Item spawn </param>
+		/// <param name="item"> Item to be spawned </param>
+		/// <param name="persistentData"> Additional data to be fed to SetPersistentData(), or null if previous data should be used </param>
+		public static void SetItemSpawn(this ActiveItem active_item, InventoryItem item, JSONObject persistentData = null) {
+			SetItemSpawn(active_item, item != null ? item.InternalName : "", persistentData);
+		}
+
+		/// <summary>
+		/// Cause the item to spawn specified InventoryItem instead
+		/// </summary>
+		/// <param name="active_item"> Item spawn </param>
+		/// <param name="item_internal_name"> Name of an item to be spawned </param>
+		/// <param name="persistentData"> Additional data to be fed to SetPersistentData(), or null if previous data should be used </param>
+		public static void SetItemSpawn(this ActiveItem active_item, string item_internal_name, JSONObject persistentData = null) {
+			active_item.item_type = InventoryItem.Type.GenericHoldable;
+			active_item.internal_name = item_internal_name;
+
+			if (persistentData != null) {
+				active_item.persistent_data = persistentData;
+			}
+		}
+
+		/// <summary>
+		/// Add specified items to the debug menu spawn list
+		/// </summary>
+		/// <param name="core_script"> ReceiverCoreScript instance </param>
+		/// <param name="items"> Items to add to the list </param>
+		/// <returns> True if items were added immidiately, False if the prefab list is locked and the items will be added once it's unlocked </returns>
+		public static bool AddItemsToSpawnList(this ReceiverCoreScript core_script, params InventoryItem[] items) {
+			if (ModLoader.rcs_prefab_list_locked) {
+				ModLoader.prefab_list_queue.AddRange(items);
+
+				return false;
+			}
+			else {
+				core_script.generic_prefabs = core_script.generic_prefabs.Concat(items).ToArray();
+
+				return true;
+			}
 		}
 
 		public static void MoveTo(this FileInfo source_file, string destination_file, bool overwrite) {
