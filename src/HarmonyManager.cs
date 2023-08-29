@@ -1,16 +1,16 @@
-﻿using System.Collections.Generic;
-using System.Reflection.Emit;
-using System.Reflection;
+﻿using System;
+using System.IO;
 using System.Linq;
-using System;
+using System.Reflection;
+using System.Reflection.Emit;
+using System.Collections.Generic;
 using UnityEngine;
+using SimpleJSON;
 using HarmonyLib;
 using ImGuiNET;
 using Receiver2;
 using Receiver2ModdingKit.ModInstaller;
 using Receiver2ModdingKit.Editor;
-using System.IO;
-using System.Text;
 
 namespace Receiver2ModdingKit {
     public static class HarmonyManager {
@@ -431,18 +431,36 @@ namespace Receiver2ModdingKit {
 		[HarmonyPatch(typeof(RuntimeTileLevelGenerator), "SpawnMagazine")]
 		[HarmonyPostfix]
 		private static void PatchSpawnMagazine(ref ActiveItem __result) {
-			if (LocalAimHandler.player_instance.TryGetGun(out var gun) && ModdingKitEvents.ItemSpawnHandlers.ContainsKey(gun.InternalName)) {
-				foreach (var spawn_event in ModdingKitEvents.ItemSpawnHandlers[gun.InternalName]) {
+			if (ModdingKitEvents.ItemSpawnHandlers.ContainsKey(ReceiverCoreScript.Instance().CurrentLoadout.gun_internal_name)) {
+				foreach (var spawn_event in ModdingKitEvents.ItemSpawnHandlers[ReceiverCoreScript.Instance().CurrentLoadout.gun_internal_name]) {
 					try {
 						if (spawn_event.Invoke(ref __result)) {
 							break;
 						}
 					} catch (Exception e) {
-						Debug.LogError("Failed invoking item spawn event method " + spawn_event.Method.Name + " for gun " + gun.InternalName + ";\nDumping stack trace:");
+						Debug.LogError("Failed invoking item spawn event method " + spawn_event.Method.Name + " for gun " + ReceiverCoreScript.Instance().CurrentLoadout.gun_internal_name + ";\nDumping stack trace:");
 						Debug.LogError(e);
 					}
 				}
 			}
+		}
+
+		[HarmonyPatch(typeof(ReceiverCoreScript), nameof(ReceiverCoreScript.StartGameMode), new Type[] { typeof(GameMode), typeof(JSONObject) })]
+		[HarmonyPrefix]
+		private static void PatchStartGame(GameMode mode, JSONObject checkpoint) {
+			Extensions.last_checkpoint = checkpoint;
+		}
+
+		[HarmonyPatch(typeof(RankingProgressionGameMode), nameof(RankingProgressionGameMode.StoreCheckpoint))]
+		[HarmonyPostfix]
+		private static void PatchStoreDreamingCheckpoint(ref JSONObject __result) {
+			JSONNode loadout_node = __result["loadout"];
+
+			if (LocalAimHandler.player_instance != null && LocalAimHandler.player_instance.TryGetGun(out var gun)) {
+				loadout_node["gun_persistent_data"] = gun.GetPersistentData();
+			}
+
+			__result["loadout"] = loadout_node;
 		}
 
 		#endregion

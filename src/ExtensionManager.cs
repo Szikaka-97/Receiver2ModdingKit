@@ -8,6 +8,8 @@ using System.Collections.Generic;
 
 namespace Receiver2ModdingKit {
 	public static class Extensions {
+		internal static JSONObject last_checkpoint;
+
 		/// <summary>
 		/// Fetch a round with of a specified type from player's inventory
 		/// </summary>
@@ -164,6 +166,15 @@ namespace Receiver2ModdingKit {
 
 				return true;
 			}
+		}
+
+		/// <summary>
+		/// Get the last checkpoint data that was loaded into the game when the gamemode started
+		/// </summary>
+		/// <param name="core_script"> ReceiverCoreScript instance </param>
+		/// <returns> The checkpoint data used when the gamemode started </returns>
+		public static JSONObject GetCheckpointData(this ReceiverCoreScript core_script) {
+			return last_checkpoint ?? new JSONObject();
 		}
 
 		public static void MoveTo(this FileInfo source_file, string destination_file, bool overwrite) {

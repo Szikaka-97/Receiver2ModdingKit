@@ -240,7 +240,36 @@ namespace Receiver2ModdingKit {
 				Debug.LogError(String.Format("Catched exception during {0}'s AwakeGun", this.InternalName));
 				Debug.LogException(e);
 			}
+
+			switch (ReceiverCoreScript.Instance().game_mode.GetGameMode()) {
+				case GameMode.ReceiverMall:
+					JSONNode item_data_array = ReceiverCoreScript.Instance().GetCheckpointData()["level"]["storable_mono_behaviours"][0];
+
+					int i = 0;
+
+					while (item_data_array[i] != null && item_data_array[i]["uid"] != this.UID) i++;
+
+					Debug.Log(item_data_array[i]);
+
+					SetPersistentData(item_data_array[i] != null ? item_data_array[i].AsObject : new JSONObject());
+
+					break;
+				case GameMode.ShootingRange:
+				case GameMode.Classic:
+				case GameMode.TestDrive:
+					break;
+				case GameMode.RankingCampaign:
+					JSONObject gun_persistent_data = ReceiverCoreScript.Instance().GetCheckpointData()["loadout"]["gun_persistent_data"].AsObject;
+
+					SetPersistentData(gun_persistent_data ?? new JSONObject());
+
+					break;
+				default:
+					// Modded gamemodes
+					break;
+			}
 		}
+
 		new protected void Update() {
 			using (var debug_scope = new TransformDebugScope()) { 
 				try {
@@ -322,7 +351,17 @@ namespace Receiver2ModdingKit {
 		}
 
 		public override string TypeName() { return "ModGunScript"; }
+
+		/// <summary>
+		/// Return an object containing data you want to save between sessions
+		/// </summary>
+		/// <returns> A JSON object containing save data </returns>
 		public override JSONObject GetPersistentData() { return base.GetPersistentData(); }
+
+		/// <summary>
+		/// Reconstruct gun's state from provided JSON object. It's structured will be the same as the one returned in GetPersistentData()
+		/// </summary>
+		/// <param name="data"> A JSON object containing save data </param>
 		public override void SetPersistentData(JSONObject data) { base.SetPersistentData(data); }
 
 		// Serialization shenanigans
