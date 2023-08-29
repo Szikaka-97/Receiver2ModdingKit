@@ -158,18 +158,21 @@ namespace Receiver2ModdingKit.ModInstaller {
 
 			if (gun.GetComponent<PegboardHangableItem>() && gun.GetComponent<PegboardHangableItem>().pegboard_hanger != null) { //Handling guns pegboard collision
 				PegboardHanger hanger = gun.GetComponent<PegboardHangableItem>().pegboard_hanger;
-				Bounds gunBounds = new Bounds();
 
-				foreach (var renderer in gun.GetComponentsInChildren<MeshRenderer>()) {
-					gunBounds.Encapsulate(
-						new Bounds(
-							hanger.transform.InverseTransformPoint(renderer.bounds.center),
-							hanger.transform.TransformPoint(renderer.bounds.extents)
-						)
-					);
+				if (((Bounds) ReflectionManager.PH_bounds.GetValue(hanger)).size == Vector3.zero) {
+					Bounds gun_bounds = new Bounds();
+
+					foreach (var renderer in gun.GetComponentsInChildren<MeshRenderer>()) {
+						gun_bounds.Encapsulate(
+							new Bounds(
+								hanger.transform.InverseTransformPoint(renderer.bounds.center),
+								hanger.transform.TransformPoint(renderer.bounds.extents)
+							)
+						);
+					}
+
+					ReflectionManager.PH_bounds.SetValue(hanger, gun_bounds);
 				}
-
-				ReflectionManager.PH_bounds.SetValue(hanger, gunBounds);
 			}
 
 			try {
