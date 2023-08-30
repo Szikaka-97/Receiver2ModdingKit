@@ -112,19 +112,16 @@ namespace Receiver2ModdingKit.ModInstaller {
 					if (magazine.round_prefab == null || magazine.round_prefab.GetComponent<ShellCasingScript>() == null) magazine.round_prefab = gun.loaded_cartridge_prefab;
 
 					if (magazine.GetComponent<PegboardHangableItem>() && magazine.GetComponent<PegboardHangableItem>().pegboard_hanger != null) {
-						PegboardHanger hanger = magazine.GetComponent<PegboardHangableItem>().pegboard_hanger;
-						Bounds magazineBounds = new Bounds();
+						if (((Bounds) ReflectionManager.PH_bounds.GetValue(magazine.GetComponent<PegboardHangableItem>().pegboard_hanger)).size == Vector3.zero) {
+							PegboardHanger hanger = magazine.GetComponent<PegboardHangableItem>().pegboard_hanger;
+							Bounds magazineBounds = new Bounds();
 
-						foreach (var renderer in magazine.GetComponentsInChildren<MeshRenderer>()) {
-							magazineBounds.Encapsulate(
-								new Bounds(
-									hanger.transform.InverseTransformPoint(renderer.bounds.center),
-									hanger.transform.TransformPoint(renderer.bounds.extents)
-								)
-							);
+							foreach (var renderer in magazine.GetComponentsInChildren<MeshRenderer>()) {
+								magazineBounds.Encapsulate(renderer.bounds);
+							}
+
+							ReflectionManager.PH_bounds.SetValue(hanger, magazineBounds);
 						}
-
-						ReflectionManager.PH_bounds.SetValue(hanger, magazineBounds);
 					}
 				}
 
@@ -163,13 +160,9 @@ namespace Receiver2ModdingKit.ModInstaller {
 					Bounds gun_bounds = new Bounds();
 
 					foreach (var renderer in gun.GetComponentsInChildren<MeshRenderer>()) {
-						gun_bounds.Encapsulate(
-							new Bounds(
-								hanger.transform.InverseTransformPoint(renderer.bounds.center),
-								hanger.transform.TransformPoint(renderer.bounds.extents)
-							)
-						);
+						gun_bounds.Encapsulate(renderer.bounds);
 					}
+					
 
 					ReflectionManager.PH_bounds.SetValue(hanger, gun_bounds);
 				}
