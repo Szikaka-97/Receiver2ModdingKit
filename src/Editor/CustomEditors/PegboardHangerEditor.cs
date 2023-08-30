@@ -11,6 +11,10 @@ namespace Receiver2ModdingKit.Editor {
         private BoxBoundsHandle box = new BoxBoundsHandle();
         private float scale = 1;
 
+        private float BoundsVolume(Bounds bounds) {
+            return bounds.size.x * bounds.size.y * bounds.size.z;
+        }
+
         public override void OnInspectorGUI() {
             serializedObject.Update();
 
@@ -27,18 +31,24 @@ namespace Receiver2ModdingKit.Editor {
                     hangable_item = hangable_item.transform.parent.gameObject;
                 }
 
-                foreach (var renderer in hangable_item.GetComponentsInChildren<Renderer>()) {
+                foreach (var renderer in hangable_item.GetComponentsInChildren<MeshRenderer>()) {
+                    if (BoundsVolume(renderer.bounds) > 0.5) {
+                        Debug.Log("Bounds of renderer " + renderer.name + " are very large, maybe you should use a SkinnedMeshRenderer and set them manually?");
+                    }
+                    
                     new_bounds.Encapsulate(renderer.bounds);
                 }
 
+                // new_bounds.center = new_bounds.center - (target as PegboardHanger).transform.position;
+
                 new_bounds.size = new_bounds.size * scale;
 
-                if (new_bounds.size.x > new_bounds.size.z) {
-                    new_bounds.size = new Vector3(new_bounds.size.x, new_bounds.size.y, new_bounds.size.x);
-                }
-                else {
-                    new_bounds.size = new Vector3(new_bounds.size.z, new_bounds.size.y, new_bounds.size.z);
-                }
+                // if (new_bounds.size.x > new_bounds.size.z) {
+                //     new_bounds.size = new Vector3(new_bounds.size.x, new_bounds.size.y, new_bounds.size.x);
+                // }
+                // else {
+                //     new_bounds.size = new Vector3(new_bounds.size.z, new_bounds.size.y, new_bounds.size.z);
+                // }
 
                 serializedObject.FindProperty("bounds").boundsValue = new_bounds;
             }
