@@ -190,7 +190,7 @@ namespace Receiver2ModdingKit {
 			}
 		}
 
-		new private void Awake() {
+		new protected void Awake() {
 			player_input = new PlayerInput(this);
 
 			if (this.spawn_info_sprite == null) {
@@ -243,15 +243,21 @@ namespace Receiver2ModdingKit {
 
 			switch (ReceiverCoreScript.Instance().game_mode.GetGameMode()) {
 				case GameMode.ReceiverMall:
-					JSONNode item_data_array = ReceiverCoreScript.Instance().GetCheckpointData()["level"]["storable_mono_behaviours"][0];
+					JSONNode item_data_array = ReceiverCoreScript.Instance().GetCheckpointData()["level"]["storable_mono_behaviours"];
 
-					int i = 0;
+					JSONObject gun_data = new JSONObject();
 
-					while (item_data_array[i] != null && item_data_array[i]["uid"] != this.UID) i++;
+					foreach (JSONNode item_data in item_data_array) {
+						if (item_data["uid"] == this.UID) {
+							if (item_data.HasKey("persistent_data")) {
+								gun_data = item_data["persistent_data"].AsObject;
+							}
 
-					Debug.Log(item_data_array[i]);
+							break;
+						}
+					}
 
-					SetPersistentData(item_data_array[i] != null ? item_data_array[i].AsObject : new JSONObject());
+					SetPersistentData(gun_data);
 
 					break;
 				case GameMode.ShootingRange:
@@ -259,9 +265,9 @@ namespace Receiver2ModdingKit {
 				case GameMode.TestDrive:
 					break;
 				case GameMode.RankingCampaign:
-					JSONObject gun_persistent_data = ReceiverCoreScript.Instance().GetCheckpointData()["loadout"]["gun_persistent_data"].AsObject;
+					JSONNode gun_persistent_data = ReceiverCoreScript.Instance().GetCheckpointData()["loadout"]["gun_persistent_data"];
 
-					SetPersistentData(gun_persistent_data ?? new JSONObject());
+					SetPersistentData(gun_persistent_data ? gun_persistent_data.AsObject : new JSONObject());
 
 					break;
 				default:
