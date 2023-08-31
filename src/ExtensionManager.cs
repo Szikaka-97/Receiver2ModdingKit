@@ -5,6 +5,7 @@ using System.IO;
 using SimpleJSON;
 using Receiver2ModdingKit.ModInstaller;
 using System.Collections.Generic;
+using UnityEngine.Events;
 
 namespace Receiver2ModdingKit {
 	public static class Extensions {
@@ -175,6 +176,18 @@ namespace Receiver2ModdingKit {
 		/// <returns> The checkpoint data used when the gamemode started </returns>
 		public static JSONObject GetCheckpointData(this ReceiverCoreScript core_script) {
 			return last_checkpoint ?? new JSONObject();
+		}
+
+		/// <summary>
+		/// Clear all persistent (set in the editor) method calls this event has
+		/// </summary>
+		/// <param name="unity_event"> Event whose method calls are to be cleared </param>
+		public static void RemovePersistentListeners(this UnityEventBase unity_event) {
+			if (unity_event.GetPersistentEventCount() == 0) return;
+
+			object persistent_calls_group = ReflectionManager.UEB_persistent_calls.GetValue(unity_event);
+
+			ReflectionManager.PCG_Clear.Invoke(persistent_calls_group, new object[] {});
 		}
 
 		public static void MoveTo(this FileInfo source_file, string destination_file, bool overwrite) {

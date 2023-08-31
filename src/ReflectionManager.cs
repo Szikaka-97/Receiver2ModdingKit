@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
 using Receiver2;
+using UnityEngine.Events;
 
 namespace Receiver2ModdingKit {
 	internal static class ReflectionManager {
@@ -93,6 +94,16 @@ namespace Receiver2ModdingKit {
 			private set;
 		}
 
+		public static FieldInfo UEB_persistent_calls {
+			get;
+			private set;
+		}
+
+		public static MethodInfo PCG_Clear {
+			get;
+			private set;
+		}
+
 		private static FieldInfo GetFieldInfo(Type type, string fieldName) {
 			FieldInfo field = type.GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 
@@ -150,15 +161,18 @@ namespace Receiver2ModdingKit {
 			GS_yoke_open = GetFieldInfo(typeof(GunScript), "yoke_open");
 			GS_current_firing_mode_index = GetFieldInfo(typeof(GunScript), "current_firing_mode_index");
 			GS_firing_pin = GetFieldInfo(typeof(GunScript), "firing_pin");
-			PH_bounds = GetFieldInfo(typeof(PegboardHanger), "bounds");
-			RCS_gun_prefabs_all = GetFieldInfo(typeof(ReceiverCoreScript), "gun_prefabs_all");
 
+			PH_bounds = GetFieldInfo(typeof(PegboardHanger), "bounds");
+
+			RCS_gun_prefabs_all = GetFieldInfo(typeof(ReceiverCoreScript), "gun_prefabs_all");
 			RCS_magazine_prefabs_all = GetFieldInfo(typeof(ReceiverCoreScript), "magazine_prefabs_all");
 
+			UEB_persistent_calls = GetFieldInfo(typeof(UnityEventBase), "m_PersistentCalls");
+
+			PCG_Clear = GetMethodInfo(UEB_persistent_calls.FieldType, "Clear");
+
 			LAH_BulletInventory = typeof(LocalAimHandler).GetNestedTypes(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Single(t => t.Name == "BulletInventory");
-
 			LAH_BulletInventory_item = GetFieldInfo(LAH_BulletInventory, "item");
-
 			LAH_pose_springs = new Dictionary<PoseSpring, FieldInfo>() {
 				{ PoseSpring.Aim, GetFieldInfo(typeof(LocalAimHandler), "aim_spring")},
 				{ PoseSpring.CameraZoom, GetFieldInfo(typeof(LocalAimHandler), "camera_zoom_spring")},
@@ -173,6 +187,7 @@ namespace Receiver2ModdingKit {
 
 			LAH_Get_Last_Bullet = GetMethodInfo(typeof(LocalAimHandler), "GetLastMatchingLooseBullet");
 			LAH_bullet_shake_time = GetFieldInfo(typeof(LocalAimHandler), "show_bullet_shake_time");
+			
 		}
 	}
 }

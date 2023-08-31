@@ -115,8 +115,8 @@ namespace Receiver2ModdingKit {
 
 			var button_event = button.transform.Find("Button").GetComponent<Button>().onClick;
 
-			button_event.RemoveAllListeners();
-			// button_event.m_Calls = new InvokableCallList();
+			button_event.RemovePersistentListeners();
+
 			button_event.AddListener(callback);
 
 			button.transform.SetParent(GameObject.Find(right_column_menu_path).transform);
@@ -156,8 +156,8 @@ namespace Receiver2ModdingKit {
 
 					var toggle_component = control.GetComponent(Type.GetType("Receiver2.ToggleComponent, Wolfire.Receiver2, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"));
 					UnityEvent<T> toggle_event = toggle_component.GetType().GetField("OnChange").GetValue(toggle_component) as UnityEvent<T>;
-					toggle_event.RemoveAllListeners();
-					toggle_event.RemoveAllListeners();
+
+					toggle_event.RemovePersistentListeners();
 
 					toggle_event.AddListener(value => { config_entry.Value = value; });
 					config_entry.SettingChanged += new EventHandler((caller, args) => {
@@ -184,8 +184,8 @@ namespace Receiver2ModdingKit {
 
 					var dropdown_event = dropdown_component.OnChange;
 
-					dropdown_event.RemoveAllListeners();
-					dropdown_event.RemoveAllListeners();
+					dropdown_event.RemovePersistentListeners();
+
 					dropdown_event.AddListener(value => { config_entry.Value = (T) Convert.ChangeType(((AcceptableValueList<string>) config_entry.Description.AcceptableValues).AcceptableValues[value], typeof(T)); });
 
 					config_entry.SettingChanged += new EventHandler((caller, args) => {
@@ -215,7 +215,7 @@ namespace Receiver2ModdingKit {
 					}
 					else {
 						string format = (string) config_entry.Description.Tags.FirstOrDefault( 
-							tag => tag is string && Regex.IsMatch((string) tag, "format: [a-Z0-9]{1,2}$")
+							tag => tag is string && Regex.IsMatch((string) tag, "format: [A-z0-9]{1,2}$")
 						);
 
 						if (format != null) {
@@ -231,8 +231,8 @@ namespace Receiver2ModdingKit {
 
 					var slider_event = slider_component.OnChange;
 
-					slider_event.RemoveAllListeners();
-					slider_event.RemoveAllListeners();
+					slider_event.RemovePersistentListeners();
+
 					slider_event.AddListener(value => { config_entry.Value = (T) Convert.ChangeType(value, typeof(T)); });
 
 					if (typeof(T).Name.StartsWith("Int")) {
