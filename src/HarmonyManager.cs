@@ -445,23 +445,67 @@ namespace Receiver2ModdingKit {
 			}
 		}
 
-		[HarmonyPatch(typeof(ReceiverCoreScript), nameof(ReceiverCoreScript.StartGameMode), new Type[] { typeof(GameMode), typeof(JSONObject) })]
+		[HarmonyPatch(typeof(PlayerLoadout), nameof(PlayerLoadout.Deserialize))]
 		[HarmonyPrefix]
-		private static void PatchStartGame(GameMode mode, JSONObject checkpoint) {
-			Extensions.last_checkpoint = checkpoint;
-		}
-
-		[HarmonyPatch(typeof(RankingProgressionGameMode), nameof(RankingProgressionGameMode.StoreCheckpoint))]
-		[HarmonyPostfix]
-		private static void PatchStoreDreamingCheckpoint(ref JSONObject __result) {
-			JSONNode loadout_node = __result["loadout"];
-
-			if (LocalAimHandler.player_instance != null && LocalAimHandler.player_instance.TryGetGun(out var gun)) {
-				loadout_node["gun_persistent_data"] = gun.GetPersistentData();
+		private static void PatchDeserializeLoadout(JSONNode jn_root) {
+			if (jn_root.HasKey("gun_persistent_data")) {
+				Extensions.current_gun_data = jn_root["gun_persistent_data"].AsObject;
 			}
-
-			__result["loadout"] = loadout_node;
 		}
+
+		[HarmonyPatch(typeof(PlayerLoadout), nameof(PlayerLoadout.Serialize))]
+		[HarmonyPostfix]
+		private static void PatchSerializeLoadout(ref JSONObject __result) {
+			if (LocalAimHandler.player_instance != null && LocalAimHandler.player_instance.TryGetGun(out var gun)) {
+				if (gun is ModGunScript) {
+					__result["gun_persistent_data"] = (gun as ModGunScript).EncodeJSON(gun.GetPersistentData());					
+				}
+			}
+		}
+
+		[HarmonyPatch(typeof(ReceiverCoreScript), nameof(ReceiverCoreScript.SpawnGun))]
+		[HarmonyPostfix]
+		private static void PatchSpawnGun(ref GunScript __result) {
+			if (__result == null) return;
+
+			if (__result is ModGunScript && (__result as ModGunScript).OwnData(Extensions.current_gun_data)) {
+				__result.SetPersistentData((__result as ModGunScript).DecodeJSON(Extensions.current_gun_data));
+			}
+		}
+
+	// Maybe later
+		// [HarmonyPatch(typeof(ReceiverCoreScript), "SpawnPlayer")]
+		// [HarmonyPostfix]
+		// private static void PatchStartIntro(ReceiverCoreScript __instance) {
+		// 	PlayerLoadout loadout = __instance.player.lah.loadout;
+
+		// 	if (
+		// 		__instance.game_mode.GetGameMode() == GameMode.RankingCampaign
+		// 		&&
+		// 		(__instance.game_mode as RankingProgressionGameMode).progression_data.receiver_rank == 0
+		// 		&&
+		// 		loadout != null
+		// 	) {
+		// 		var tile_with_gun = RuntimeTileLevelGenerator.instance.GetTiles()[2];
+
+		// 		var gun = tile_with_gun.GetComponentInChildren<GunScript>();
+
+		// 		if (gun != null && gun.InternalName != loadout.gun_internal_name && __instance.TryGetItemPrefab<GunScript>(loadout.gun_internal_name, out var replacement_gun)) {
+		// 			Vector3 gun_position = gun.transform.position;
+		// 			Quaternion gun_rotation = gun.transform.rotation;
+
+		// 			Debug.Log("Changed gun");
+
+		// 			if (replacement_gun.two_handed) {
+		// 				gun_position += Vector3.up * 0.5f;
+		// 			}
+					
+		// 			UnityEngine.Object.DestroyImmediate(gun.gameObject);
+
+		// 			UnityEngine.Object.Instantiate(replacement_gun, gun_position, gun_rotation, tile_with_gun.transform).Move(null);
+		// 		}
+		// 	}
+		// }
 
 		#endregion
 

@@ -9,7 +9,7 @@ using UnityEngine.Events;
 
 namespace Receiver2ModdingKit {
 	public static class Extensions {
-		internal static JSONObject last_checkpoint;
+		internal static JSONObject current_gun_data;
 
 		/// <summary>
 		/// Fetch a round with of a specified type from player's inventory
@@ -175,7 +175,7 @@ namespace Receiver2ModdingKit {
 		/// <param name="core_script"> ReceiverCoreScript instance </param>
 		/// <returns> The checkpoint data used when the gamemode started </returns>
 		public static JSONObject GetCheckpointData(this ReceiverCoreScript core_script) {
-			return last_checkpoint ?? new JSONObject();
+			return current_gun_data ?? new JSONObject();
 		}
 
 		/// <summary>

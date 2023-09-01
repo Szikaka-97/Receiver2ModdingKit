@@ -240,40 +240,6 @@ namespace Receiver2ModdingKit {
 				Debug.LogError(String.Format("Catched exception during {0}'s AwakeGun", this.InternalName));
 				Debug.LogException(e);
 			}
-
-			switch (ReceiverCoreScript.Instance().game_mode.GetGameMode()) {
-				case GameMode.ReceiverMall:
-					JSONNode item_data_array = ReceiverCoreScript.Instance().GetCheckpointData()["level"]["storable_mono_behaviours"];
-
-					JSONObject gun_data = new JSONObject();
-
-					foreach (JSONNode item_data in item_data_array) {
-						if (item_data["uid"] == this.UID) {
-							if (item_data.HasKey("persistent_data")) {
-								gun_data = item_data["persistent_data"].AsObject;
-							}
-
-							break;
-						}
-					}
-
-					SetPersistentData(gun_data);
-
-					break;
-				case GameMode.ShootingRange:
-				case GameMode.Classic:
-				case GameMode.TestDrive:
-					break;
-				case GameMode.RankingCampaign:
-					JSONNode gun_persistent_data = ReceiverCoreScript.Instance().GetCheckpointData()["loadout"]["gun_persistent_data"];
-
-					SetPersistentData(gun_persistent_data ? gun_persistent_data.AsObject : new JSONObject());
-
-					break;
-				default:
-					// Modded gamemodes
-					break;
-			}
 		}
 
 		new protected void Update() {
@@ -357,6 +323,53 @@ namespace Receiver2ModdingKit {
 		}
 
 		public override string TypeName() { return "ModGunScript"; }
+
+		/// <summary>
+		/// Check whether provided json data can be used in this gun's SetPersistentData() method
+		/// </summary>
+		/// <param name="data"> JSON data to check </param>
+		/// <returns> True if the data is matching, False otherwise </returns>
+		public bool OwnData(JSONNode data) {
+			return data != null && data.HasKey("gun_internal_name") && data["gun_internal_name"] == this.InternalName;
+		}
+
+		/// <summary>
+		/// Encode JSON data such that other guns won't be able to read it
+		/// </summary>
+		/// <param name="json"> Node to be encoded </param>
+		/// <returns> Encoded JSON object with provided gun_internal_name key </returns>
+		public JSONObject EncodeJSON(JSONNode json) {
+			JSONObject result = new JSONObject();
+
+			result["gun_internal_name"] = this.InternalName;
+
+			if (json == null) return result;
+
+			foreach (var node in json) {
+				result[this.InternalName + "." + node.Key] = node.Value;
+			}
+
+			return result;
+		}
+
+		/// <summary>
+		/// Decode JSON data to be used by this gun
+		/// </summary>
+		/// <param name="json"> Node to be decoded </param>
+		/// <returns> Decoded JSON object, exactly as was returned in GetPersistentData() </returns>
+		public JSONObject DecodeJSON(JSONNode json) {
+			JSONObject result = new JSONObject();
+
+			if (json == null) return result;
+
+			foreach (var node in json) {
+				if (node.Key == "gun_internal_name") continue;
+
+				result[node.Key.Replace(this.InternalName + ".", "")] = node.Value;
+			}
+
+			return result;
+		}
 
 		/// <summary>
 		/// Return an object containing data you want to save between sessions
