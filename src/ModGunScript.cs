@@ -3,6 +3,9 @@ using UnityEngine;
 using Receiver2;
 using SimpleJSON;
 using BepInEx;
+using HarmonyLib;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Receiver2ModdingKit {
 	/// <summary>
@@ -64,6 +67,7 @@ namespace Receiver2ModdingKit {
 			set { ReflectionManager.GS_firing_pin.SetValue(this, value); }
 		}
 
+		public GameObject muzzle_flash_prefab;
 		public bool visible_in_spawnmenu = true;
 		public bool spawns_in_dreaming = true;
 		public ModHelpEntry help_entry;
@@ -232,6 +236,44 @@ namespace Receiver2ModdingKit {
 				});
 
 				this.audio.SetSoundEvents();
+			}
+
+			var flash_prefab = this.muzzle_flash_prefab;
+
+			if (flash_prefab == null) {
+				flash_prefab = this.pooled_muzzle_flash.object_prefab;
+			}
+
+			if (flash_prefab != null) {
+				var muzzle_flash_pool = ObjectPool.pools["MuzzleFlashPool"];
+
+				var pool_map = ReflectionManager.OP_pool_map.GetValue(muzzle_flash_pool) as Dictionary<string, int>;
+				
+				this.pooled_muzzle_flash.pool_prefab = muzzle_flash_pool.gameObject;
+
+				GameObject muzzle_flash_container;
+
+				if (pool_map.ContainsKey(this.InternalName + "_muzzle_flash")) {
+					muzzle_flash_container = muzzle_flash_pool.pooled_prefab_parameters[pool_map[this.InternalName + "_muzzle_flash"]].pool_object;
+				}
+				else {
+					muzzle_flash_pool.AddPrefab(this.muzzle_flash_prefab);
+
+					muzzle_flash_container = new GameObject(this.InternalName + "_muzzle_flash");
+
+					muzzle_flash_container.transform.parent = muzzle_flash_pool.transform;
+
+					Instantiate(this.muzzle_flash_prefab, muzzle_flash_container.transform);
+
+					var pool_map_index = pool_map.Values.Max() + 1;
+
+					pool_map.Add(muzzle_flash_container.name, pool_map_index);
+
+					muzzle_flash_pool.pooled_prefab_parameters[pool_map_index].ClaimPool(muzzle_flash_container);
+				}
+				
+				this.pooled_muzzle_flash.object_prefab = muzzle_flash_container;
+				this.pooled_muzzle_flash.object_prefab_name = muzzle_flash_container.name;
 			}
 
 			try {

@@ -104,6 +104,11 @@ namespace Receiver2ModdingKit {
 			private set;
 		}
 
+		public static FieldInfo OP_pool_map {
+			get;
+			private set;
+		}
+
 		private static FieldInfo GetFieldInfo(Type type, string fieldName) {
 			FieldInfo field = type.GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 
@@ -168,6 +173,8 @@ namespace Receiver2ModdingKit {
 			RCS_magazine_prefabs_all = GetFieldInfo(typeof(ReceiverCoreScript), "magazine_prefabs_all");
 
 			UEB_persistent_calls = GetFieldInfo(typeof(UnityEventBase), "m_PersistentCalls");
+
+			OP_pool_map = GetFieldInfo(typeof(ObjectPool), "pool_map");
 
 			PCG_Clear = GetMethodInfo(UEB_persistent_calls.FieldType, "Clear");
 
