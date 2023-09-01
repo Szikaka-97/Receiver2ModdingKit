@@ -33,6 +33,8 @@ namespace Receiver2ModdingKit.Editor {
 			x_ray_on = 
 				target_gun != null
 				&&
+				target_gun.gun_part_materials != null
+				&&
 				target_gun.gun_part_materials.Length > 0
 				&&
 				target_gun.gun_part_materials[0].xray_material != null
