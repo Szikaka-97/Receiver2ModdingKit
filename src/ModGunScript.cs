@@ -28,6 +28,18 @@ namespace Receiver2ModdingKit {
 			}
 		}
 
+		internal static void UpdateModGun(GunScript gun) {
+			if (gun is ModGunScript) {
+				try {
+					((ModGunScript) gun).UpdateGun();
+				} catch (Exception e) {
+					Debug.LogError(String.Format("Catched exception during {0}'s UpdateGun", gun.InternalName));
+
+					Debug.LogException(e);
+				}
+			}
+		}
+
 		protected bool _disconnector_needs_reset {
 			get { return (bool) ReflectionManager.GS_disconnector_needs_reset.GetValue(this); }
 			set { ReflectionManager.GS_disconnector_needs_reset.SetValue(this, value); }
@@ -287,7 +299,16 @@ namespace Receiver2ModdingKit {
 		new protected void Update() {
 			using (var debug_scope = new TransformDebugScope()) { 
 				try {
+					this.EarlyUpdateGun();
+				} catch (Exception e) {
+					Debug.LogError(String.Format("Catched exception during {0}'s EarlyUpdateGun", this.InternalName));
+				}
+
+				try {
 					base.Update();
+					
+					UpdateAnimatedComponents();
+					if (safety.transform) safety.UpdateDisplay();
 				} catch (NullReferenceException e) {
 					Debug.LogError(String.Format("Catched exception during {0}'s Update", this.InternalName));
 
@@ -300,10 +321,13 @@ namespace Receiver2ModdingKit {
 
 					Debug.LogError(e);
 				}
-			}
 
-			UpdateAnimatedComponents();
-			if (safety.transform) safety.UpdateDisplay();
+				try {
+					this.LateUpdateGun();
+				} catch (Exception e) {
+					Debug.LogError(String.Format("Catched exception during {0}'s LateUpdateGun", this.InternalName));
+				}
+			}
 		}
 
 		/// <summary>
@@ -350,19 +374,19 @@ namespace Receiver2ModdingKit {
 		}
 
 		/// <summary>
-		/// A method performed every frame when the gun is active. Control things like firing the bullet within it
+		/// A method invoked every frame when the gun is active. Control things like firing the bullet within it
 		/// </summary>
 		public abstract void UpdateGun();
 
-		internal static void UpdateModGun(GunScript gun) {
-			if (gun is ModGunScript) {
-				try {
-					((ModGunScript) gun).UpdateGun();
-				} catch (Exception e) {
-					Debug.LogException(e);
-				}
-			}
-		}
+		/// <summary>
+		/// A method invoked every frame when the gun is active before the full GunScript.Update is performed
+		/// </summary>
+		public virtual void EarlyUpdateGun() {}
+
+		/// <summary>
+		/// A method invoked every frame when the gun is active after the full GunScript.Update is performed. Useful for things dependent on slide position
+		/// </summary>
+		public virtual void LateUpdateGun() {}
 
 		public override string TypeName() { return "ModGunScript"; }
 
