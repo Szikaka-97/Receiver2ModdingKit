@@ -167,7 +167,7 @@ namespace Receiver2ModdingKit {
 			this.is_valid = true;
 		}
 
-		public void UpdateRoundPositions() {
+		private void UpdateRoundPositions() {
 			if (this.rounds.Count == 0) return;
 
 			var round_array = this.rounds.ToArray();
@@ -283,11 +283,7 @@ namespace Receiver2ModdingKit {
 							round_array[1].transform.position = orig_pos;
 						}
 
-						Vector3 prev_round_pos = round_array[1].transform.position;
-
-						round_array[1].transform.position = Vector3.MoveTowards(round_array[1].transform.position, this.first_round_position.position, move_dist);
-
-						move_dist = Vector3.Distance(prev_round_pos, round_array[1].transform.position);
+						move_dist = Mathf.Min(Vector3.Distance(round_array[1].transform.position, this.first_round_position.position), move_dist);
 
 						for (int index = 2; index < round_array.Length; index++) {
 							round_array[index].transform.position = Vector3.MoveTowards(round_array[index].transform.position, this.first_round_position.position + this.magazine_direction * cartridge_length * (index - 1), move_dist);
@@ -342,15 +338,24 @@ namespace Receiver2ModdingKit {
 			}
 		}
 
-		public void Update() {
+		private void Update() {
 			UpdateRoundPositions();
 		}
 
-		public void AddRound(ShellCasingScript round) {
-			this.TryAddRound(round);
+		/// <summary>
+		/// Insert round into the magazine, if possible
+		/// </summary>
+		/// <param name="round"> Round to be inserted </param>
+		public void InsertRound(ShellCasingScript round) {
+			this.TryInsertRound(round);
 		}
 
-		public bool TryAddRound(ShellCasingScript round) {
+		/// <summary>
+		/// Insert round into the magazine and return whether it was done
+		/// </summary>
+		/// <param name="round"> Round to be inserted </param>
+		/// <returns> True if round was inserted, False otherwise </returns>
+		public bool TryInsertRound(ShellCasingScript round) {
 			if (!is_valid || this.rounds.Count >= capacity || this.busy) {
 				return false;
 			}
@@ -370,6 +375,10 @@ namespace Receiver2ModdingKit {
 			return true;
 		}
 
+		/// <summary>
+		/// Begin the round removing animation and return whether there was anything to remove
+		/// </summary>
+		/// <returns> True if round was removed, False if there were no rounds or the magazine is busy </returns>
 		public bool StartRemoveRound() {
 			if (!is_valid || this.busy) {
 				return false;
@@ -386,7 +395,11 @@ namespace Receiver2ModdingKit {
 			return false;
 		}
 
-		public ShellCasingScript RemoveRound() {
+		/// <summary>
+		/// Retrieve the round that started to be removed in StartRemoveRound()
+		/// </summary>
+		/// <returns> Round that was being removed or Null if there was no such round </returns>
+		public ShellCasingScript RetrieveRound() {
 			if (!is_valid || !ready_to_remove_round) {
 				return null;
 			}

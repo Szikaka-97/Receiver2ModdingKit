@@ -30,7 +30,7 @@ namespace Receiver2ModdingKit.Editor {
 					EditorGUILayout.Space(40);
 
 					if (GUILayout.Button("Add Round", GUILayout.Width(width))) {
-						mag.AddRound(Instantiate(serializedObject.FindProperty("round_prefab").objectReferenceValue as GameObject).GetComponent<ShellCasingScript>());
+						mag.InsertRound(Instantiate(serializedObject.FindProperty("round_prefab").objectReferenceValue as GameObject).GetComponent<ShellCasingScript>());
 					}
 
 					EditorGUILayout.Space(40);
@@ -42,7 +42,7 @@ namespace Receiver2ModdingKit.Editor {
 					EditorGUILayout.Space(40);
 				
 					if (GUILayout.Button("End Remove Round", GUILayout.Width(width))) {
-						var shell = mag.RemoveRound();
+						var shell = mag.RetrieveRound();
 
 						if (shell != null) Destroy(shell.gameObject);
 					}
