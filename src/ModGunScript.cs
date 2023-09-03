@@ -68,17 +68,16 @@ namespace Receiver2ModdingKit {
 			get { return (float) ReflectionManager.GS_yoke_open.GetValue(this); }
 			set { ReflectionManager.GS_yoke_open.SetValue(this, value); }
 		}
-
 		protected int _current_firing_mode_index {
 			get { return (int) ReflectionManager.GS_current_firing_mode_index.GetValue(this); }
 			set { ReflectionManager.GS_current_firing_mode_index.SetValue(this, value); }
 		}
-
 		protected LinearMover _firing_pin {
 			get { return (LinearMover) ReflectionManager.GS_firing_pin.GetValue(this); }
 			set { ReflectionManager.GS_firing_pin.SetValue(this, value); }
 		}
 
+		[Tooltip("All objects in the prefab should have the same activation status, most desirably they should be deactivated")]
 		public GameObject muzzle_flash_prefab;
 		public bool visible_in_spawnmenu = true;
 		public bool spawns_in_dreaming = true;
@@ -302,6 +301,8 @@ namespace Receiver2ModdingKit {
 					this.EarlyUpdateGun();
 				} catch (Exception e) {
 					Debug.LogError(String.Format("Catched exception during {0}'s EarlyUpdateGun", this.InternalName));
+
+					Debug.LogException(e);
 				}
 
 				try {
@@ -326,6 +327,8 @@ namespace Receiver2ModdingKit {
 					this.LateUpdateGun();
 				} catch (Exception e) {
 					Debug.LogError(String.Format("Catched exception during {0}'s LateUpdateGun", this.InternalName));
+
+					Debug.LogException(e);
 				}
 			}
 		}
