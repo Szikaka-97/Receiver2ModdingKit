@@ -8,7 +8,7 @@ using Receiver2;
 using Receiver2ModdingKit.ModInstaller;
 
 namespace Receiver2ModdingKit {
-	[BepInPlugin("pl.szikaka.receiver_2_modding_kit", "Receiver 2 Modding Kit", "1.3.2")]
+	[BepInPlugin("pl.szikaka.receiver_2_modding_kit", "Receiver 2 Modding Kit", "1.4.0")]
 	[BepInProcess("Receiver2")]
 	public class ModdingKitCorePlugin : BaseUnityPlugin {
 		public static ModdingKitCorePlugin instance {
@@ -73,8 +73,6 @@ namespace Receiver2ModdingKit {
 		private void Awake() {
 			instance = this;
 
-			#if THUNDERSTORE
-
 			try {
 				if (Thunderstore.Thunderstore.LaunchedWithR2ModMan) {
 					Debug.Log("Launched Receiver 2 Modding Kit with r2modman");
@@ -89,12 +87,6 @@ namespace Receiver2ModdingKit {
 					Debug.Log("Launched Receiver 2 Modding Kit standalone");	
 				}
 			}
-
-			#else
-
-			Debug.Log("Launched Receiver 2 Modding Kit");
-
-			#endif
 
 			try {
 				HarmonyManager.Initialize();
@@ -139,11 +131,9 @@ namespace Receiver2ModdingKit {
 
 			CustomSounds.ModAudioManager.Release();
 
-			#if THUNDERSTORE
-
-			Thunderstore.Thunderstore.CleanupMods();
-
-			#endif
+			if (Thunderstore.Thunderstore.LaunchedWithR2ModMan) {
+				Thunderstore.Thunderstore.CleanupMods();
+			}
 		}
 	}
 }

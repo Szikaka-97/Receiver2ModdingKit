@@ -162,7 +162,6 @@ namespace Receiver2ModdingKit {
 			}
 		}
 
-		#if THUNDERSTORE
 		private static class R2ModManTranspilers {
 			[HarmonyPatch(typeof(Locale), nameof(Locale.GetTapeSubtitle), new Type[] { typeof(string), typeof(LocaleID)})]
 			[HarmonyPostfix]
@@ -230,7 +229,6 @@ namespace Receiver2ModdingKit {
 				}
 			}
 		}
-		#endif
 
 		#endregion
 
@@ -542,7 +540,6 @@ namespace Receiver2ModdingKit {
 			HarmonyInstances.FMODDebug = Harmony.CreateAndPatchAll(typeof(AudioDebugMenuTranspiler));
 			#endif
 
-			#if THUNDERSTORE
 			if (Thunderstore.Thunderstore.LaunchedWithR2ModMan) {
 				HarmonyInstances.Thunderstore = Harmony.CreateAndPatchAll(typeof(R2ModManTranspilers));
 
@@ -550,7 +547,6 @@ namespace Receiver2ModdingKit {
 					HarmonyInstances.Thunderstore.PatchAll(clazz);
 				}
 			}
-			#endif
 
 			ModdingKitCorePlugin.instance.StartCoroutine(FixLegacySounds()); //Calling this method has to be delayed to wait for patches from all plugins to get applied
 		}
