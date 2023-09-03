@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using UnityEngine;
 using UnityEditor;
+using Receiver2ModdingKit.Editor;
 
 public class CreateAssetBundles {
 	static BuildTarget mainTarget = BuildTarget.StandaloneWindows;
@@ -19,6 +20,16 @@ public class CreateAssetBundles {
 		var target_path = Path.Combine(asset_bundle_directory, target.Item2.ToString());
 
 		if (!Directory.Exists(target_path)) Directory.CreateDirectory(target_path);
+
+		foreach(var asset_bundle_name in AssetDatabase.GetAllAssetBundleNames()) {
+			foreach(var asset_path in AssetDatabase.GetAssetPathsFromAssetBundle(asset_bundle_name)) {
+				var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(asset_path);
+
+				if (asset is INotifiedByAssetbundleBuild) {
+					(asset as INotifiedByAssetbundleBuild).PreAssetbundleBuild();
+				}
+			}
+		}
 
 		var manifest = BuildPipeline.BuildAssetBundles(
 			target_path, 
