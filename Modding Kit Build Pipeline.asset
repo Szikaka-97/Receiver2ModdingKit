@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: StageAssemblies
   m_EditorClassIdentifier: 
   Active: 1
-  stageDebugDatabases: 1
+  stageDebugDatabases: 0
   releaseBuild: 0
   assemblyArtifactPath: <AssemblyStaging>
   buildTarget: 5
@@ -29,7 +29,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77f65d4371163fb4695da79ab8df0e84, type: 3}
   m_Name: ExecuteProcess
   m_EditorClassIdentifier: 
-  Active: 0
+  Active: 1
   PerManifest: 0
   ListType: 0
   Manifests: []

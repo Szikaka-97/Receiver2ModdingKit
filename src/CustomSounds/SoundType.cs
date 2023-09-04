@@ -28,7 +28,7 @@
 		UI,
 		/// <summary> Event will use the voice bus, being affected by the Voice Volume slider </summary>
 		Voice,
-		#if !RELEASE
+		#if DEBUG
 		/// <summary> Various garbage useful in debugging </summary>
 		Test
 		#endif

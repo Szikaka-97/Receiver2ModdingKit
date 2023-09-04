@@ -9,20 +9,32 @@
 		<LangVersion>latest</LangVersion>
 		<RootNamespace>Receiver2ModdingKit</RootNamespace>
 		<RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-		<Configurations>Debug;Release</Configurations>
+		<Configurations>Standalone;Thunderstore</Configurations>
 	</PropertyGroup>
 
-	<PropertyGroup>
-		<DebugType>portable</DebugType>
-	</PropertyGroup>
-	
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<DefineConstants>DEBUG</DefineConstants>
+		<DebugType>portable</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<DefineConstants>RELEASE</DefineConstants>
+		<DebugType>portable</DebugType>
 	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Thunderstore|AnyCPU'">
+		<DefineConstants>THUNDERSTORE</DefineConstants>
+	</PropertyGroup>
+	
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DefineConstants>THUNDERSTORE; DEBUG</DefineConstants>
+	</PropertyGroup>
+
+	<ItemGroup Condition="$(Configuration)=='Standalone'">
+		<Compile Remove="src\Thunderstore\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Remove="src\Editor\Tools\**" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<EmbeddedResource Include="resources\cog.png" />
