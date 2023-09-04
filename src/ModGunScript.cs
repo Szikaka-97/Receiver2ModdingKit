@@ -208,11 +208,6 @@ namespace Receiver2ModdingKit {
 		new protected void Awake() {
 			player_input = new PlayerInput(this);
 
-			if (this.spawn_info_sprite == null) {
-				Debug.LogError("Your gun doesn't have a spawn_info_sprite assigned, it may cause problems later");
-				this.spawn_info_sprite = Sprite.Create(Texture2D.blackTexture, Rect.zero, Vector2.zero);
-			}
-
 			using (var debug_scope = new TransformDebugScope()) {
 				try {
 					base.Awake();
@@ -349,6 +344,11 @@ namespace Receiver2ModdingKit {
 		}
 
 		public void BaseInitializeGun() {
+			if (this.spawn_info_sprite == null) {
+				Debug.LogError("Gun" + this.InternalName + " doesn't have a spawn_info_sprite assigned, it may cause problems later");
+				this.spawn_info_sprite = Sprite.Create(Texture2D.blackTexture, Rect.zero, Vector2.zero);
+			}
+
 			try {
 				this.InitializeGun();
 			} catch (Exception e) {
