@@ -268,13 +268,13 @@ namespace Receiver2ModdingKit {
 					muzzle_flash_container = muzzle_flash_pool.pooled_prefab_parameters[pool_map[this.InternalName + "_muzzle_flash"]].pool_object;
 				}
 				else {
-					muzzle_flash_pool.AddPrefab(this.muzzle_flash_prefab);
+					muzzle_flash_pool.AddPrefab(flash_prefab);
 
 					muzzle_flash_container = new GameObject(this.InternalName + "_muzzle_flash");
 
 					muzzle_flash_container.transform.parent = muzzle_flash_pool.transform;
 
-					Instantiate(this.muzzle_flash_prefab, muzzle_flash_container.transform);
+					Instantiate(flash_prefab, muzzle_flash_container.transform);
 
 					var pool_map_index = pool_map.Values.Max() + 1;
 
