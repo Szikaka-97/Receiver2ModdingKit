@@ -250,6 +250,7 @@ namespace Receiver2ModdingKit {
 			}
 
 			var flash_prefab = this.muzzle_flash_prefab;
+			bool set_pooled_object = true;
 
 			if (flash_prefab == null) {
 				flash_prefab = this.pooled_muzzle_flash.object_prefab;
@@ -260,8 +261,6 @@ namespace Receiver2ModdingKit {
 
 				var pool_map = ReflectionManager.OP_pool_map.GetValue(muzzle_flash_pool) as Dictionary<string, int>;
 				
-				this.pooled_muzzle_flash.pool_prefab = muzzle_flash_pool.gameObject;
-
 				GameObject muzzle_flash_container;
 
 				if (pool_map.ContainsKey(this.InternalName + "_muzzle_flash")) {
@@ -278,13 +277,29 @@ namespace Receiver2ModdingKit {
 
 					var pool_map_index = pool_map.Values.Max() + 1;
 
-					pool_map.Add(muzzle_flash_container.name, pool_map_index);
+					if (pool_map_index >= muzzle_flash_pool.pooled_prefab_parameters.Count) {
+						#if DEBUG
 
-					muzzle_flash_pool.pooled_prefab_parameters[pool_map_index].ClaimPool(muzzle_flash_container);
+						Debug.Log("Gun " + this.InternalName + " uses an in-game muzzleflash");
+
+						#endif
+
+						Destroy(muzzle_flash_container);
+
+						set_pooled_object = false;
+					}
+					else {
+						pool_map.Add(muzzle_flash_container.name, pool_map_index);
+
+						muzzle_flash_pool.pooled_prefab_parameters[pool_map_index].ClaimPool(muzzle_flash_container);
+					}
 				}
-				
-				this.pooled_muzzle_flash.object_prefab = muzzle_flash_container;
-				this.pooled_muzzle_flash.object_prefab_name = muzzle_flash_container.name;
+
+				if (set_pooled_object) {
+					this.pooled_muzzle_flash.pool_prefab = muzzle_flash_pool.gameObject;
+					this.pooled_muzzle_flash.object_prefab = muzzle_flash_container;
+					this.pooled_muzzle_flash.object_prefab_name = muzzle_flash_container.name;
+				}
 			}
 
 			try {
@@ -330,6 +345,15 @@ namespace Receiver2ModdingKit {
 
 					Debug.LogException(e);
 				}
+			}
+		}
+
+		public void BaseInitializeGun() {
+			try {
+				this.InitializeGun();
+			} catch (Exception e) {
+				Debug.LogError("Error accured while initializing gun " + this.InternalName + ":");
+				Debug.LogException(e);
 			}
 		}
 

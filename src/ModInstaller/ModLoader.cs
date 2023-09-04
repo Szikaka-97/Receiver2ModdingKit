@@ -169,7 +169,7 @@ namespace Receiver2ModdingKit.ModInstaller {
 			}
 
 			try {
-				gun.InitializeGun();
+				gun.BaseInitializeGun();
 			} catch (Exception e) {
 				Debug.LogError("Error accured while initializing gun " + gun.InternalName + ":");
 				Debug.LogException(e);
