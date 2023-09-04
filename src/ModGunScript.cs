@@ -273,7 +273,7 @@ namespace Receiver2ModdingKit {
 					var pool_map_index = pool_map.Values.Max() + 1;
 
 					if (pool_map_index >= muzzle_flash_pool.pooled_prefab_parameters.Count) {
-						#if DEBUG
+						#if !RELEASE
 
 						Debug.Log("Gun " + this.InternalName + " uses an in-game muzzleflash");
 

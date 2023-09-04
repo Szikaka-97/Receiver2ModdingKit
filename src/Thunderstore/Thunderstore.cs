@@ -60,7 +60,7 @@ namespace Receiver2ModdingKit.Thunderstore {
 
 					installed_mods.Add(mod);
 
-					#if DEBUG
+					#if !RELEASE
 					Debug.Log("Loading mod " + mod_dir.Name);
 					#endif
 				}
@@ -74,7 +74,7 @@ namespace Receiver2ModdingKit.Thunderstore {
 				foreach (var mod in installed_mods) {
 					mod.InstallCampaign();
 
-					#if DEBUG
+					#if !RELEASE
 					Debug.Log("Installing mod " + mod.Name);
 					#endif
 				}
@@ -83,7 +83,7 @@ namespace Receiver2ModdingKit.Thunderstore {
 
 		public static void InstallGuns() {
 			if (LaunchedWithR2ModMan) {
-				#if DEBUG
+				#if !RELEASE
 				Debug.Log("Installing guns");
 				#endif
 
@@ -97,7 +97,7 @@ namespace Receiver2ModdingKit.Thunderstore {
 
 		public static void InstallTapes(TapeManager instance) {
 			if (LaunchedWithR2ModMan) {
-				#if DEBUG
+				#if !RELEASE
 				Debug.Log("Installing tapes");
 				#endif
 
@@ -111,7 +111,7 @@ namespace Receiver2ModdingKit.Thunderstore {
 
 		public static void InstallTiles(ModulePrefabsList instance) {
 			if (LaunchedWithR2ModMan) {
-				#if DEBUG
+				#if !RELEASE
 				Debug.Log("Installing tiles");
 				#endif
 
@@ -128,7 +128,7 @@ namespace Receiver2ModdingKit.Thunderstore {
 				foreach (var mod in installed_mods) {
 					mod.UninstallCampaign();
 
-					#if DEBUG
+					#if !RELEASE
 					Debug.Log("Uninstalling mod " + mod.Name);
 					#endif
 				}

@@ -534,7 +534,7 @@ namespace Receiver2ModdingKit {
 			HarmonyInstances.CustomSounds = Harmony.CreateAndPatchAll(typeof(CustomSounds.ModAudioPatches));
 			HarmonyInstances.LocalAimHandler = Harmony.CreateAndPatchAll(typeof(LAHGunControlsTranspiler));
 
-			#if DEBUG
+			#if !RELEASE
 			HarmonyInstances.DevMenu = Harmony.CreateAndPatchAll(typeof(DevMenuTranspiler));
 			HarmonyInstances.TransformDebug = Harmony.CreateAndPatchAll(typeof(TransformDebugScope));
 			HarmonyInstances.FMODDebug = Harmony.CreateAndPatchAll(typeof(AudioDebugMenuTranspiler));

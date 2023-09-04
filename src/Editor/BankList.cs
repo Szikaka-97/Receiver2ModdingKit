@@ -83,7 +83,7 @@ namespace Receiver2ModdingKit.Editor {
 		public List<byte[]> GetBanks() {
 			List<byte[]> banks_data = new List<byte[]>();
 
-			#if DEBUG
+			#if !RELEASE
 			Debug.Log("Trying to get banks from list " + this.name);
 			Debug.Log("Banks count: " + offsets.Count);
 			foreach (int o in offsets) {
