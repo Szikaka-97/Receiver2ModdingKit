@@ -49,7 +49,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e563561e08b6a3642a487177f5cfbb37, type: 3}
-  m_Name: Build Manifest
+  m_Name: Receiver 2 Modding Kit Manifest
   m_EditorClassIdentifier: 
   Data:
   - {fileID: -5275258946920398887}
