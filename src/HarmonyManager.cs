@@ -23,7 +23,8 @@ namespace Receiver2ModdingKit {
 			public static Harmony TransformDebug;
 			public static Harmony DevMenu;
 			public static Harmony FMODDebug;
-			public static Harmony LocalAimHandler;
+			public static Harmony LAHGunControls;
+			public static Harmony LAHBullets;
 			public static Harmony Thunderstore;
 		}
 
@@ -156,6 +157,40 @@ namespace Receiver2ModdingKit {
 					codeMatcher
 					.Advance(1)
 					.Insert(new CodeInstruction(OpCodes.Nop));
+				}
+
+				return codeMatcher.InstructionEnumeration();
+			}
+		}
+
+		[HarmonyPatch(typeof(LocalAimHandler), "UpdateLooseBulletDisplay")]
+		private static class LAHBulletDisplayTranspiler {
+			private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, MethodBase __originalMethod) {
+				CodeMatcher codeMatcher = new CodeMatcher(instructions);
+
+				codeMatcher
+				.MatchForward(true, 
+					new CodeMatch(OpCodes.Ldnull),
+					new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(UnityEngine.Object), "op_Equality")),
+					new CodeMatch(OpCodes.Brtrue)
+				);
+
+				if (!codeMatcher.ReportFailure(__originalMethod, Debug.LogError)) {
+					var branchInstruction = codeMatcher.Instruction;
+
+					codeMatcher
+					.Advance(-codeMatcher.Pos)
+					.MatchForward(false, 
+						new CodeMatch(OpCodes.Ldarg_0),
+						new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(LocalAimHandler), "get_IsHoldingMagazine")),
+						new CodeMatch(OpCodes.Brfalse)
+					);
+
+					if (!codeMatcher.ReportFailure(__originalMethod, Debug.LogError)) {
+						codeMatcher
+						.InsertAndAdvance(new CodeInstruction(OpCodes.Ldsfld, AccessTools.Field(typeof(Extensions), nameof(Extensions.lah_force_bullet_display))))
+						.Insert(branchInstruction);
+					}
 				}
 
 				return codeMatcher.InstructionEnumeration();
@@ -532,7 +567,8 @@ namespace Receiver2ModdingKit {
 			HarmonyInstances.GunScript = Harmony.CreateAndPatchAll(typeof(GunScriptTranspiler));
 			HarmonyInstances.ModHelpEntry = Harmony.CreateAndPatchAll(typeof(ModHelpEntryManager));
 			HarmonyInstances.CustomSounds = Harmony.CreateAndPatchAll(typeof(CustomSounds.ModAudioPatches));
-			HarmonyInstances.LocalAimHandler = Harmony.CreateAndPatchAll(typeof(LAHGunControlsTranspiler));
+			HarmonyInstances.LAHGunControls = Harmony.CreateAndPatchAll(typeof(LAHGunControlsTranspiler));
+			HarmonyInstances.LAHBullets = Harmony.CreateAndPatchAll(typeof(LAHBulletDisplayTranspiler));
 
 			#if DEBUG
 			HarmonyInstances.DevMenu = Harmony.CreateAndPatchAll(typeof(DevMenuTranspiler));

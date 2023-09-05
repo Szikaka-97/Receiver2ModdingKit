@@ -10,6 +10,7 @@ using UnityEngine.Events;
 namespace Receiver2ModdingKit {
 	public static class Extensions {
 		internal static JSONObject current_gun_data;
+		internal static bool lah_force_bullet_display;
 
 		/// <summary>
 		/// Fetch a round with of a specified type from player's inventory
@@ -75,6 +76,10 @@ namespace Receiver2ModdingKit {
 		/// </returns>
 		public static ShellCasingScript GetBullet(this LocalAimHandler lah, uint[] cartridge_dimensions) {
 			return lah.GetBullet(cartridge_dimensions.Cast<CartridgeSpec.Preset>().ToArray());
+		}
+
+		public static void ShowBullets(this LocalAimHandler lah, bool show_bullets) {
+			lah_force_bullet_display = show_bullets;
 		}
 
 		/// <summary>
