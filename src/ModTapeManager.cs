@@ -22,10 +22,8 @@ namespace Receiver2ModdingKit {
 		} = new Dictionary<string, FileInfo>();
 
 		internal static void Init() {
-			instantiate_tape_button_prefab = Object.Instantiate(GameObject.Find("ReceiverCore/Menus/Overlay Menu Canvas/Aspect Ratio Fitter/New Pause Menu/Backdrop1/Sub-Menu Layout Group/New Tape Menu/Entries Layout/ScrollableContent Variant/Viewport/Content/Standard/Invalid/Secondary Button"));
+			instantiate_tape_button_prefab = Instantiate(GameObject.Find("ReceiverCore/Menus/Overlay Menu Canvas/Aspect Ratio Fitter/New Pause Menu/Backdrop1/Sub-Menu Layout Group/New Tape Menu/Entries Layout/ScrollableContent Variant/Viewport/Content/Standard/Invalid/Secondary Button"));
 			
-			Debug.Log(Assembly.GetExecutingAssembly().GetManifestResourceInfo("Receiver2ModdingKit.resources.tape.png"));
-
 			using (var image_stream = ModdingKitCorePlugin.GetResourceStream("tape.png")) {
 				if (image_stream.Length > 0) {
 					byte[] data = new byte[image_stream.Length];

@@ -43,6 +43,28 @@ namespace Receiver2ModdingKit {
 
 		private static readonly string left_column_menu_path = "ReceiverCore/Menus/Overlay Menu Canvas/Aspect Ratio Fitter/New Pause Menu/Backdrop1/Sub-Menu Layout Group/New Settings Menu/ScrollableContent Variant/Viewport/Content/Left Column/";
 		private static readonly string right_column_menu_path = "ReceiverCore/Menus/Overlay Menu Canvas/Aspect Ratio Fitter/New Pause Menu/Backdrop1/Sub-Menu Layout Group/New Settings Menu/ScrollableContent Variant/Viewport/Content/Right Column/";
+		
+		private static GameObject m_keybinds_menu = null;
+		private static GameObject keybinds_menu {
+			get {
+				if (m_keybinds_menu == null) {
+					m_keybinds_menu = GameObject.Find("ReceiverCore/Menus/Overlay Menu Canvas/Aspect Ratio Fitter/New Pause Menu/Backdrop1/Sub-Menu Layout Group/New Keybinding Menu/ScrollableContent Variant/Viewport/Content");
+				}
+
+                return m_keybinds_menu;
+			}
+		}
+
+		private static GameObject m_keybinds_selection_field = null;
+		private static GameObject keybinds_selection_field {
+			get {
+				if (m_keybinds_selection_field == null) {
+					m_keybinds_selection_field = keybinds_menu.GetComponentInChildren<KeybindingComponent>().gameObject;
+				}
+
+                return m_keybinds_selection_field;
+			}
+		}
 
         private static GameObject m_label_prefab = null;
         private static GameObject label_prefab {
@@ -56,7 +78,6 @@ namespace Receiver2ModdingKit {
         }
 
 		private static GameObject m_button_setting_prefab = null;
-
 		private static GameObject button_setting_prefab {
             get {
                 if (m_button_setting_prefab != null) return m_button_setting_prefab;
@@ -70,7 +91,6 @@ namespace Receiver2ModdingKit {
         }
 
 		private static GameObject m_toggle_setting_prefab = null;
-
 		private static GameObject toggle_setting_prefab {
             get {
                 if (m_toggle_setting_prefab != null) return m_toggle_setting_prefab;
@@ -83,7 +103,6 @@ namespace Receiver2ModdingKit {
         }
 
 		private static GameObject m_dropdown_setting_prefab = null;
-
 		private static GameObject dropdown_setting_prefab {
             get {
                 if (m_dropdown_setting_prefab != null) return m_dropdown_setting_prefab;
@@ -95,7 +114,6 @@ namespace Receiver2ModdingKit {
         }
 
 		private static GameObject m_slider_setting_prefab = null;
-
 		private static GameObject slider_setting_prefab {
             get {
                 if (m_slider_setting_prefab != null) return m_slider_setting_prefab;
@@ -275,5 +293,154 @@ namespace Receiver2ModdingKit {
 
             return new SettingsMenuEntry<T>(config_entry, label, control);
         }
+
+		public static GameObject AddKeybindsCategory(string category_name, float scale) {
+			GameObject category_object = UnityEngine.Object.Instantiate(keybinds_menu.transform.Find("Automatics Category").gameObject, keybinds_menu.transform);
+
+			category_object.transform.Find("Title").GetComponent<TextMeshProUGUI>().text = category_name;
+
+			category_object.transform.localScale = new Vector3(scale, scale, scale);
+
+			category_object.name = category_name + " Category";
+
+			category_object.GetComponent<RectTransform>().SetAsLastSibling();
+
+			Component.DestroyImmediate(category_object.transform.Find("Title").GetComponent<LocalizedTextMesh>());
+
+			return category_object;
+		}
+
+		public static ModKeybindComponent AddKeybindField(Keybind keybind) {
+			GameObject keybind_field = GameObject.Instantiate(keybinds_selection_field, keybinds_menu.transform);
+			keybind_field.name = keybind.name;
+
+			GameObject.DestroyImmediate(keybind_field.GetComponent<KeybindingComponent>());
+
+			keybind_field.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = keybind.name;
+
+			GameObject.DestroyImmediate(keybind_field.transform.Find("Second Binding").gameObject);
+
+			GameObject dropdown = GameObject.Instantiate(dropdown_setting_prefab, keybind_field.transform);
+			dropdown.GetComponent<RectTransform>().SetSiblingIndex(2);
+			dropdown.name = "Redirect Dropdown";
+
+			var dropdown_component = dropdown.GetComponent<DropdownComponent>();
+
+			var rewired_actions_list = KeybindsManager.rewired_actions.Keys.ToList();
+
+			dropdown_component.SetOptions(rewired_actions_list);
+
+			dropdown_component.OnChange.RemovePersistentListeners();
+
+			if (keybind.key != null && keybind.key.IsRedirect()) {
+				dropdown_component.Select(rewired_actions_list.FindIndex( action_name => KeybindsManager.rewired_actions[action_name] == keybind.key.GetKey()));
+			}
+
+			(dropdown.GetComponent<RectTransform>().Find("Dropdown") as RectTransform).anchoredPosition = new Vector2(3, 0);
+			(dropdown.GetComponent<RectTransform>().Find("Dropdown") as RectTransform).sizeDelta = new Vector2(9, 46);
+
+			var keybind_button = keybind_field.transform.Find("First Binding").Find("Button").GetComponent<Button>();
+			keybind_button.GetComponent<RectTransform>().anchoredPosition -= new Vector2(4, 0);
+
+			keybind_button.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "";
+
+			keybind_button.onClick.RemovePersistentListeners();
+
+			var keybind_component = keybind_field.AddComponent<ModKeybindComponent>();
+
+			keybind_component.keybind = keybind;
+			keybind_component.keyboard_binding = keybind_button;
+			keybind_component.keyboard_binding_text = keybind_button.transform.Find("Text").GetComponent<TextMeshProUGUI>();
+			keybind_component.redirect_binding = dropdown_component;
+
+			return keybind_component;
+		}
+
+		internal static KeybindContainer GenerateKeybindMenu(ModGunScript gun) {
+			if (gun == null || string.IsNullOrEmpty(gun.weapon_group_name)) {
+				return null;
+			}
+
+			if (KeybindsManager.TryGetKeybinds(gun.weapon_group_name, out var keybinds)) {
+				return keybinds;
+			}
+
+			if (KeybindsManager.keybinds_menu_banner == null) {
+				KeybindsManager.keybinds_menu_banner = AddKeybindsCategory("Modded Gun Keybinds", 1);
+			}
+
+			KeybindContainer container = new KeybindContainer() {
+				gun_name = gun.weapon_group_name,
+				category_object = AddKeybindsCategory(gun.GetGunTactics().title, 0.75f)
+			};
+
+			List<Keybind> gun_keybinds = new List<Keybind>();
+
+			foreach (FieldInfo keybind_field in gun.GetType().GetRuntimeFields()) {
+				if (keybind_field.FieldType != typeof(Keybind)) {
+					continue;
+				}
+
+				if (!keybind_field.IsStatic) {
+					Debug.LogError("Field " + gun.GetType().Name + "." + keybind_field.Name + " isn't static. Keybind fields have to be static to work");
+				}
+
+				Keybind keybind = keybind_field.GetValue(gun) as Keybind;
+
+				keybind.gun_name = gun.weapon_group_name;
+
+				string key = ModdingKitConfig.BindKeybindConfig(keybind);
+
+				if (int.TryParse(key, out int action_id)) {
+					keybind.key = new Keybind.KeyRedirect(action_id);
+				}
+				else if (Enum.TryParse<KeyCode>(key, true, out var keyboard_key)) {
+					keybind.key = new Keybind.KeyboardKey(keyboard_key);
+				}
+				else {
+					keybind.key = new Keybind.KeyRedirect(keybind.fallback_action_id);
+				}
+
+				gun_keybinds.Add(keybind);
+			}
+
+			container.keybind_components = gun_keybinds.Select( AddKeybindField ).ToArray();
+
+			container.SetActive(false);
+
+			KeybindsManager.custom_keybinds.Add(container);
+
+			if (KeybindsManager.keybinds_menu_space == null) {
+				KeybindsManager.keybinds_menu_space = AddKeybindsCategory("", 1);
+
+				KeybindsManager.keybinds_menu_space.name = "Keybinds Space";
+
+				KeybindsManager.keybinds_menu_space.GetComponent<HorizontalLayoutGroup>().childControlHeight = true;
+				KeybindsManager.keybinds_menu_space.GetComponentInChildren<LayoutElement>().preferredHeight = 200;
+			}
+
+			KeybindsManager.keybinds_menu_space.GetComponent<RectTransform>().SetAsLastSibling();
+			
+			return container;
+		}
+
+		internal static void ShowKeyBindDialog(string text) {
+			var menu = GameObject.Find("ReceiverCore/Menus/Overlay Menu Canvas/Aspect Ratio Fitter/New Pause Menu/Backdrop1/Sub-Menu Layout Group");
+
+			menu.transform.Find("New Keybinding Menu").gameObject.SetActive(false);
+
+			menu.transform.Find("Bind Key Dialog").gameObject.SetActive(true);
+
+			menu.transform.Find("Bind Key Dialog").GetComponent<BindKeyDialogScript>().title_text.text = Locale.FormatUIString(LocaleUIString.M_CBM_REBIND_TITLE, new object[] { text });
+			menu.transform.Find("Bind Key Dialog").GetComponent<BindKeyDialogScript>().main_text.text = Locale.FormatUIString(LocaleUIString.M_CBM_REBIND_TEXT, new object[] { text });
+		}
+
+		internal static void HideKeyBindDialog() {
+			var menu = GameObject.Find("ReceiverCore/Menus/Overlay Menu Canvas/Aspect Ratio Fitter/New Pause Menu/Backdrop1/Sub-Menu Layout Group");
+
+			menu.transform.Find("New Keybinding Menu").gameObject.SetActive(true);
+
+			menu.transform.Find("Bind Key Dialog").gameObject.SetActive(false);
+		}
     }
 }

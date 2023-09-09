@@ -15,7 +15,9 @@
         "ImGui.dll",
         "SimpleJSON.dll",
         "BepInEx.dll",
-        "Mono.Cecil.dll"
+        "Mono.Cecil.dll",
+        "Wolfire.dll",
+        "Rewired_Core.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],

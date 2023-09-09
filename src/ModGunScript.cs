@@ -114,6 +114,11 @@ namespace Receiver2ModdingKit {
 			protected set;
 		}
 
+		public KeybindContainer keybinds {
+			get;
+			protected set;
+		}
+
 		/// <summary>
 		/// Linearly interpolates between time-value pairs provided in curve parameter
 		/// </summary>
@@ -348,6 +353,8 @@ namespace Receiver2ModdingKit {
 				Debug.LogError("Gun" + this.InternalName + " doesn't have a spawn_info_sprite assigned, it may cause problems later");
 				this.spawn_info_sprite = Sprite.Create(Texture2D.blackTexture, Rect.zero, Vector2.zero);
 			}
+
+			this.keybinds = SettingsMenuManager.GenerateKeybindMenu(this);
 
 			try {
 				this.InitializeGun();

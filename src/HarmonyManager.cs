@@ -11,6 +11,7 @@ using ImGuiNET;
 using Receiver2;
 using Receiver2ModdingKit.ModInstaller;
 using Receiver2ModdingKit.Editor;
+using FMODUnity;
 
 namespace Receiver2ModdingKit {
     public static class HarmonyManager {
@@ -504,6 +505,14 @@ namespace Receiver2ModdingKit {
 			if (__result is ModGunScript && (__result as ModGunScript).OwnData(Extensions.current_gun_data)) {
 				__result.SetPersistentData((__result as ModGunScript).DecodeJSON(Extensions.current_gun_data));
 			}
+		}
+
+		[HarmonyPatch(typeof(SettingsMenuScript), nameof(SettingsMenuScript.OnKeybindsClick))]
+		[HarmonyPostfix]
+		private static void PatchOpenKeybinds() {
+			if (LocalAimHandler.player_instance == null || !LocalAimHandler.player_instance.TryGetGun(out var gun)) return;
+
+			KeybindsManager.SetKeybindsActive(gun.weapon_group_name);
 		}
 
 	// Maybe later

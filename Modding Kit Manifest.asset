@@ -18,7 +18,8 @@ MonoBehaviour:
   Name: Receiver 2 Modding Kit
   Description: 
   Version: 1.3.2
-  Dependencies: []
+  Dependencies:
+  - {fileID: 11400000, guid: 08252974f3d547b3ecc87b18a8e60e97, type: 2}
 --- !u!114 &-779784125055682449
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -55,8 +56,24 @@ MonoBehaviour:
   - {fileID: -5275258946920398887}
   - {fileID: 5856983553914998996}
   - {fileID: -779784125055682449}
+  - {fileID: 4796028673648602997}
   identity: {fileID: -5275258946920398887}
   QuickAccess: 0
+--- !u!114 &4796028673648602997
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a82fec78ebc734d9ad1346cd40b5f9, type: 3}
+  m_Name: ThunderstoreData
+  m_EditorClassIdentifier: 
+  StagingPaths:
+  - C:\Users\Szikaka\Desktop\Modowanie\Receiver 2\ModdingKit\TEST
+  url: https://thunderstore.io/c/receiver-2/p/Szikaka/Receiver_2_Modding_Kit/
 --- !u!114 &5856983553914998996
 MonoBehaviour:
   m_ObjectHideFlags: 0
