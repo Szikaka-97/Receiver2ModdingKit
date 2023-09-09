@@ -33,7 +33,7 @@ MonoBehaviour:
   PerManifest: 0
   ListType: 0
   Manifests: []
-  workingDirectory: D:\Gry\Steam\steamapps\common\Receiver 2
+  workingDirectory: <GamePath>
   executable: Receiver2.exe
   arguments: []
 --- !u!114 &11400000
