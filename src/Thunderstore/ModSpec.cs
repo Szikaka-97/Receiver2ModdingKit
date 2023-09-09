@@ -285,7 +285,7 @@ namespace Receiver2ModdingKit.Thunderstore {
 							spec.WorldGenerationsConfigs.Add(mod_file);
 						
 						break;
-					case ".oog":
+					case ".ogg":
 					case ".mp3":
 					case ".wav":
 						spec.Tapes.Add(mod_file);
