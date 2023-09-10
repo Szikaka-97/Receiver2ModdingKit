@@ -18,7 +18,7 @@ namespace Receiver2ModdingKit {
 		/// </summary>
 		public void SetEntryCompound() {
 			entry.button.GetComponent<RectTransform>().anchoredPosition = new Vector2(-56.2f, 2f);
-            entry.button.GetComponent<RectTransform>().sizeDelta = new Vector2(343f, 46f);
+			entry.button.GetComponent<RectTransform>().sizeDelta = new Vector2(343f, 46f);
 
 			tertiary_button.SetActive(true);
 		}
@@ -28,7 +28,7 @@ namespace Receiver2ModdingKit {
 		/// </summary>
 		public void SetEntryNormal() {
 			entry.button.GetComponent<RectTransform>().anchoredPosition = new Vector2(200, -23f);
-            entry.button.GetComponent<RectTransform>().sizeDelta = new Vector2(400f, 46f);
+			entry.button.GetComponent<RectTransform>().sizeDelta = new Vector2(400f, 46f);
 
 			tertiary_button.SetActive(false);
 		}

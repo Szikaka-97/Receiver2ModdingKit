@@ -4,7 +4,6 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using Receiver2;
-using HarmonyLib;
 using System.Reflection;
 using Receiver2ModdingKit.CustomSounds;
 
@@ -20,7 +19,7 @@ namespace Receiver2ModdingKit.ModInstaller {
 		public static void SearchForMod() {
 			mod_installer = ModdingKitCorePlugin.instance.gameObject.AddComponent<ModInstallerObject>();
 		}
-				
+
 		public static bool IsGunModInstalled(string gunName) {
 			if (Directory.Exists(Path.Combine(Application.persistentDataPath, "Guns", gunName))) {
 				foreach (string file in Directory.GetFiles(Path.Combine(Application.persistentDataPath, "Guns", gunName))) {
@@ -50,7 +49,7 @@ namespace Receiver2ModdingKit.ModInstaller {
 			if (!prefab_9mm) { //Fallback bullet prefab
 				prefab_9mm = items.First( item => { return item is ShellCasingScript && ((ShellCasingScript) item).cartridge_type == CartridgeSpec.Preset._9mm && ((ShellCasingScript) item).go_casing != null; }).gameObject;
 			}
-				
+
 			Editor.InBuiltCartridge cartridge = gun.GetComponent<Editor.InBuiltCartridge>(); //Handling cartridges
 			if (cartridge) {
 				try {
@@ -162,7 +161,7 @@ namespace Receiver2ModdingKit.ModInstaller {
 					foreach (var renderer in gun.GetComponentsInChildren<MeshRenderer>()) {
 						gun_bounds.Encapsulate(renderer.bounds);
 					}
-					
+
 
 					ReflectionManager.PH_bounds.SetValue(hanger, gun_bounds);
 				}
@@ -183,7 +182,7 @@ namespace Receiver2ModdingKit.ModInstaller {
 
 			if (prefab_list_queue.Count > 0) {
 				items.AddRange(prefab_list_queue);
-				
+
 				prefab_list_queue.Clear();
 			}
 

@@ -14,7 +14,7 @@ using Receiver2ModdingKit.Editor;
 using FMODUnity;
 
 namespace Receiver2ModdingKit {
-    public static class HarmonyManager {
+	public static class HarmonyManager {
 		internal static class HarmonyInstances {
 			public static Harmony Core;
 			public static Harmony PopulateItems;
@@ -307,7 +307,7 @@ namespace Receiver2ModdingKit {
 		}
 
 		[HarmonyPatch(typeof(TapesMenuScript), "OnLoad")]
-        [HarmonyPrefix]
+		[HarmonyPrefix]
 		private static void PatchTapeMenuLoad() {
 			if (ReceiverCoreScript.Instance().game_mode.GetGameMode() == GameMode.ReceiverMall) {
 				ModTapeManager.PrepareTapesForCompound();
@@ -318,17 +318,17 @@ namespace Receiver2ModdingKit {
 		}
 
 		[HarmonyPatch(typeof(TapesMenuScript), "CreateMenuEntries")]
-        [HarmonyPrefix]
-        private static void PrePatchTapeCreateMenuEntries(ref TapesMenuScript __instance) {
+		[HarmonyPrefix]
+		private static void PrePatchTapeCreateMenuEntries(ref TapesMenuScript __instance) {
 			ModTapeManager.Init();
 
 			GameObject entry_prefab = UnityEngine.Object.Instantiate(GameObject.Find("ReceiverCore/Menus/Overlay Menu Canvas/Aspect Ratio Fitter/New Pause Menu/Backdrop1/Sub-Menu Layout Group/New Tape Menu/Entries Layout/ScrollableContent Variant/Viewport/Content/Standard/Invalid"));
 
 			__instance.ecsPrefab = entry_prefab;
-        }
+		}
 
 		[HarmonyPatch(typeof(TapesMenuScript), "CreateMenuEntries")]
-        [HarmonyPostfix]
+		[HarmonyPostfix]
 		private static void PostPatchTapeCreateMenuEntries(TapesMenuScript __instance) {
 			ModTapeManager.CreateModTapes(__instance);
 		}
@@ -406,17 +406,17 @@ namespace Receiver2ModdingKit {
 		[HarmonyPrefix]
 		private static bool PatchCollisionSound(BallisticMaterial material, ref ShellCasingScript __instance) {
 			if (__instance.physics_collided || !(__instance is ModShellCasingScript)) return true;
-    
+	
 			ModShellCasingScript bullet = (ModShellCasingScript) __instance;
-    
+	
 			bullet.physics_collided = true;
 
 			if (!bullet.IsSpent()) {
 				AudioManager.PlayOneShot3D(bullet.sound_bullet_fall_hard, bullet.transform.position, 1f, 1f);
-        
+		
 				return false;
 			}
-    
+	
 			switch (material.material_label) {
 				case BallisticMaterial.MaterialLabel.Glass:
 				case BallisticMaterial.MaterialLabel.Metal:
@@ -428,7 +428,7 @@ namespace Receiver2ModdingKit {
 				case BallisticMaterial.MaterialLabel.CardboardBox:
 				case BallisticMaterial.MaterialLabel.GlassBulletproof:
 					AudioManager.PlayOneShot3D(bullet.sound_shell_casing_impact_hard, bullet.transform.position, 1f, 1f);
-            
+			
 					break;
 				case BallisticMaterial.MaterialLabel.Flesh:
 				case BallisticMaterial.MaterialLabel.Pillow:
@@ -438,10 +438,10 @@ namespace Receiver2ModdingKit {
 				case BallisticMaterial.MaterialLabel.Cloth:
 				case BallisticMaterial.MaterialLabel.Paper:
 					AudioManager.PlayOneShot3D(bullet.sound_shell_casing_impact_soft, bullet.transform.position, 1f, 1f);
-            
+			
 					break;
 			}
-    
+	
 			return false;
 		}
 

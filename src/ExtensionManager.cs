@@ -105,7 +105,7 @@ namespace Receiver2ModdingKit {
 			}
 
 			return ((Spring) ReflectionManager.LAH_pose_springs[spring].GetValue(lah)).state;
-        }
+		}
 
 		/// <summary>
 		/// Helper method designed to use for the Thunderstore mod loading system
@@ -199,5 +199,5 @@ namespace Receiver2ModdingKit {
 			if (overwrite && File.Exists(destination_file)) File.Delete(destination_file);
 			source_file.MoveTo(destination_file);
 		}
-    }
+	}
 }
