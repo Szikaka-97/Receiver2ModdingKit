@@ -65,7 +65,7 @@ namespace Receiver2ModdingKit.ModInstaller {
 
 				if (!ModShellCasingScript.mod_cartridges.ContainsKey(round.cartridge_type)) {
 					if ((int) round.cartridge_type > (int) Enum.GetValues(typeof(CartridgeSpec.Preset)).Cast<CartridgeSpec.Preset>().Max()) {
-						if (round.glint_renderer && round.glint_renderer.material.name != "ItemGlint (Instance)") {
+						if (round.glint_renderer && (round.glint_renderer.material == null || round.glint_renderer.material.name != "ItemGlint (Instance)")) {
 							round.glint_renderer.material = prefab_9mm.GetComponent<ShellCasingScript>().glint_renderer.material;
 						}
 
@@ -113,7 +113,7 @@ namespace Receiver2ModdingKit.ModInstaller {
 				foreach (MagazineScript magazine in magazines) { //Handling magazine pegboard collision
 					if (magazine.round_prefab == null || magazine.round_prefab.GetComponent<ShellCasingScript>() == null) magazine.round_prefab = gun.loaded_cartridge_prefab;
 
-					if (magazine.glint_renderer && magazine.glint_renderer.material.name != "ItemGlint (Instance)") {
+					if (magazine.glint_renderer && (magazine.glint_renderer.material == null || magazine.glint_renderer.material.name != "ItemGlint (Instance)")) {
 						magazine.glint_renderer.material = prefab_9mm.GetComponent<ShellCasingScript>().glint_renderer.material;
 					}
 
@@ -201,8 +201,8 @@ namespace Receiver2ModdingKit.ModInstaller {
 		public static void Finish() {
 			foreach (var prefab in ReceiverCoreScript.Instance().generic_prefabs) {
 				foreach (var glint_item in prefab.GetComponentsInChildren<ItemWithGlint>()) {
-					if (glint_item.TryGetComponent<InventoryItem>(out var item) && item.glint_renderer != null && item.glint_renderer.sharedMaterial.name != "ItemGlint (Instance)") {
-						item.glint_renderer.sharedMaterial = prefab_9mm.GetComponent<InventoryItem>().glint_renderer.sharedMaterial;
+					if (glint_item.TryGetComponent<InventoryItem>(out var item) && item.glint_renderer != null && (item.glint_renderer.material == null || item.glint_renderer.material.name != "ItemGlint (Instance)")) {
+						item.glint_renderer.material = prefab_9mm.GetComponent<InventoryItem>().glint_renderer.sharedMaterial;
 					}
 				}
 			}
