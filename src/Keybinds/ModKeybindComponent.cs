@@ -15,6 +15,8 @@ namespace Receiver2ModdingKit {
 
 		public DropdownComponent redirect_binding;
 
+		public Button clear_button;
+
 		private IEnumerator PickKeyCoroutine() {
 			SettingsMenuManager.ShowKeyBindDialog(this.name);
 			
@@ -71,6 +73,16 @@ namespace Receiver2ModdingKit {
 				this.keybind.key = new Keybind.KeyRedirect(KeybindsManager.rewired_actions[key]);
 
 				this.keyboard_binding_text.text = "";
+
+				ModdingKitConfig.UpdateKeybindValue(keybind);
+			} );
+
+			this.clear_button.onClick.AddListener( () => {
+				keyboard_binding_text.text = "";
+
+				this.redirect_binding.Select(0);
+
+				this.keybind.key = new Keybind.KeyRedirect(-1);
 
 				ModdingKitConfig.UpdateKeybindValue(keybind);
 			} );

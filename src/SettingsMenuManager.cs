@@ -339,12 +339,16 @@ namespace Receiver2ModdingKit {
 			(dropdown.GetComponent<RectTransform>().Find("Dropdown") as RectTransform).anchoredPosition = new Vector2(3, 0);
 			(dropdown.GetComponent<RectTransform>().Find("Dropdown") as RectTransform).sizeDelta = new Vector2(9, 46);
 
-			var keybind_button = keybind_field.transform.Find("First Binding").Find("Button").GetComponent<Button>();
+			var keybind_button = keybind_field.transform.Find("First Binding/Button").GetComponent<Button>();
 			keybind_button.GetComponent<RectTransform>().anchoredPosition -= new Vector2(4, 0);
 
 			keybind_button.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "";
 
 			keybind_button.onClick.RemovePersistentListeners();
+
+			var clear_button = keybind_field.transform.Find("Clear button container/New red button").GetComponent<Button>();
+
+			clear_button.onClick.RemovePersistentListeners();
 
 			var keybind_component = keybind_field.AddComponent<ModKeybindComponent>();
 
@@ -352,6 +356,7 @@ namespace Receiver2ModdingKit {
 			keybind_component.keyboard_binding = keybind_button;
 			keybind_component.keyboard_binding_text = keybind_button.transform.Find("Text").GetComponent<TextMeshProUGUI>();
 			keybind_component.redirect_binding = dropdown_component;
+			keybind_component.clear_button = clear_button;
 
 			return keybind_component;
 		}
