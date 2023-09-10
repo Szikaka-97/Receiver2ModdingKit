@@ -360,6 +360,8 @@ namespace Receiver2ModdingKit {
 				}
 			}
 
+			ModLoader.Finish();
+
 			//doing this prevents stocks for some guns from clipping into the camera.
 			ReceiverCoreScript.Instance().player_prefab.GetComponent<PlayerScript>().main_camera_prefab.GetComponent<Camera>().nearClipPlane = 0.02f;
 

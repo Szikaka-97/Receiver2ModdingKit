@@ -6,6 +6,7 @@ using UnityEngine;
 using Receiver2;
 using System.Reflection;
 using Receiver2ModdingKit.CustomSounds;
+using Receiver2ModdingKit.Editor;
 
 namespace Receiver2ModdingKit.ModInstaller {
 	public static class ModLoader {
@@ -85,6 +86,8 @@ namespace Receiver2ModdingKit.ModInstaller {
 #pragma warning restore CS0618 // Type or member is obsolete
 						}
 
+						if (round.TryGetComponent<ItemWithGlint>(out var glint_item)) GameObject.Destroy(glint_item);
+
 						items.Add(round);
 					}
 					else {
@@ -109,6 +112,12 @@ namespace Receiver2ModdingKit.ModInstaller {
 
 				foreach (MagazineScript magazine in magazines) { //Handling magazine pegboard collision
 					if (magazine.round_prefab == null || magazine.round_prefab.GetComponent<ShellCasingScript>() == null) magazine.round_prefab = gun.loaded_cartridge_prefab;
+
+					if (magazine.glint_renderer && magazine.glint_renderer.material.name != "ItemGlint (Instance)") {
+						magazine.glint_renderer.material = prefab_9mm.GetComponent<ShellCasingScript>().glint_renderer.material;
+					}
+
+					if (magazine.TryGetComponent<ItemWithGlint>(out var glint_item)) GameObject.Destroy(glint_item);
 
 					if (magazine.GetComponent<PegboardHangableItem>() && magazine.GetComponent<PegboardHangableItem>().pegboard_hanger != null) {
 						if (((Bounds) ReflectionManager.PH_bounds.GetValue(magazine.GetComponent<PegboardHangableItem>().pegboard_hanger)).size == Vector3.zero) {
@@ -187,6 +196,16 @@ namespace Receiver2ModdingKit.ModInstaller {
 			}
 
 			ReceiverCoreScript.Instance().generic_prefabs = items.ToArray();
+		}
+
+		public static void Finish() {
+			foreach (var prefab in ReceiverCoreScript.Instance().generic_prefabs) {
+				foreach (var glint_item in prefab.GetComponentsInChildren<ItemWithGlint>()) {
+					if (glint_item.TryGetComponent<InventoryItem>(out var item) && item.glint_renderer != null && item.glint_renderer.sharedMaterial.name != "ItemGlint (Instance)") {
+						item.glint_renderer.sharedMaterial = prefab_9mm.GetComponent<InventoryItem>().glint_renderer.sharedMaterial;
+					}
+				}
+			}
 		}
 
 		public static bool IsGunLoaded(GunScript gun) {
