@@ -47,7 +47,7 @@ namespace Receiver2ModdingKit.Editor {
 				if (new_obj && AssetDatabase.GetAssetPath(new_obj).EndsWith(".bank") && !BankListContains(new_obj)) bank_slot.objectReferenceValue = new_obj;
 			}
 
-			if (serializedObject.ApplyModifiedProperties()) {
+			if (serializedObject.ApplyModifiedProperties() || GUILayout.Button("Reload Banks")) {
 				bank_list.ReloadBanks();
 
 				loaded_banks.Clear();
