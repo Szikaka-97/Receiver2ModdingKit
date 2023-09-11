@@ -492,11 +492,15 @@ namespace Receiver2ModdingKit {
 		[HarmonyPatch(typeof(PlayerLoadout), nameof(PlayerLoadout.Serialize))]
 		[HarmonyPostfix]
 		private static void PatchSerializeLoadout(ref JSONObject __result) {
-			if (LocalAimHandler.player_instance != null && LocalAimHandler.player_instance.TryGetGun(out var gun)) {
-				if (gun is ModGunScript) {
-					__result["gun_persistent_data"] = (gun as ModGunScript).EncodeJSON(gun.GetPersistentData());					
-				}
+			if (LocalAimHandler.player_instance != null && LocalAimHandler.player_instance.TryGetGun(out var gun) && gun is ModGunScript) {
+				__result["gun_persistent_data"] = (gun as ModGunScript).EncodeJSON(gun.GetPersistentData());					
 			}
+		}
+
+		[HarmonyPatch(typeof(PlayerLoadout), nameof(PlayerLoadout.Reserialize))]
+		[HarmonyPostfix]
+		private static void PatchReserializeLoadout() {
+			Extensions.current_gun_data = null;
 		}
 
 		[HarmonyPatch(typeof(ReceiverCoreScript), nameof(ReceiverCoreScript.SpawnGun))]
