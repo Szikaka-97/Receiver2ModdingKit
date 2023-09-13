@@ -1,6 +1,22 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-5275258946920398887
+--- !u!114 &-3672443921114445846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b7e13dda513544419a89926bd12ad8a, type: 3}
+  m_Name: AssemblyDefinitions
+  m_EditorClassIdentifier: 
+  StagingPaths:
+  - <GamePath>\BepInEx\plugins\Receiver2ModdingKit
+  definitions:
+  - {fileID: 5897886265953266890, guid: 041edb9e43e1cd140a16ecbcf83eaffa, type: 3}
+--- !u!114 &-3078336892808536419
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -12,15 +28,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f22bb7fd1d3b56a48bc52f8e407901d6, type: 3}
   m_Name: ManifestIdentity
   m_EditorClassIdentifier: 
-  StagingPaths:
-  - D:\Gry\Steam\steamapps\common\Receiver 2\BepInEx\plugins\Receiver2ModdingKit
+  StagingPaths: []
   Author: Szikaka
   Name: Receiver 2 Modding Kit
   Description: 
-  Version: 1.3.2
-  Dependencies:
-  - {fileID: 11400000, guid: 08252974f3d547b3ecc87b18a8e60e97, type: 2}
---- !u!114 &-779784125055682449
+  Version: 1.4.0
+  Dependencies: []
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e563561e08b6a3642a487177f5cfbb37, type: 3}
+  m_Name: Modding Kit Manifest
+  m_EditorClassIdentifier: 
+  Data:
+  - {fileID: -3078336892808536419}
+  - {fileID: -3672443921114445846}
+  - {fileID: 4090554973207230164}
+  identity: {fileID: -3078336892808536419}
+  QuickAccess: 0
+--- !u!114 &4090554973207230164
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -33,60 +65,10 @@ MonoBehaviour:
   m_Name: Files
   m_EditorClassIdentifier: 
   StagingPaths:
-  - D:\Gry\Steam\steamapps\common\Receiver 2\BepInEx\plugins\Receiver2ModdingKit
+  - <GamePath>\BepInEx\plugins\Receiver2ModdingKit
   includeMetaFiles: 0
   files:
   - {fileID: 2800000, guid: cce70fca3163cde4d98f84fc13dfdc10, type: 3}
   - {fileID: 102900000, guid: ddb80bdf67cbe074da3d2da333cb89b3, type: 3}
   - {fileID: 102900000, guid: 48ab137a757cbfb4e897e8bec755eb2c, type: 3}
   - {fileID: 2800000, guid: 9b56e72cb4bd5864e9e0d794ffabab40, type: 3}
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e563561e08b6a3642a487177f5cfbb37, type: 3}
-  m_Name: Receiver 2 Modding Kit Manifest
-  m_EditorClassIdentifier: 
-  Data:
-  - {fileID: -5275258946920398887}
-  - {fileID: 5856983553914998996}
-  - {fileID: -779784125055682449}
-  - {fileID: 4796028673648602997}
-  identity: {fileID: -5275258946920398887}
-  QuickAccess: 0
---- !u!114 &4796028673648602997
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e0a82fec78ebc734d9ad1346cd40b5f9, type: 3}
-  m_Name: ThunderstoreData
-  m_EditorClassIdentifier: 
-  StagingPaths:
-  - C:\Users\Szikaka\Desktop\Modowanie\Receiver 2\ModdingKit\TEST
-  url: https://thunderstore.io/c/receiver-2/p/Szikaka/Receiver_2_Modding_Kit/
---- !u!114 &5856983553914998996
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b7e13dda513544419a89926bd12ad8a, type: 3}
-  m_Name: Modding Kit Manifest
-  m_EditorClassIdentifier: 
-  StagingPaths:
-  - D:\Gry\Steam\steamapps\common\Receiver 2\BepInEx\plugins\Receiver2ModdingKit
-  definitions:
-  - {fileID: 5897886265953266890, guid: 041edb9e43e1cd140a16ecbcf83eaffa, type: 3}
