@@ -310,6 +310,11 @@ namespace Receiver2ModdingKit {
 			return rounds.Pop();
 		}
 
+		/// <summary>
+		/// Try to retrieve the round that started to be removed in StartRemoveRound()
+		/// </summary>
+		/// <param name="round"> Retrieved round or null if failed to retrieve </param>
+		/// <returns> True if the round was retrieved, False otherwise </returns>
 		public bool TryRetrieveRound(out ShellCasingScript round) {
 			round = this.RetrieveRound();
 
