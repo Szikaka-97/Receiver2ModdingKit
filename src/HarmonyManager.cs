@@ -11,7 +11,6 @@ using ImGuiNET;
 using Receiver2;
 using Receiver2ModdingKit.ModInstaller;
 using Receiver2ModdingKit.Editor;
-using FMODUnity;
 
 namespace Receiver2ModdingKit {
 	public static class HarmonyManager {

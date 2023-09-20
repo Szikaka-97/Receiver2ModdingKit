@@ -4,7 +4,6 @@ using Receiver2;
 using System.IO;
 using SimpleJSON;
 using Receiver2ModdingKit.ModInstaller;
-using System.Collections.Generic;
 using UnityEngine.Events;
 
 namespace Receiver2ModdingKit {
