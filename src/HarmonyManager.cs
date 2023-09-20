@@ -28,6 +28,25 @@ namespace Receiver2ModdingKit {
 			public static Harmony Thunderstore;
 		}
 
+		private static void DisplayInstructions(CodeMatcher code_matcher, int breadth) {
+			DisplayInstructions(code_matcher, breadth, Debug.LogError);
+		}
+
+		private static void DisplayInstructions(CodeMatcher code_matcher, int breadth, Action<string> logger) {
+			int start_pos = Mathf.Max(code_matcher.Pos - breadth, 0);
+			int end_pos = Mathf.Min(code_matcher.Pos + breadth + 1, code_matcher.Length - 1);
+
+			for (int before = start_pos; before < code_matcher.Pos; before++) {
+				Debug.LogError(code_matcher.InstructionAt(before - code_matcher.Pos));
+			}
+
+			Debug.LogError(code_matcher.Instruction + " <");
+
+			for (int after = code_matcher.Pos + 1; after < end_pos; after++) {
+				Debug.LogError(code_matcher.InstructionAt(after - code_matcher.Pos));
+			}
+		}
+
 		#region Transpilers
 
 		[HarmonyPatch(typeof(RuntimeTileLevelGenerator), nameof(RuntimeTileLevelGenerator.PopulateItems))]
@@ -518,6 +537,84 @@ namespace Receiver2ModdingKit {
 			if (LocalAimHandler.player_instance == null || !LocalAimHandler.player_instance.TryGetGun(out var gun)) return;
 
 			KeybindsManager.SetKeybindsActive(gun.weapon_group_name);
+		}
+
+		[HarmonyPatch(typeof(RankingProgressionGameMode), nameof(RankingProgressionGameMode.EvaluateNextLoadout))]
+		[HarmonyPrefix]
+		private static void PatchEvaluateLoadout(ref HashSet<string> ___campaign_loadouts) {
+			string[] loadout_names = ReceiverCoreScript.Instance().weapon_loadout_asset.GetAllLoadoutNames();
+
+			___campaign_loadouts.RemoveWhere( loadout_name => {
+				bool contains = loadout_names.Contains(loadout_name);
+
+				#if DEBUG
+
+				if (!contains) {
+					Debug.Log("Couldn't find loadout " + loadout_name + ", dropping it");
+				}
+
+				#endif
+
+				return !contains;
+			});
+		}
+
+		[HarmonyPatch(typeof(ReceiverCoreScript), nameof(ReceiverCoreScript.GetWorldGenerationConfigurationFromName))]
+		[HarmonyPostfix]
+		private static void PatchGetWCG(ref WorldGenerationConfiguration __result) {
+			if (__result == null) return;
+
+			string[] loadout_names = ReceiverCoreScript.Instance().weapon_loadout_asset.GetAllLoadoutNames();
+
+			__result.loadouts.RemoveAll( loadout => {
+				string loadout_name = loadout.name;
+
+				bool contains = loadout_names.Contains(loadout_name);
+
+				#if DEBUG
+
+				if (!contains) {
+					Debug.Log("Couldn't find loadout " + loadout_name + ", dropping it");
+				}
+
+				#endif
+
+				return !contains;
+			});
+		}
+
+		[HarmonyPatch(typeof(RankingProgressionCampaign), nameof(RankingProgressionCampaign.LoadFile))]
+		[HarmonyPostfix]
+		private static void PatchLoadCampaign(string filename) {
+			JSONNode campaign_data = ReceiverCoreScript.LoadJSONFile(filename);
+
+			if (campaign_data.HasKey("use_modded_guns") && campaign_data["use_modded_guns"].AsBool && !ModdedGunsCampaignManager.modded_guns_campaigns.Contains(filename)) {
+				ModdedGunsCampaignManager.modded_guns_campaigns.Add(filename);
+			}
+		}
+
+		[HarmonyPatch(typeof(WorldGenerationConfiguration), nameof(WorldGenerationConfiguration.Deserialize))]
+		[HarmonyPostfix]
+		private static void PatchLoadWCG(ref WorldGenerationConfiguration __result) {
+			GameModeBase game_mode = ReceiverCoreScript.Instance().game_mode;
+
+			if (game_mode != null && game_mode is RankingProgressionGameMode) {
+				string campaign_path = AccessTools.Field(typeof(RankingProgressionGameMode), "campaign_path").GetValue(game_mode) as string;
+
+				if (ModdedGunsCampaignManager.modded_guns_campaigns.Contains(campaign_path)) {
+					string[] loadout_names = ReceiverCoreScript.Instance().weapon_loadout_asset.GetAllLoadoutNames();
+
+					__result.loadouts.RemoveAll( loadout => !loadout_names.Contains(loadout.name) );
+
+					foreach (var loadout_name in loadout_names) {
+						var loadout = ReceiverCoreScript.Instance().weapon_loadout_asset.GetLoadoutPrefab(loadout_name);
+
+						if (!loadout.gun_internal_name.StartsWith("wolfire") && !__result.loadouts.Any( loadout_value => loadout_value.name == loadout_name)) {
+							__result.loadouts.Add(new LoadoutValue() { name = loadout_name });
+						}
+					}
+				}
+			}
 		}
 
 	// Maybe later
