@@ -107,7 +107,7 @@ namespace Receiver2ModdingKit {
 		private string locale_tactics_description;
 
 		[Tooltip("List of custom audio events used by the gun, created via RMB -> Create -> Receiver 2 Modding -> Custom Sounds List")]
-		public Editor.CustomSoundsList audio;
+		new public Editor.CustomSoundsList audio;
 		
 		public PlayerInput player_input {
 			get;
@@ -256,7 +256,7 @@ namespace Receiver2ModdingKit {
 				flash_prefab = this.pooled_muzzle_flash.object_prefab;
 			}
 
-			if (flash_prefab != null) {
+			if (flash_prefab != null && ObjectPool.pools != null) {
 				var muzzle_flash_pool = ObjectPool.pools["MuzzleFlashPool"];
 
 				var pool_map = ReflectionManager.OP_pool_map.GetValue(muzzle_flash_pool) as Dictionary<string, int>;

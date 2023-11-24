@@ -8,6 +8,29 @@ using Receiver2;
 using Receiver2ModdingKit.ModInstaller;
 
 namespace Receiver2ModdingKit {
+#if UNITY_EDITOR
+	public class ModdingKitCorePlugin : MonoBehaviour {
+		public static ModdingKitCorePlugin instance {
+			get;
+			private set;
+		}
+
+		public PluginInfo Info;
+
+		public static Stream GetResourceStream(string resource_name) { return null; }
+
+		private void Awake() {
+			instance = this;
+
+			try {
+				ReflectionManager.Initialize();
+			} catch (ReflectionManager.MissingFieldException e) {
+				Debug.LogError(e);
+			}
+		}
+	}
+
+#else
 	[BepInPlugin("pl.szikaka.receiver_2_modding_kit", "Receiver 2 Modding Kit", "1.4.0")]
 	[BepInProcess("Receiver2")]
 	public class ModdingKitCorePlugin : BaseUnityPlugin {
@@ -136,4 +159,5 @@ namespace Receiver2ModdingKit {
 			}
 		}
 	}
+#endif
 }

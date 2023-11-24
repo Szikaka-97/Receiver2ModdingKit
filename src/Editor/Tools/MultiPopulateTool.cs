@@ -21,6 +21,8 @@ namespace Receiver2ModdingKit.Editor {
 		private bool x_ray_on;
 
 		void OnEnable() {
+			if (!(target is GunScript)) return;
+
 			guiContent = new GUIContent() {
 				image = icon,
 				text = "Populate Gun Lists",
