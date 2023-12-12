@@ -6,9 +6,10 @@ using TMPro;
 using BepInEx;
 using Receiver2;
 using Receiver2ModdingKit.ModInstaller;
+using Receiver2ModdingKit.Assets;
 
 namespace Receiver2ModdingKit {
-#if UNITY_EDITOR
+#if false
 	public class ModdingKitCorePlugin : MonoBehaviour {
 		public static ModdingKitCorePlugin instance {
 			get;
@@ -110,6 +111,10 @@ namespace Receiver2ModdingKit {
 					Debug.Log("Launched Receiver 2 Modding Kit standalone");	
 				}
 			}
+
+			ModdingKitEvents.AddTaskAtCoreStartup( () => {
+				AssetDomain.Create(@"D:\Gry\Steam\steamapps\common\Receiver 2\Receiver2_Data");
+			} );
 
 			try {
 				HarmonyManager.Initialize();

@@ -7,8 +7,8 @@ namespace Receiver2ModdingKit.Assets {
 	public delegate SerializedAsset[] AssetDependencyFunction(SerializedAsset asset);
 
 	public static class AssetTypeBindings {
-		private static Dictionary<AssetType, AssetNameFunction> asset_name_bindings;
+		private static Dictionary<AssetIDType, AssetNameFunction> asset_name_bindings;
 
-		private static Dictionary<AssetType, AssetDependencyFunction> asset_dependency_bindings;
+		private static Dictionary<AssetIDType, AssetDependencyFunction> asset_dependency_bindings;
 	}
 }

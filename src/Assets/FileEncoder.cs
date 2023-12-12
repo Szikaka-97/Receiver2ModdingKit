@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-using Microsoft.Win32.SafeHandles;
+using UnityEngine;
 
 namespace Receiver2ModdingKit.Assets {
 	public class FileEncoder {
@@ -11,7 +11,7 @@ namespace Receiver2ModdingKit.Assets {
 			LittleEndian
 		}
 
-		public FileStream stream {
+		public Stream BackingStream {
 			get;
 			private set;
 		}
@@ -19,91 +19,277 @@ namespace Receiver2ModdingKit.Assets {
 			get;
 			set;
 		}
-
-		public FileEncoder(string file_name) {
-			this.stream = File.Open(file_name, FileMode.OpenOrCreate);
-			this.Endian = Endianness.BigEndian;
+		public bool CanWrite {
+			get;
+			private set;
 		}
 
-		private T GetNBitsAs<T>() where T : struct {
-			long result = 0;
+		public long Position {
+			get {
+				return BackingStream.Position;
+			}
+			set {
+				BackingStream.Position = value;
+			}
+		}
 
+		public FileEncoder(string file_path, bool read_only = false, Endianness endianness = Endianness.LittleEndian) {
+			if (read_only || !FileUtilities.CanWrite(file_path)) {
+				this.BackingStream = new FileStream(file_path, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+				this.CanWrite = false;
+			}
+			else {
+				this.BackingStream = File.Open(file_path, FileMode.OpenOrCreate);
+
+				this.CanWrite = true;
+			}
+
+			this.Endian = endianness;
+		}
+
+		public FileEncoder(Stream stream, bool can_write, Endianness endianness = Endianness.LittleEndian) {
+			this.BackingStream = stream;
+			this.CanWrite = can_write;
+			this.Endian = endianness;
+		}
+
+		public FileEncoder(Stream stream, Endianness endianness = Endianness.LittleEndian) {
+			this.BackingStream = stream;
+			this.Endian = endianness;
+		}
+
+#region Read
+
+		private T GetNumber<T>() where T : struct {
 			int count = Marshal.SizeOf<T>();
 
 			byte[] bytes = new byte[count];
 
-			this.stream.Read(bytes, 0, count);
+			this.BackingStream.Read(bytes, 0, count);
 
 			if (this.Endian == Endianness.BigEndian) {
+				byte[] temp = new byte[count];
+
 				for (int i = 0; i < count; i++) {
-					result += bytes[i] << (8 * i);
+					temp[count - 1 - i] = bytes[i];
 				}
-			}
-			else {
-				for (int i = count - 1; i >= 0; i--) {
-					result += bytes[i] << (8 * i);
-				}
+				
+				bytes = temp;
 			}
 
-			return (T)(object) result;
+			var handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
+			T result = Marshal.PtrToStructure<T>(handle.AddrOfPinnedObject());
+			handle.Free();
+
+			return result;
 		}
 
 		public byte ReadByte() {
-			return GetNBitsAs<byte>();
+			return GetNumber<byte>();
 		}
 
 		public short ReadInt16() {
-			return GetNBitsAs<short>();
+			return GetNumber<short>();
 		}
 
 		public ushort ReadUInt16() {
-			return GetNBitsAs<ushort>();
+			return GetNumber<ushort>();
 		}
 
 		public int ReadInt32() {
-			return GetNBitsAs<int>();
+			return GetNumber<int>();
 		}
 
 		public uint ReadUint32() {
-			return GetNBitsAs<uint>();
+			return GetNumber<uint>();
 		}
 
 		public long ReadInt64() {
-			return GetNBitsAs<long>();
+			return GetNumber<long>();
 		}
 
 		public ulong ReadUint64() {
-			return GetNBitsAs<ulong>();
+			return GetNumber<ulong>();
 		}
 
 		public bool ReadBool() {
-			return GetNBitsAs<byte>() != 0;
+			return GetNumber<byte>() != 0;
 		}
 
-		public string ReadStringToNull() {
+		public string ReadStringToNull(int max_length = 256) {
 			StringBuilder result = new StringBuilder();
 
-			int current_byte = this.stream.ReadByte();
+			int current_byte = this.BackingStream.ReadByte();
 
-			while (current_byte != 0) {
+			for (int i = 0; i < max_length && current_byte != 0; i++) {
 				result.Append((char) current_byte);
+				
+				current_byte = this.BackingStream.ReadByte();
 			}
 
 			return result.ToString();
 		}
 
 		public string ReadStringWithPrefix() {
-			int length = GetNBitsAs<int>();
+			int length = GetNumber<int>();
 
 			StringBuilder result = new StringBuilder(length);
 
 			for (int i = 0; i < length; i++) {
-				int current_byte = this.stream.ReadByte();
+				int current_byte = this.BackingStream.ReadByte();
 
 				result.Append((char) current_byte);
 			}
 
 			return result.ToString();
+		}
+
+		public byte[] ReadBytes(int count) {
+			byte[] buffer = new byte[count];
+
+			this.BackingStream.Read(buffer, 0, count);
+
+			return buffer;
+		}
+#endregion
+
+#region Write
+
+		private void WriteNumber<T>(T item) where T : struct {
+			if (!this.CanWrite) {
+				return;
+			}
+
+			long buffer = (long)(object) item;
+
+			int count = Marshal.SizeOf<T>();
+
+			byte[] bytes = new byte[count];
+
+			if (this.Endian == Endianness.BigEndian) {
+				for (int i = count - 1; i >= 0; i--) {
+					bytes[i] = (byte) (buffer >> (8 * i));
+				}
+			}
+			else {
+				for (int i = 0; i < count; i++) {
+					bytes[i] = (byte) (buffer >> (8 * i));
+				}
+			}
+
+			this.BackingStream.Write(bytes, 0, count);
+		}
+
+		public FileEncoder WriteByte(byte value) {
+			WriteNumber(value);
+
+			return this;
+		}
+
+		public FileEncoder WriteInt16(short value) {
+			WriteNumber(value);
+
+			return this;
+		}
+
+		public FileEncoder WriteUInt16(ushort value) {
+			WriteNumber(value);
+
+			return this;
+		}
+
+		public FileEncoder WriteInt32(int value) {
+			WriteNumber(value);
+
+			return this;
+		}
+
+		public FileEncoder WriteUint32(uint value) {
+			WriteNumber(value);
+
+			return this;
+		}
+
+		public FileEncoder WriteInt64(long value) {
+			WriteNumber(value);
+
+			return this;
+		}
+
+		public FileEncoder WriteUint64(ulong value) {
+			WriteNumber(value);
+
+			return this;
+		}
+
+		public FileEncoder WriteBool(bool value) {
+			WriteNumber(value);
+
+			return this;
+		}
+
+		public FileEncoder WriteStringToNull(string value) {
+			if (!this.CanWrite) {
+				return this;
+			}
+
+			this.BackingStream.Write(Encoding.ASCII.GetBytes(value), 0, value.Length);
+
+			this.BackingStream.WriteByte(0);
+
+			return this;
+		}
+
+		public FileEncoder WriteStringWithPrefix(string value) {
+			if (!this.CanWrite) {
+				return this;
+			}
+
+			WriteNumber(value.Length);
+
+			this.BackingStream.Write(Encoding.ASCII.GetBytes(value), 0, value.Length);
+
+			return this;
+		}
+
+		public FileEncoder WriteBytes(byte[] data) {
+			if (!this.CanWrite) {
+				return this;
+			}
+			
+			this.BackingStream.Write(data, 0, data.Length);
+
+			return this;
+		}
+#endregion
+
+		public FileEncoder SetEndianess(Endianness endianness) {
+			this.Endian = endianness;
+
+			return this;
+		}
+
+		public FileEncoder AlignStream(int n) {
+			if (this.BackingStream.Position % n != 0) {
+				this.BackingStream.Position += n - (this.BackingStream.Position % n);
+			}
+
+			return this;
+		}
+
+		public FileEncoder Advance(int n) {
+			this.BackingStream.Position += n;
+
+			return this;
+		}
+
+		public FileEncoder Clone() {
+			var clone = new FileEncoder(this.BackingStream, this.CanWrite, this.Endian) {
+				Position = this.Position
+			};
+
+			return clone;
 		}
 	}
 }
