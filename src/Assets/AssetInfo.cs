@@ -42,7 +42,12 @@ namespace Receiver2ModdingKit.Assets {
 			private set;
 		}
 
-		public static AssetInfo FromObjectStruct(HeaderStructs.ObjectStruct obj, AssetFileHeader header = null) {
+		public StreamingInfo StreamingData {
+			get;
+			set;
+		}
+
+		public static AssetInfo FromObjectStruct(HeaderStructs.ObjectStruct obj, AssetFileHeader header) {
 			return new AssetInfo() {
 				path_id = obj.path_id,
 				start_offset = obj.start_offset,
@@ -73,6 +78,17 @@ namespace Receiver2ModdingKit.Assets {
 			}
 
 			return this.header.data_offset + this.start_offset;
+		}
+
+		public HeaderStructs.TypeStruct GetTypeStruct() {
+			return this.header.Types[this.type_index];
+		}
+
+		public byte[] GetBinaryData() {
+#warning fuck
+			var encoder = this.GetEncoder();
+
+			return encoder.ReadBytes(this.size);
 		}
 	}
 }

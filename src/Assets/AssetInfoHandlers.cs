@@ -30,6 +30,20 @@ namespace Receiver2ModdingKit.Assets {
 
 				asset.name = encoder.ReadStringWithPrefix();
 
+				encoder.AlignStream(4);
+
+				encoder.Position += 0x4c;
+
+				int length = encoder.ReadInt32();
+
+				if (length == 0) {
+					asset.StreamingData = new StreamingInfo() {
+						offset = encoder.ReadInt32(),
+						size = encoder.ReadInt32(),
+						path = encoder.ReadStringWithPrefix()
+					};
+				}
+
 				return asset;
 			} }
 		};

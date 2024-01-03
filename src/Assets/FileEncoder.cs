@@ -145,10 +145,10 @@ namespace Receiver2ModdingKit.Assets {
 			return result.ToString();
 		}
 
-		public byte[] ReadBytes(int count) {
+		public byte[] ReadBytes(uint count) {
 			byte[] buffer = new byte[count];
 
-			this.BackingStream.Read(buffer, 0, count);
+			this.BackingStream.Read(buffer, 0, (int) count);
 
 			return buffer;
 		}

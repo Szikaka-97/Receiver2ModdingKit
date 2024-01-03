@@ -36,6 +36,18 @@ namespace Receiver2ModdingKit.Assets {
 
 			foreach (var asset in Assets) {
 				root["objects"][(int) asset.path_id - 1]["name"] = asset.name;
+
+				root["objects"][(int) asset.path_id - 1]["dependencies"] = new JSONArray();
+
+				if (asset.StreamingData != null) {
+					var streaming_info = new JSONObject();
+
+					streaming_info["offset"] = asset.StreamingData.offset;
+					streaming_info["size"] = asset.StreamingData.size;
+					streaming_info["path"] = asset.StreamingData.path;
+
+					root["objects"][(int) asset.path_id - 1]["streaming_info"] = streaming_info;
+				}
 			}
 
 			return root;
@@ -77,7 +89,7 @@ namespace Receiver2ModdingKit.Assets {
 					AssetInfo info = AssetInfo.FromObjectStruct(obj, asset_header);
 
 					asset_handler(ref info);
-					
+
 					assets.Add(info);
 				}
 			}
