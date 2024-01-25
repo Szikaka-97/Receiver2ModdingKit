@@ -3,48 +3,45 @@ using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
-using Receiver2;
 using UnityEngine.Events;
+using Receiver2;
+using HarmonyLib;
 
 namespace Receiver2ModdingKit {
 	internal static class ReflectionManager {
-		public class MissingFieldException : Exception {
-			public MissingFieldException(string message) : base() { }
-		}
-
-		public static FieldInfo GS_disconnector_needs_reset {
+		public static AccessTools.FieldRef<GunScript, bool> GS_disconnector_needs_reset {
 			get;
 			private set;
 		}
-		public static FieldInfo GS_hammer_halfcocked {
+		public static AccessTools.FieldRef<GunScript, float> GS_hammer_halfcocked {
 			get;
 			private set;
 		}
-		public static FieldInfo GS_hammer_cocked_val {
+		public static AccessTools.FieldRef<GunScript, float> GS_hammer_cocked_val {
 			get;
 			private set;
 		}
-		public static FieldInfo GS_hammer_state {
+		public static AccessTools.FieldRef<GunScript, int> GS_hammer_state {
 			get;
 			private set;
 		}
 
-		public static FieldInfo GS_select_fire {
+		public static AccessTools.FieldRef<GunScript, LinearMover> GS_select_fire {
 			get;
 			private set;
 		}
 
-		public static FieldInfo GS_yoke_open {
+		public static AccessTools.FieldRef<GunScript, float> GS_yoke_open {
 			get;
 			private set;
 		}
 
-		public static FieldInfo GS_current_firing_mode_index {
+		public static AccessTools.FieldRef<GunScript, int> GS_current_firing_mode_index {
 			get;
 			private set;
 		}
 
-		public static FieldInfo GS_firing_pin {
+		public static AccessTools.FieldRef<GunScript, LinearMover> GS_firing_pin {
 			get;
 			private set;
 		}
@@ -59,7 +56,7 @@ namespace Receiver2ModdingKit {
 			private set;
 		}
 
-		public static FieldInfo GS_slide_stop_locked {
+		public static AccessTools.FieldRef<GunScript, bool> GS_slide_stop_locked {
 			get;
 			private set;
 		}
@@ -107,6 +104,15 @@ namespace Receiver2ModdingKit {
 		public static FieldInfo OP_pool_map {
 			get;
 			private set;
+		}
+
+		private static AccessTools.FieldRef<I_Type, F_Type> GetFieldDelegate<I_Type, F_Type>(string field_name) {
+			try {
+				return AccessTools.FieldRefAccess<I_Type, F_Type>(field_name);
+			} catch (ArgumentException) {
+				Debug.LogError("Cannot find field \"" + field_name + "\", perhaps your Modding Kit plugin is out of date?");
+				throw new MissingFieldException("Cannot Find Field: - " + typeof(F_Type).ToString() + " " + typeof(I_Type).ToString() + "." + field_name);
+			}
 		}
 
 		private static FieldInfo GetFieldInfo(Type type, string fieldName) {
@@ -157,15 +163,15 @@ namespace Receiver2ModdingKit {
 		}
 
 		internal static void Initialize() {
-			GS_disconnector_needs_reset = GetFieldInfo(typeof(GunScript), "disconnector_needs_reset");
-			GS_hammer_halfcocked = GetFieldInfo(typeof(GunScript), "hammer_halfcocked");
-			GS_hammer_cocked_val = GetFieldInfo(typeof(GunScript), "hammer_cocked_val");
-			GS_hammer_state = GetFieldInfo(typeof(GunScript), "hammer_state");
-			GS_slide_stop_locked = GetFieldInfo(typeof(GunScript), "slide_stop_locked");
-			GS_select_fire = GetFieldInfo(typeof(GunScript), "select_fire");
-			GS_yoke_open = GetFieldInfo(typeof(GunScript), "yoke_open");
-			GS_current_firing_mode_index = GetFieldInfo(typeof(GunScript), "current_firing_mode_index");
-			GS_firing_pin = GetFieldInfo(typeof(GunScript), "firing_pin");
+			GS_disconnector_needs_reset = GetFieldDelegate<GunScript, bool>("disconnector_needs_reset");
+			GS_hammer_halfcocked = GetFieldDelegate<GunScript, float>("hammer_halfcocked");
+			GS_hammer_cocked_val = GetFieldDelegate<GunScript, float>("hammer_cocked_val");
+			GS_hammer_state = GetFieldDelegate<GunScript, int>("hammer_state");
+			GS_slide_stop_locked = GetFieldDelegate<GunScript, bool>("slide_stop_locked");
+			GS_select_fire = GetFieldDelegate<GunScript, LinearMover>("select_fire");
+			GS_yoke_open = GetFieldDelegate<GunScript, float>("yoke_open");
+			GS_current_firing_mode_index = GetFieldDelegate<GunScript, int>("current_firing_mode_index");
+			GS_firing_pin = GetFieldDelegate<GunScript, LinearMover>("firing_pin");
 
 			PH_bounds = GetFieldInfo(typeof(PegboardHanger), "bounds");
 
@@ -194,7 +200,6 @@ namespace Receiver2ModdingKit {
 
 			LAH_Get_Last_Bullet = GetMethodInfo(typeof(LocalAimHandler), "GetLastMatchingLooseBullet");
 			LAH_bullet_shake_time = GetFieldInfo(typeof(LocalAimHandler), "show_bullet_shake_time");
-			
 		}
 	}
 }

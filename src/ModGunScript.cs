@@ -41,40 +41,40 @@ namespace Receiver2ModdingKit {
 		}
 
 		protected bool _disconnector_needs_reset {
-			get { return (bool) ReflectionManager.GS_disconnector_needs_reset.GetValue(this); }
-			set { ReflectionManager.GS_disconnector_needs_reset.SetValue(this, value); }
+			get { return ReflectionManager.GS_disconnector_needs_reset(this); }
+			set { ReflectionManager.GS_disconnector_needs_reset(this) = value; }
 		}
 		protected float _hammer_halfcocked {
-			get { return (float) ReflectionManager.GS_hammer_halfcocked.GetValue(this); }
-			set { ReflectionManager.GS_hammer_halfcocked.SetValue(this, value); }
+			get { return ReflectionManager.GS_hammer_halfcocked(this); }
+			set { ReflectionManager.GS_hammer_halfcocked(this) = value; }
 		}
 		protected float _hammer_cocked_val {
-			get { return (float) ReflectionManager.GS_hammer_cocked_val.GetValue(this); }
-			set { ReflectionManager.GS_hammer_cocked_val.SetValue(this, value); }
+			get { return ReflectionManager.GS_hammer_cocked_val(this); }
+			set { ReflectionManager.GS_hammer_cocked_val(this) = value; }
 		}
 		protected int _hammer_state {
-			get { return (int) ReflectionManager.GS_hammer_state.GetValue(this); }
-			set { ReflectionManager.GS_hammer_state.SetValue(this, value); }
+			get { return ReflectionManager.GS_hammer_state(this); }
+			set { ReflectionManager.GS_hammer_state(this) = value; }
 		}
 		protected bool _slide_stop_locked {
-			get { return (bool) ReflectionManager.GS_slide_stop_locked.GetValue(this); }
-			set { ReflectionManager.GS_slide_stop_locked.SetValue(this, value); }
+			get { return ReflectionManager.GS_slide_stop_locked(this); }
+			set { ReflectionManager.GS_slide_stop_locked(this) = value; }
 		}
 		protected LinearMover _select_fire {
-			get { return (LinearMover) ReflectionManager.GS_select_fire.GetValue(this); }
-			set { ReflectionManager.GS_select_fire.SetValue(this, value); }
+			get { return ReflectionManager.GS_select_fire(this); }
+			set { ReflectionManager.GS_select_fire(this) = value; }
 		}
 		protected float _yoke_open {
-			get { return (float) ReflectionManager.GS_yoke_open.GetValue(this); }
-			set { ReflectionManager.GS_yoke_open.SetValue(this, value); }
+			get { return ReflectionManager.GS_yoke_open(this); }
+			set { ReflectionManager.GS_yoke_open(this) = value; }
 		}
 		protected int _current_firing_mode_index {
-			get { return (int) ReflectionManager.GS_current_firing_mode_index.GetValue(this); }
-			set { ReflectionManager.GS_current_firing_mode_index.SetValue(this, value); }
+			get { return ReflectionManager.GS_current_firing_mode_index(this); }
+			set { ReflectionManager.GS_current_firing_mode_index(this) = value; }
 		}
 		protected LinearMover _firing_pin {
-			get { return (LinearMover) ReflectionManager.GS_firing_pin.GetValue(this); }
-			set { ReflectionManager.GS_firing_pin.SetValue(this, value); }
+			get { return ReflectionManager.GS_firing_pin(this); }
+			set { ReflectionManager.GS_firing_pin(this) = value; }
 		}
 
 		[Tooltip("All objects in the prefab should have the same activation status, most desirably they should be deactivated")]
