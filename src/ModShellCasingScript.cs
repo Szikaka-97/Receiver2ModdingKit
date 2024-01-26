@@ -35,13 +35,13 @@ namespace Receiver2ModdingKit {
 		}
 
 		[EventRef]
-		public string sound_shell_casing_impact_hard;
+		public string sound_shell_casing_impact_hard = "event:/bullets/shell_casing_impact_hard";
 
 		[EventRef]
-		public string sound_bullet_fall_hard;
+		public string sound_bullet_fall_hard = "event:/bullets/bullet_fall_hard";
 
 		[EventRef]
-		public string sound_shell_casing_impact_soft;
+		public string sound_shell_casing_impact_soft = "event:/bullets/shell_casing_impact_soft";
 
 		public ModCartridgeSpec spec;
 
