@@ -112,9 +112,9 @@ namespace Receiver2ModdingKit {
 
 			[HarmonyPatch(typeof(LocalAimHandler), "UpdateLooseBulletDisplay")]
 			[HarmonyTranspiler]
-			private static IEnumerable<CodeInstruction> LAHBulletDisplayTranspiler(IEnumerable<CodeInstruction> instructions, MethodBase __originalMethod) {
+			private static IEnumerable<CodeInstruction> LAHBulletDisplayTranspiler(IEnumerable<CodeInstruction> instructions) {
 				
-				CodeMatcher code_matcher = new SmartCodeMatcher(instructions)
+				SmartCodeMatcher code_matcher = new SmartCodeMatcher(instructions)
 				.MatchForward(true, 
 					new CodeMatch(OpCodes.Ldnull),
 					new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(UnityEngine.Object), "op_Equality")),
@@ -135,6 +135,83 @@ namespace Receiver2ModdingKit {
 				}
 
 				return code_matcher.InstructionEnumeration();
+			}
+
+			[HarmonyPatch(typeof(LocalAimHandler), nameof(LocalAimHandler.HandleGunControls))]
+			[HarmonyTranspiler]
+			private static IEnumerable<CodeInstruction> LAHHandleGunControlsTranspiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator) {
+				var code_matcher = new SmartCodeMatcher(instructions, generator)
+				.MatchForward(true, 
+					new CodeMatch(OpCodes.Stfld, AccessTools.Field(typeof(GunScript), nameof(GunScript.mag_seated_wrong)))
+				)
+				.MatchBack(true,
+					new CodeMatch(OpCodes.Call),
+					new CodeMatch(OpCodes.Call),
+					new CodeMatch(OpCodes.Newobj)
+				)
+				.Advance()
+				.InsertAndAdvance(
+					new CodeInstruction(OpCodes.Ldarg_1),
+					new CodeInstruction(OpCodes.Isinst, typeof(ModGunScript))
+				)
+				.Insert(OpCodes.Call, AccessTools.Method(typeof(Vector3), "op_Multiply", new Type[] { typeof(Vector3), typeof(float) }))
+				.CreateBranch(
+					OpCodes.Brfalse_S,
+					new CodeInstruction[] {
+						new CodeInstruction(OpCodes.Ldarg_1),
+						new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModGunScript), nameof(ModGunScript.GetMagSmackStrength)))
+					},
+					new CodeInstruction[] {
+						new CodeInstruction(OpCodes.Ldc_I4_1)
+					}
+				);
+
+				var local_var = generator.DeclareLocal(typeof(Vector3));
+
+				code_matcher
+				.Advance()
+				.InsertAndAdvance(
+					new CodeInstruction(OpCodes.Stloc, local_var.LocalIndex),
+					new CodeInstruction(OpCodes.Ldloca, local_var.LocalIndex),
+					new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Time), "get_time")),
+					new CodeInstruction(OpCodes.Stfld, AccessTools.Field(typeof(Vector3), nameof(Vector3.z))),
+					new CodeInstruction(OpCodes.Ldloc, local_var.LocalIndex)
+				);
+
+				return code_matcher.InstructionEnumeration();
+			}
+
+			[HarmonyPatch(typeof(LocalAimHandler), nameof(LocalAimHandler.Update))]
+			[HarmonyTranspiler]
+			private static IEnumerable<CodeInstruction> LAHUpdateXRayTranspiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator) {
+				return new CodeMatcher(instructions)
+				.MatchForward(true,
+					new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(LocalAimHandler), nameof(LocalAimHandler.inspect_x_ray_timer)))
+				)
+				.Advance(2)
+				.InsertAndAdvance(
+					new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Time), "get_timeScale")),
+					new CodeInstruction(OpCodes.Div)
+				)
+				.InstructionEnumeration();
+			}
+
+			[HarmonyPatch(typeof(MagazineScript), nameof(MagazineScript.UpdateRoundPositions))]
+			[HarmonyTranspiler]
+			private static IEnumerable<CodeInstruction> MagazineFollowerTranspiler(IEnumerable<CodeInstruction> instructions) {
+				return new SmartCodeMatcher(instructions)
+				.MatchForward(true,
+					new CodeMatch(OpCodes.Brfalse),
+					new CodeMatch(OpCodes.Ldc_R4),
+					new CodeMatch(OpCodes.Ldarg_0)
+				)
+				.Advance(-1)
+				.RemoveInstruction()
+				.MatchForward(false,
+					new CodeMatch(OpCodes.Sub)
+				)
+				.RemoveInstruction()
+				.InstructionEnumeration();
 			}
 		}
 
@@ -561,6 +638,28 @@ namespace Receiver2ModdingKit {
 						if (!loadout.gun_internal_name.StartsWith("wolfire") && !__result.loadouts.Any( loadout_value => loadout_value.name == loadout_name)) {
 							__result.loadouts.Add(new LoadoutValue() { name = loadout_name });
 						}
+					}
+				}
+			}
+		}
+
+		[HarmonyPatch(typeof(LocalAimHandler), nameof(LocalAimHandler.StepRecoil))]
+		[HarmonyPostfix]
+		private static void PatchStepRecoil() {
+			LocalAimHandler lah = LocalAimHandler.player_instance;
+
+			foreach (var hand in lah.hands) {
+				if (hand.state == LocalAimHandler.Hand.State.HoldingGun) {
+					var gun = hand.slot.contents[0] as ModGunScript;
+
+					if (gun != null) {
+						Vector3 last_recoil_event = hand.recoil_events.Last();
+						Vector2 multiplier = gun.GetStepRecoilMultiplier();
+
+						last_recoil_event.x *= multiplier.x;
+						last_recoil_event.y *= multiplier.y;
+
+						hand.recoil_events[hand.recoil_events.Count - 1] = last_recoil_event;
 					}
 				}
 			}

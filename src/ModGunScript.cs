@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
+using System.Collections.Generic;
 using UnityEngine;
 using Receiver2;
 using SimpleJSON;
 using BepInEx;
 using HarmonyLib;
-using System.Linq;
-using System.Collections.Generic;
 
 namespace Receiver2ModdingKit {
 	/// <summary>
@@ -81,6 +82,7 @@ namespace Receiver2ModdingKit {
 		public GameObject muzzle_flash_prefab;
 		public bool visible_in_spawnmenu = true;
 		public bool spawns_in_dreaming = true;
+		public float magazine_shake_strength_multiplier = 1;
 		public ModHelpEntry help_entry;
 		public ModLocaleTactics locale_tactics;
 
@@ -364,10 +366,23 @@ namespace Receiver2ModdingKit {
 			}
 		}
 
-		/// <summary>
-		/// Any setup that has to be done before the gun is ever used. It is called only once, right after a gun is loaded from the AssetBundle
-		/// </summary>
-		public virtual void InitializeGun() { }
+        public override void OnChangeInventorySlot(InventorySlot old_slot, InventorySlot new_slot, LocalAimHandler.Hand from_hand, LocalAimHandler.Hand to_hand) {
+			base.OnChangeInventorySlot(old_slot, new_slot, from_hand, to_hand);
+
+			if (new_slot != null && old_slot != null) {
+				if (new_slot.type == InventorySlot.Type.Pocket) {
+					this.OnHolster();
+				}
+				else if (new_slot.type == InventorySlot.Type.RightHand) {
+					this.OnUnholster();
+				}
+			}
+		}
+
+        /// <summary>
+        /// Any setup that has to be done before the gun is ever used. It is called only once, right after a gun is loaded from the AssetBundle
+        /// </summary>
+        public virtual void InitializeGun() { }
 
 		/// <summary>
 		/// Setup that has to be done for every gun individually. It is called when the gun is spawned, whether for a campaign or from spawnmenu
@@ -406,6 +421,69 @@ namespace Receiver2ModdingKit {
 		public virtual LocaleTactics GetGunTactics() {
 			return locale_tactics.GetLocaleTactics(this);
 		}
+
+		/// <summary>
+		/// Override this method to return the total mass of the gun
+		/// </summary>
+		/// <returns>
+		/// Mass of the gun
+		/// </returns>
+		new public virtual float GetTotalMass() {
+			return -1;
+		}
+
+		/// <summary>
+		/// Get mass that would be calculated in vanilla game, gun mass + mass of cartridges
+		/// </summary>
+		/// <returns>
+		/// Default calculated mass
+		/// </returns>
+		[HarmonyPatch(typeof(GunScript), nameof(GunScript.GetTotalMass))]
+		[HarmonyReversePatch(HarmonyReversePatchType.Original)]
+		public float GetDefaultTotalMass() {
+			return 0;
+		}
+
+		[HarmonyPatch(typeof(GunScript), nameof(GunScript.GetTotalMass))]
+		[HarmonyPrefix]
+		public static bool PatchGetTotalMass(GunScript __instance, ref float __result) {
+			__result = __instance.GetTotalMass();
+
+			return __result < 0;
+		}
+
+		/// <summary>
+		/// Override this method to change the strength of the magazine smack
+		/// </summary>
+		/// <returns>
+		/// Value by which the magazine smack is multiplied
+		/// </returns>
+		public virtual float GetMagSmackStrength() {
+			return magazine_shake_strength_multiplier;
+		}
+
+		/// <summary>
+		/// Override this method to change the strength of the weapon bob while walking
+		/// </summary>
+		/// <returns>
+		/// Value by which the weapon bob is multiplied
+		/// </returns>
+		public virtual Vector2 GetStepRecoilMultiplier() {
+			return new Vector2(
+				1 / this.mass,
+				1 / this.mass
+			);
+		}
+
+		/// <summary>
+		/// Execute the method after the weapon is holstered but not dropped
+		/// </summary>
+		public virtual void OnHolster() { }
+
+		/// <summary>
+		/// Execute the method after the weapon is unholstered but not picked up
+		/// </summary>
+		public virtual void OnUnholster() { }
 
 		/// <summary>
 		/// A method invoked every frame when the gun is active. Control things like firing the bullet within it
