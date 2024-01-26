@@ -19,7 +19,15 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Value:
 		//     The index or -1 if out of bounds
-		public int Pos => this.matcher.Pos;
+		public int Pos {
+			get {
+				return this.matcher.Pos;
+			}
+			set {
+				this.Start();
+				this.Advance(value);
+			}
+		}
 
 		//
 		// Summary:
@@ -543,6 +551,24 @@ namespace Receiver2ModdingKit.Helpers {
 
 		//
 		// Summary:
+		//     Inserts an instruction
+		//
+		// Parameters:
+		//   instructions:
+		//     The instructions
+		//
+		// Returns:
+		//     The same code matcher
+		public SmartCodeMatcher Insert(OpCode opcode, object operand = null) {
+			if (this.matcher.IsValid) {
+				this.matcher.Insert(new CodeInstruction(opcode, operand));
+			}
+
+			return this;
+		}
+
+		//
+		// Summary:
 		//     Inserts some instructions
 		//
 		// Parameters:
@@ -593,6 +619,24 @@ namespace Receiver2ModdingKit.Helpers {
 		public SmartCodeMatcher InsertBranch(OpCode opcode, int destination) {
 			if (this.matcher.IsValid) {
 				this.matcher.InsertBranch(opcode, destination);
+			}
+
+			return this;
+		}
+
+		//
+		// Summary:
+		//     Inserts an instruction and advances the position
+		//
+		// Parameters:
+		//   instructions:
+		//     The instructions
+		//
+		// Returns:
+		//     The same code matcher
+		public SmartCodeMatcher InsertAndAdvance(OpCode opcode, object operand = null) {
+			if (this.matcher.IsValid) {
+				this.matcher.InsertAndAdvance(new CodeInstruction(opcode, operand));
 			}
 
 			return this;
@@ -737,7 +781,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
-		public SmartCodeMatcher Advance(int offset) {
+		public SmartCodeMatcher Advance(int offset = 1) {
 			if (this.matcher.IsValid) {
 				this.matcher.Advance(offset);
 			}
@@ -971,6 +1015,28 @@ namespace Receiver2ModdingKit.Helpers {
 		// Returns:
 		//     An instruction
 		public CodeInstruction NamedMatch(string name) => this.matcher.NamedMatch(name);
+
+		public SmartCodeMatcher CreateBranch(OpCode branch_opcode, CodeInstruction[] if_true, CodeInstruction[] if_false = null) {
+
+			this.Insert(OpCodes.Nop);
+
+			this.InsertBranchAndAdvance(branch_opcode, this.Pos);
+
+			this.InsertAndAdvance(
+				if_true
+			);
+
+			if (if_false != null) {
+				this.InsertBranchAndAdvance(OpCodes.Br, this.Pos + 1);
+
+				this.Advance(1);
+				this.InsertAndAdvance(
+					if_false
+				);
+			}
+
+			return this;
+		}
 
 		public static implicit operator CodeMatcher(SmartCodeMatcher matcher) => matcher.matcher;
 	}
