@@ -366,7 +366,7 @@ namespace Receiver2ModdingKit {
 			}
 		}
 
-        public override void OnChangeInventorySlot(InventorySlot old_slot, InventorySlot new_slot, LocalAimHandler.Hand from_hand, LocalAimHandler.Hand to_hand) {
+		public override void OnChangeInventorySlot(InventorySlot old_slot, InventorySlot new_slot, LocalAimHandler.Hand from_hand, LocalAimHandler.Hand to_hand) {
 			base.OnChangeInventorySlot(old_slot, new_slot, from_hand, to_hand);
 
 			if (new_slot != null && old_slot != null) {
@@ -379,10 +379,10 @@ namespace Receiver2ModdingKit {
 			}
 		}
 
-        /// <summary>
-        /// Any setup that has to be done before the gun is ever used. It is called only once, right after a gun is loaded from the AssetBundle
-        /// </summary>
-        public virtual void InitializeGun() { }
+		/// <summary>
+ 		/// Any setup that has to be done before the gun is ever used. It is called only once, right after a gun is loaded from the AssetBundle
+		/// </summary>
+		public virtual void InitializeGun() { }
 
 		/// <summary>
 		/// Setup that has to be done for every gun individually. It is called when the gun is spawned, whether for a campaign or from spawnmenu
