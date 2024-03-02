@@ -124,7 +124,6 @@ namespace Receiver2ModdingKit {
 				Debug.LogError(e);
 
 				StartCoroutine(SetErrorState());
-			} catch (ReflectionManager.MissingFieldException e) {
 			} catch (MissingFieldException e) {
 				Debug.LogError(e);
 

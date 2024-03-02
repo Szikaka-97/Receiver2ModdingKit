@@ -51,6 +51,13 @@ namespace Receiver2ModdingKit.ModInstaller {
 				prefab_9mm = items.First( item => { return item is ShellCasingScript && ((ShellCasingScript) item).cartridge_type == CartridgeSpec.Preset._9mm && ((ShellCasingScript) item).go_casing != null; }).gameObject;
 			}
 
+			if (gun.TryGetComponent<Editor.AssignVanillaMuzzleflash>(out var vanillaMuzzleflash) && gun.muzzle_flash_prefab == null) //Vanilla muzzleflash assignement thing
+			{
+				gun.pooled_muzzle_flash = ((GunScript)items.First( item => { return (item is GunScript && ((GunScript) item).gun_model == vanillaMuzzleflash.muzzleflashFromGun); })).pooled_muzzle_flash; //Are you proud of me? I'm doing lambda operations, just like you!
+
+				global::UnityEngine.Object.DestroyImmediate(vanillaMuzzleflash);
+			}
+
 			Editor.InBuiltCartridge cartridge = gun.GetComponent<Editor.InBuiltCartridge>(); //Handling cartridges
 			if (cartridge) {
 				try {

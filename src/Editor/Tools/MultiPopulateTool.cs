@@ -86,6 +86,7 @@ namespace Receiver2ModdingKit.Editor {
 
 			mover_components.AddRange(gun.animated_components);
 
+			Debug.Log(gun.GetComponentsInChildren<AnimatedComponent>().Length);
 			foreach (var animated_component in gun.GetComponentsInChildren<AnimatedComponent>()) {
 				string base_path = animated_component.path + " / ";
 
@@ -111,6 +112,8 @@ namespace Receiver2ModdingKit.Editor {
 
 				if (!string.IsNullOrEmpty(animated_component.mover_name)) {
 					bool flag = true;
+
+					Debug.Log(flag);
 
 					foreach (var component in mover_components) {
 						if (component.anim_path == animated_component.path && component.mover_name == animated_component.mover_name && (component.component == animated_component.transform || component.component_name == animated_component.name)) {

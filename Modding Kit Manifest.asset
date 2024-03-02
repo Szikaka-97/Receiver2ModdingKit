@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: AssemblyDefinitions
   m_EditorClassIdentifier: 
   StagingPaths:
-  - <GamePath>\BepInEx\plugins\Receiver2ModdingKit
+  - C:\Users\coren\AppData\Roaming\r2modmanPlus-local\Receiver2\profiles\Default\BepInEx\plugins\Szikaka-Receiver_2_Modding_Kit
   definitions:
   - {fileID: 5897886265953266890, guid: 041edb9e43e1cd140a16ecbcf83eaffa, type: 3}
 --- !u!114 &-3078336892808536419
@@ -65,7 +65,7 @@ MonoBehaviour:
   m_Name: Files
   m_EditorClassIdentifier: 
   StagingPaths:
-  - <GamePath>\BepInEx\plugins\Receiver2ModdingKit
+  - C:\Users\coren\AppData\Roaming\r2modmanPlus-local\Receiver2\profiles\Default\BepInEx\plugins\Szikaka-Receiver_2_Modding_Kit
   includeMetaFiles: 0
   files:
   - {fileID: 2800000, guid: cce70fca3163cde4d98f84fc13dfdc10, type: 3}

@@ -5,6 +5,8 @@ using System.IO;
 using SimpleJSON;
 using Receiver2ModdingKit.ModInstaller;
 using UnityEngine.Events;
+using System;
+using HarmonyLib;
 
 namespace Receiver2ModdingKit {
 	public static class Extensions {
@@ -197,6 +199,46 @@ namespace Receiver2ModdingKit {
 		public static void MoveTo(this FileInfo source_file, string destination_file, bool overwrite) {
 			if (overwrite && File.Exists(destination_file)) File.Delete(destination_file);
 			source_file.MoveTo(destination_file);
+		}
+
+		public static HarmonyLib.Harmony getConsoleColorHarmonyInstance;
+
+		public static void LogDebugWithColor(this BepInEx.Logging.ManualLogSource logger, ConsoleColor color, object data)
+		{
+			if (getConsoleColorHarmonyInstance == null)
+			{
+				getConsoleColorHarmonyInstance = new HarmonyLib.Harmony("GetConsoleColor");
+			}
+
+			getConsoleColorHarmonyInstance = Harmony.CreateAndPatchAll(typeof(HarmonyManager.GetConsoleColorPatch));
+			HarmonyManager.GetConsoleColorPatch.consoleColor = color;
+			logger.LogDebug(data);
+			getConsoleColorHarmonyInstance.UnpatchSelf();
+		}
+
+		public static void LogErrorWithColor(ConsoleColor color, object data)
+		{
+
+		}
+
+		public static void LogFatalWithColor(ConsoleColor color, object data)
+		{
+
+		}
+
+		public static void LogInfoWithColor(ConsoleColor color, object data)
+		{
+
+		}
+
+		public static void LogMesageWithColor(ConsoleColor color, object data)
+		{
+
+		}
+
+		public static void LogWarningWithColor(ConsoleColor color, object data)
+		{
+
 		}
 	}
 }

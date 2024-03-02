@@ -563,7 +563,7 @@ namespace Receiver2ModdingKit {
 
 		// Serialization shenanigans
 		// BepInEx injected classes don't get serialized correctly, this is an attempt to remedy it
-		public void OnBeforeSerialize() {
+		public virtual void OnBeforeSerialize() {
 			this.help_entry_generate = help_entry.generate;
 			this.help_entry_name = help_entry.name;
 			this.help_entry_info_sprite = help_entry.info_sprite;
@@ -574,7 +574,7 @@ namespace Receiver2ModdingKit {
 			this.locale_tactics_description = locale_tactics.description;
 		}
 
-		public void OnAfterDeserialize() {
+		public virtual void OnAfterDeserialize() {
 			if (this.help_entry == null) {
 				this.help_entry = new ModHelpEntry(help_entry_name) {
 					generate = help_entry_generate,
