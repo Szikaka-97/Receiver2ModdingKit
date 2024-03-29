@@ -7,6 +7,7 @@ using BepInEx;
 using Receiver2;
 using Receiver2ModdingKit.ModInstaller;
 using Receiver2ModdingKit.Assets;
+using static UnityEditor.Graphs.Styles;
 
 namespace Receiver2ModdingKit {
 #if false
@@ -134,6 +135,15 @@ namespace Receiver2ModdingKit {
 			mod_tapes = gameObject.AddComponent<ModTapeManager>();
 
 			CustomSounds.ModAudioManager.Initialize();
+
+			foreach (Type type in typeof(BepInPlugin).Assembly.GetTypes())
+			{
+				if (type.FullName == "BepInEx.ConsoleUtil.Kon")
+				{
+					Extensions.konType = type;
+					break;
+				}
+			}
 
 			if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "GlobalBaseConfiguration"))) Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "GlobalBaseConfiguration"));
 			if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "PlayerLoadouts"))) Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "PlayerLoadouts"));

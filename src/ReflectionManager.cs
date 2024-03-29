@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityEngine.Events;
 using Receiver2;
 using HarmonyLib;
+using BepInEx;
+using static UnityEditor.Graphs.Styles;
 
 namespace Receiver2ModdingKit {
 	internal static class ReflectionManager {

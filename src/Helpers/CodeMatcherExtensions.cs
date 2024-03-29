@@ -4,9 +4,64 @@ using UnityEngine;
 using HarmonyLib;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using System.Linq;
+using BepInEx.Logging;
+using System.Runtime.CompilerServices;
+using System.Reflection.Emit;
 
 namespace Receiver2ModdingKit.Helpers {
     public static class CodeMatcherExtensions {
+		public static void Print(this CodeMatcher matcher) {
+			var instructions = matcher.InstructionEnumeration().ToArray();
+
+			for (int instructionIndex = 0; instructionIndex < instructions.Length; instructionIndex++) {
+				Debug.Log(instructions[instructionIndex]);
+			}
+		}
+
+		public static void Print(this CodeMatcher matcher, ManualLogSource logger, ConsoleColor consoleColor)
+		{
+			var instructions = matcher.InstructionEnumeration().ToArray();
+
+			for (int instructionIndex = 0; instructionIndex < instructions.Length; instructionIndex++)
+			{
+				logger.LogInfoWithColor(instructions[instructionIndex], consoleColor);
+			}
+		}
+
+		static List<string> originalInstructionsHelp = new List<string>();
+		static List<string> currentInstructionsHelp = new List<string>();
+
+		public static void Print(this MethodBase method, ManualLogSource logger, CodeMatcher currentMatcher, ConsoleColor differenceColor = ConsoleColor.Yellow, ConsoleColor duplicateColor = ConsoleColor.DarkGray) {
+			var originalInstructions = PatchProcessor.GetOriginalInstructions(method);
+			var currentInstructions = currentMatcher.InstructionEnumeration().ToList();
+
+			for (int i = 0; i < originalInstructions.Count; i++)
+			{
+				originalInstructionsHelp.Add(originalInstructions[i].opcode.ToString() + " " + (originalInstructions[i].operand == null ? "" : originalInstructions[i].operand.ToString()));
+			}
+
+			for (int x = 0; x < currentInstructions.Count; x++)
+			{
+				currentInstructionsHelp.Add(currentInstructions[x].opcode.ToString() + " " + (currentInstructions[x].operand == null ? "" : currentInstructions[x].operand.ToString()));
+			}
+
+			int catchUp = 0;
+
+			for (int instructionIndex = 0; instructionIndex < currentInstructions.Count; instructionIndex++) {
+				if (currentInstructions[instructionIndex].opcode == originalInstructions[instructionIndex - catchUp].opcode && currentInstructions[instructionIndex].operand == originalInstructions[instructionIndex - catchUp].operand)
+				{
+					logger.LogInfoWithColor(currentInstructions[instructionIndex], duplicateColor);
+				}
+				else
+				{
+					logger.LogInfoWithColor(currentInstructions[instructionIndex], differenceColor);
+					logger.LogInfoWithColor($"{currentInstructions[instructionIndex]} doesn't match with {originalInstructions[instructionIndex - catchUp]}", ConsoleColor.DarkYellow);
+					catchUp++;
+				}
+			}
+		}
+
         public static MethodInfo GetMethod(this System.Type type, string method_signature) {
             // Przepisać żeby działało coś w stylu Wolfire.Receiver2@Receiver2.LinearMover.UpdateDisplay();
 

@@ -7,11 +7,22 @@ using Receiver2ModdingKit.ModInstaller;
 using UnityEngine.Events;
 using System;
 using HarmonyLib;
+using BepInEx;
+using BepInEx.Logging;
+using static UnityEditor.Graphs.Styles;
 
 namespace Receiver2ModdingKit {
 	public static class Extensions {
 		internal static JSONObject current_gun_data;
 		internal static bool lah_force_bullet_display;
+
+		internal static Type konType = null;
+
+		public static ConsoleColor BackgroundColor
+		{
+			get { return (ConsoleColor)konType?.GetProperty("BackgroundColor").GetMethod.Invoke(null, null); }
+			set { konType?.GetProperty("BackgroundColor").SetMethod.Invoke(null, new object[] { value }); }
+		}
 
 		/// <summary>
 		/// Fetch a round with of a specified type from player's inventory
@@ -201,9 +212,70 @@ namespace Receiver2ModdingKit {
 			source_file.MoveTo(destination_file);
 		}
 
+		/// <summary>
+		/// Returns the BepInPlugin Attribute, for the BaseUnityPlugin awake message
+		/// </summary>
+		/// <param name="plugin"></param> The BaseUnityPlugin type
+		/// <returns></returns> The BepInPlugin attribute
+		public static BepInPlugin GetBepInAttribute(this BaseUnityPlugin plugin)
+		{
+			return (BepInPlugin)Attribute.GetCustomAttribute(plugin.GetType(), typeof(BepInPlugin)); //how fucking cool is it that GetType returns the higher-most type?
+		}
+
+		/// <summary>
+		/// Similar to TryGetComponent<>, but for FindObjectOfType<>
+		/// </summary>
+		/// <typeparam name="T"></typeparam> Type searched
+		/// <param name="result"></param> The result, null if no match found
+		/// <returns></returns> True if match found, otherwise false
+		public static bool TryFindObjectOfType<T>(out T result) where T : UnityEngine.Object
+		{
+			return (result = UnityEngine.Object.FindObjectOfType<T>()) != null;
+		}
+
+		/// <summary>
+		/// Similar to TryGetComponents<>, but for FindObjectsOfType<>
+		/// </summary>
+		/// <typeparam name="T"></typeparam> Type searched
+		/// <param name="result"></param> The array result, null if no match found
+		/// <returns></returns> True if matched found, otherwise false
+		public static bool TryFindObjectsOfType<T>(out T[] result) where T : UnityEngine.Object
+		{
+			return (result = UnityEngine.Object.FindObjectsOfType<T>()) != null;
+		}
+
 		public static HarmonyLib.Harmony getConsoleColorHarmonyInstance;
 
-		public static void LogDebugWithColor(this BepInEx.Logging.ManualLogSource logger, ConsoleColor color, object data)
+		public static HarmonyLib.Harmony logEventArgsToStringHarmonyInstance;
+
+		public static void LogWithCustomLevelName(this ManualLogSource logger, object data, string levelName)
+		{
+			logEventArgsToStringHarmonyInstance = Harmony.CreateAndPatchAll(typeof(HarmonyManager.LogEventArgsToStringPatch));
+			HarmonyManager.LogEventArgsToStringPatch.levelName = levelName;
+			logger.Log((LogLevel)696969, data);
+			logEventArgsToStringHarmonyInstance.UnpatchSelf();
+		}
+
+		public static void LogWithCustomLevelNameAndColor(this ManualLogSource logger, object data, string levelName, ConsoleColor color)
+		{
+			getConsoleColorHarmonyInstance = Harmony.CreateAndPatchAll(typeof(HarmonyManager.GetConsoleColorPatch));
+			HarmonyManager.GetConsoleColorPatch.consoleColor = color;
+			logEventArgsToStringHarmonyInstance = Harmony.CreateAndPatchAll(typeof(HarmonyManager.LogEventArgsToStringPatch));
+			HarmonyManager.LogEventArgsToStringPatch.levelName = levelName;
+			logger.Log((LogLevel)696969, data);
+			logEventArgsToStringHarmonyInstance.UnpatchSelf();
+			getConsoleColorHarmonyInstance.UnpatchSelf();
+		}
+
+		public static void LogWithColor(this BepInEx.Logging.ManualLogSource logger, LogLevel logLevel, object data, ConsoleColor color)
+		{
+			getConsoleColorHarmonyInstance = Harmony.CreateAndPatchAll(typeof(HarmonyManager.GetConsoleColorPatch));
+			HarmonyManager.GetConsoleColorPatch.consoleColor = color;
+			logger.Log(logLevel, data);
+			getConsoleColorHarmonyInstance.UnpatchSelf();
+		}
+
+		public static void LogDebugWithColor(this BepInEx.Logging.ManualLogSource logger, object data, ConsoleColor color)
 		{
 			if (getConsoleColorHarmonyInstance == null)
 			{
@@ -216,29 +288,69 @@ namespace Receiver2ModdingKit {
 			getConsoleColorHarmonyInstance.UnpatchSelf();
 		}
 
-		public static void LogErrorWithColor(ConsoleColor color, object data)
+		public static void LogErrorWithColor(this BepInEx.Logging.ManualLogSource logger, object data, ConsoleColor color)
 		{
+			if (getConsoleColorHarmonyInstance == null)
+			{
+				getConsoleColorHarmonyInstance = new HarmonyLib.Harmony("GetConsoleColor");
+			}
 
+			getConsoleColorHarmonyInstance = Harmony.CreateAndPatchAll(typeof(HarmonyManager.GetConsoleColorPatch));
+			HarmonyManager.GetConsoleColorPatch.consoleColor = color;
+			logger.LogError(data);
+			getConsoleColorHarmonyInstance.UnpatchSelf();
 		}
 
-		public static void LogFatalWithColor(ConsoleColor color, object data)
+		public static void LogFatalWithColor(this BepInEx.Logging.ManualLogSource logger, object data, ConsoleColor color)
 		{
+			if (getConsoleColorHarmonyInstance == null)
+			{
+				getConsoleColorHarmonyInstance = new HarmonyLib.Harmony("GetConsoleColor");
+			}
 
+			getConsoleColorHarmonyInstance = Harmony.CreateAndPatchAll(typeof(HarmonyManager.GetConsoleColorPatch));
+			HarmonyManager.GetConsoleColorPatch.consoleColor = color;
+			logger.LogFatal(data);
+			getConsoleColorHarmonyInstance.UnpatchSelf();
 		}
 
-		public static void LogInfoWithColor(ConsoleColor color, object data)
+		public static void LogInfoWithColor(this BepInEx.Logging.ManualLogSource logger, object data, ConsoleColor color)
 		{
+			if (getConsoleColorHarmonyInstance == null)
+			{
+				getConsoleColorHarmonyInstance = new HarmonyLib.Harmony("GetConsoleColor");
+			}
 
+			getConsoleColorHarmonyInstance = Harmony.CreateAndPatchAll(typeof(HarmonyManager.GetConsoleColorPatch));
+			HarmonyManager.GetConsoleColorPatch.consoleColor = color;
+			logger.LogInfo(data);
+			getConsoleColorHarmonyInstance.UnpatchSelf();
 		}
 
-		public static void LogMesageWithColor(ConsoleColor color, object data)
+		public static void LogMessageWithColor(this BepInEx.Logging.ManualLogSource logger, object data, ConsoleColor color)
 		{
+			if (getConsoleColorHarmonyInstance == null)
+			{
+				getConsoleColorHarmonyInstance = new HarmonyLib.Harmony("GetConsoleColor");
+			}
 
+			getConsoleColorHarmonyInstance = Harmony.CreateAndPatchAll(typeof(HarmonyManager.GetConsoleColorPatch));
+			HarmonyManager.GetConsoleColorPatch.consoleColor = color;
+			logger.LogMessage(data);
+			getConsoleColorHarmonyInstance.UnpatchSelf();
 		}
 
-		public static void LogWarningWithColor(ConsoleColor color, object data)
+		public static void LogWarningWithColor(this BepInEx.Logging.ManualLogSource logger, object data, ConsoleColor color)
 		{
+			if (getConsoleColorHarmonyInstance == null)
+			{
+				getConsoleColorHarmonyInstance = new HarmonyLib.Harmony("GetConsoleColor");
+			}
 
+			getConsoleColorHarmonyInstance = Harmony.CreateAndPatchAll(typeof(HarmonyManager.GetConsoleColorPatch));
+			HarmonyManager.GetConsoleColorPatch.consoleColor = color;
+			logger.LogWarning(data);
+			getConsoleColorHarmonyInstance.UnpatchSelf();
 		}
 	}
 }

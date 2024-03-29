@@ -371,6 +371,18 @@ namespace Receiver2ModdingKit {
 			}
 		}
 
+		internal static class LogEventArgsToStringPatch
+		{
+			internal static string levelName;
+
+			[HarmonyPatch(typeof(LogEventArgs), nameof(LogEventArgs.ToString))]
+			[HarmonyPostfix]
+			internal static void ChangeLogEventArgsLevel(LogEventArgs __instance, ref string __result)
+			{
+				__result = string.Format("[{0,-7}:{1,10}] {2}", levelName, __instance.Source.SourceName, __instance.Data);
+			}
+		}
+
 		[HarmonyPatch(typeof(MagazineScript), "UpdateRoundPositions")]
 		[HarmonyPostfix]
 		private static void PatchMagazineRoundPositions(ref MagazineScript __instance) {
@@ -413,8 +425,6 @@ namespace Receiver2ModdingKit {
 		{
 			if (__instance.spring)
 			{
-				Debug.Log("piss");
-
 				__instance.spring.UpdateScale();
 			}
 		}
