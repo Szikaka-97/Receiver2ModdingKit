@@ -164,7 +164,7 @@ namespace Receiver2ModdingKit {
 						new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModGunScript), nameof(ModGunScript.GetMagSmackStrength)))
 					},
 					new CodeInstruction[] {
-						new CodeInstruction(OpCodes.Ldc_I4_1)
+						new CodeInstruction(OpCodes.Ldc_R4, 1f)
 					}
 				);
 
