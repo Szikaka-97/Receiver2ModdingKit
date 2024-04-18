@@ -7,7 +7,6 @@ using BepInEx;
 using Receiver2;
 using Receiver2ModdingKit.ModInstaller;
 using Receiver2ModdingKit.Assets;
-using static UnityEditor.Graphs.Styles;
 
 namespace Receiver2ModdingKit {
 #if false
@@ -99,6 +98,15 @@ namespace Receiver2ModdingKit {
 		private void Awake() {
 			instance = this;
 
+			foreach (Type type in typeof(BepInPlugin).Assembly.GetTypes()) //needs to be at beginning, other the Kon won't get assigned until later
+			{
+				if (type.FullName == "BepInEx.ConsoleUtil.Kon")
+				{
+					Extensions.konType = type;
+					break;
+				}
+			}
+
 			try {
 				if (Thunderstore.Thunderstore.LaunchedWithR2ModMan) {
 					Debug.Log("Launched Receiver 2 Modding Kit with r2modman");
@@ -135,15 +143,6 @@ namespace Receiver2ModdingKit {
 			mod_tapes = gameObject.AddComponent<ModTapeManager>();
 
 			CustomSounds.ModAudioManager.Initialize();
-
-			foreach (Type type in typeof(BepInPlugin).Assembly.GetTypes())
-			{
-				if (type.FullName == "BepInEx.ConsoleUtil.Kon")
-				{
-					Extensions.konType = type;
-					break;
-				}
-			}
 
 			if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "GlobalBaseConfiguration"))) Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "GlobalBaseConfiguration"));
 			if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "PlayerLoadouts"))) Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "PlayerLoadouts"));

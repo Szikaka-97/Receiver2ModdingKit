@@ -9,7 +9,8 @@ using System;
 using HarmonyLib;
 using BepInEx;
 using BepInEx.Logging;
-using static UnityEditor.Graphs.Styles;
+using System.Collections.Generic;
+using System.Reflection.Emit;
 
 namespace Receiver2ModdingKit {
 	public static class Extensions {
@@ -242,6 +243,45 @@ namespace Receiver2ModdingKit {
 		public static bool TryFindObjectsOfType<T>(out T[] result) where T : UnityEngine.Object
 		{
 			return (result = UnityEngine.Object.FindObjectsOfType<T>()) != null;
+		}
+
+		public static List<CodeInstruction> ToCodeInstructions(this System.Reflection.MethodInfo methodInfo, Dictionary<CodeInstruction, CodeInstruction> replaceInstructionWith = null)
+		{
+			var methodIL = PatchProcessor.GetOriginalInstructions(methodInfo);
+
+			if (replaceInstructionWith != null)
+			{
+				for (int instructionIndex = 0; instructionIndex < methodIL.Count; instructionIndex++)
+				{
+					if (replaceInstructionWith.TryGetValue(methodIL[instructionIndex], out var replacementInstrution))
+					{
+						methodIL[instructionIndex] = replacementInstrution;
+					}
+				}
+			}
+
+			return methodIL;
+		}
+
+		public static List<CodeInstruction> ToCodeInstructionsClipLast(this System.Reflection.MethodInfo methodInfo, out List<Label> extractedLabels, Dictionary<CodeInstruction, CodeInstruction> replaceInstructionWith = null)
+		{
+			var methodIL = PatchProcessor.GetOriginalInstructions(methodInfo);
+
+			if (replaceInstructionWith != null)
+			{
+				for (int instructionIndex = 0; instructionIndex < methodIL.Count; instructionIndex++)
+				{
+					if (replaceInstructionWith.TryGetValue(methodIL[instructionIndex], out var replacementInstrution))
+					{
+						methodIL[instructionIndex] = replacementInstrution;
+					}
+				}
+			}
+
+			extractedLabels = (methodIL.Last().ExtractLabels());
+			methodIL.Remove(methodIL.Last());
+
+			return methodIL;
 		}
 
 		public static HarmonyLib.Harmony getConsoleColorHarmonyInstance;

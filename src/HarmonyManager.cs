@@ -467,14 +467,14 @@ namespace Receiver2ModdingKit {
 			return true;
 		}
 
-		public static void PrintMethodIL(Type type, string name)
+		public static void PrintMethodIL(Type type, string name, bool original = false)
 		{
-			PrintMethodIL(AccessTools.Method(type, name));
+			PrintMethodIL(AccessTools.Method(type, name), original);
 		}
 
-		public static void PrintMethodIL(MethodInfo method)
+		public static void PrintMethodIL(MethodInfo method, bool original = false)
 		{
-			var shitfuck = PatchProcessor.GetOriginalInstructions(method);
+			var shitfuck = (original) ? PatchProcessor.GetOriginalInstructions(method) : PatchProcessor.GetCurrentInstructions(method);
 
 			var shitfuckCount = shitfuck.Count;
 			for (int instructionIndex = 0; instructionIndex < shitfuckCount; instructionIndex++)

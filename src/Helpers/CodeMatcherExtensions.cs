@@ -8,24 +8,56 @@ using System.Linq;
 using BepInEx.Logging;
 using System.Runtime.CompilerServices;
 using System.Reflection.Emit;
+using Receiver2;
+using MonoMod.Utils.Cil;
 
 namespace Receiver2ModdingKit.Helpers {
     public static class CodeMatcherExtensions {
-		public static void Print(this CodeMatcher matcher) {
-			var instructions = matcher.InstructionEnumeration().ToArray();
 
-			for (int instructionIndex = 0; instructionIndex < instructions.Length; instructionIndex++) {
-				Debug.Log(instructions[instructionIndex]);
-			}
-		}
+		static AccessTools.FieldRef<CodeMatcher, ILGenerator> codeMatcherILGeneratorField = AccessTools.FieldRefAccess<CodeMatcher, ILGenerator>("generator");
+		static AccessTools.FieldRef<object ,CecilILGenerator> ilGeneratorMethodInfoField; //It's not actually an ILGenerator, it's an ILGeneratorProxy, which is a class that is generated at runtime for some ungodly reason, so you also have to do it a runtime, isn't it great? I love my wife.
 
-		public static void Print(this CodeMatcher matcher, ManualLogSource logger, ConsoleColor consoleColor)
+		public static void Print(this CodeMatcher matcher, ManualLogSource logger = null, ConsoleColor consoleColor = ConsoleColor.Gray)
 		{
 			var instructions = matcher.InstructionEnumeration().ToArray();
 
+			var ilGen = codeMatcherILGeneratorField.Invoke(matcher);
+
+			if (ilGen != null)
+			{
+				if (ilGeneratorMethodInfoField == null) ilGeneratorMethodInfoField = AccessTools.FieldRefAccess<CecilILGenerator>(ilGen.GetType(), "Target");
+
+				var methodInfo = ilGeneratorMethodInfoField.Invoke(ilGen).IL.Body.Method;
+
+				if (methodInfo != null)
+				{
+					string pattern = "------ " + methodInfo.Name + " ------";
+
+					if (logger == null)
+					{
+						Debug.Log("");
+						Debug.Log(pattern);
+						Debug.Log("");
+					}
+					else
+					{
+						logger.LogInfoWithColor("", consoleColor);
+						logger.LogInfoWithColor(pattern, consoleColor);
+						logger.LogInfoWithColor("", consoleColor);
+					}
+				}
+			}
+
 			for (int instructionIndex = 0; instructionIndex < instructions.Length; instructionIndex++)
 			{
-				logger.LogInfoWithColor(instructions[instructionIndex], consoleColor);
+				if (logger == null)
+				{
+					Debug.Log(instructions[instructionIndex]);
+				}
+				else
+				{
+					logger.LogInfoWithColor(instructions[instructionIndex], consoleColor);
+				}
 			}
 		}
 

@@ -1,5 +1,7 @@
 ﻿using BepInEx.Logging;
+using HarmonyLib;
 using System;
+using System.CodeDom;
 using System.Runtime.CompilerServices;
 
 namespace Receiver2ModdingKit.Logging
@@ -11,6 +13,11 @@ namespace Receiver2ModdingKit.Logging
 			Logger.Sources.Add(this);
 		}
 
+		public ExtendedManualLogSource(string sourceName, ManualLogSource manualLogSource) : base(sourceName)
+		{
+			this.LogEvent = AccessTools.FieldRefAccess<ManualLogSource, EventHandler<LogEventArgs>>("LogEvent").Invoke(manualLogSource);
+		}
+
 		/// <inheritdoc />
 		public new event EventHandler<LogEventArgs> LogEvent;
 
@@ -19,7 +26,7 @@ namespace Receiver2ModdingKit.Logging
 		/// </summary>
 		/// <param name="level">Log levels to attach to the message. Multiple can be used with bitwise ORing.</param>
 		/// <param name="data">Data to log.</param>
-		public new void Log(LogLevel level, object data) => LogEvent?.Invoke(this, new LogEventArgs(data, level, this));
+		public new void Log(LogLevel level, object data) => base.Log(level, data);
 
 		public void LogWithColor(LogLevel level, object data, ConsoleColor color) => LogEvent?.Invoke(this, new ExtendedLogEventArgs(data, level, this, color));
 
@@ -108,5 +115,7 @@ namespace Receiver2ModdingKit.Logging
 		public void LogDebugWithColor(object data, ConsoleColor color) => LogWithColor(LogLevel.Debug, data, color);
 
 		public void LogDebugWithLevelName(object data, string levelName) => LogEvent?.Invoke(this, new ExtendedLogEventArgs(data, LogLevel.Debug, this, levelName));
+
+
 	}
 }

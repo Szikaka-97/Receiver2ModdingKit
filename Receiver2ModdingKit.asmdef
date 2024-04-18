@@ -16,7 +16,8 @@
         "Wolfire.dll",
         "Rewired_Core.dll",
         "UnityEngine.UI.dll",
-        "Unity.TextMeshPro.dll"
+        "Unity.TextMeshPro.dll",
+        "MonoMod.Utils.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],
