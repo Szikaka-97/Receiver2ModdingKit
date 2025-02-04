@@ -82,6 +82,7 @@ namespace Receiver2ModdingKit {
 		public bool visible_in_spawnmenu = true;
 		public bool spawns_in_dreaming = true;
 		public float magazine_shake_strength_multiplier = 1;
+		public float slide_return_time = 0.04f;
 		public ModHelpEntry help_entry;
 		public ModLocaleTactics locale_tactics;
 
@@ -475,6 +476,13 @@ namespace Receiver2ModdingKit {
 		}
 
 		/// <summary>
+		/// Can the gun be holstered at the moment
+		/// </summary>
+		public new virtual bool CanHolster() {
+			return !(this.magazine_instance_in_gun != null) || this.magazine.amount == 0f;
+		}
+
+		/// <summary>
 		/// Execute the method after the weapon is holstered but not dropped
 		/// </summary>
 		public virtual void OnHolster() { }
@@ -498,6 +506,18 @@ namespace Receiver2ModdingKit {
 		/// A method invoked every frame when the gun is active after the full GunScript.Update is performed. Useful for things dependent on slide position
 		/// </summary>
 		public virtual void LateUpdateGun() {}
+
+		public virtual float GetSlideReturnTime() {
+			return this.slide_return_time;
+		}
+
+		public static float CalculateSlideAcceleration(GunScript __instance, float change, float time) {
+			if (__instance is ModGunScript) {
+				time = (__instance as ModGunScript).GetSlideReturnTime();
+			}
+
+			return 2f * change / (time*time);
+		}
 
 		public override string TypeName() { return "ModGunScript"; }
 

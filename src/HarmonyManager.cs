@@ -70,6 +70,16 @@ namespace Receiver2ModdingKit {
 				// return codeMatcher.InstructionEnumeration();
 			}
 
+			[HarmonyPatch(typeof(GunScript), "UpdateSlide")]
+			[HarmonyTranspiler]
+			private static IEnumerable<CodeInstruction> GunScriptSlideTranspiler(IEnumerable<CodeInstruction> instructions) {
+				return new SmartCodeMatcher(instructions)
+				.MatchForward(false, 
+					new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(GunScript), "AccelFromChangeAndTime"))
+				).SetOperandAndAdvance(AccessTools.Method(typeof(ModGunScript), nameof(ModGunScript.CalculateSlideAcceleration)))
+				.InstructionEnumeration();
+			}
+
 			[HarmonyPatch(typeof(RuntimeTileLevelGenerator), nameof(RuntimeTileLevelGenerator.PopulateItems))]
 			[HarmonyTranspiler]
 			private static IEnumerable<CodeInstruction> PopulateItemsTranspiler(IEnumerable<CodeInstruction> instructions) {
@@ -313,6 +323,18 @@ namespace Receiver2ModdingKit {
 		#endregion
 
 		#region General Patches
+
+		[HarmonyPatch(typeof(GunScript), nameof(GunScript.CanHolster))]
+		[HarmonyPrefix]
+		private static bool PatchGunHolster(GunScript __instance, ref bool __result) {
+			if (__instance is ModGunScript) {
+				__result = ((ModGunScript) __instance).CanHolster();
+
+				return false;
+			}
+
+			return true;
+		}
 
 		[HarmonyPatch(typeof(MagazineScript), "UpdateRoundPositions")]
 		[HarmonyPostfix]
