@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
 using Receiver2;
@@ -564,14 +563,18 @@ namespace Receiver2ModdingKit {
 		// Serialization shenanigans
 		// BepInEx injected classes don't get serialized correctly, this is an attempt to remedy it
 		public void OnBeforeSerialize() {
-			this.help_entry_generate = help_entry.generate;
-			this.help_entry_name = help_entry.name;
-			this.help_entry_info_sprite = help_entry.info_sprite;
-			this.help_entry_title = help_entry.title;
-			this.help_entry_description = help_entry.description;
+			if (this.help_entry != null) {
+				this.help_entry_generate = help_entry.generate;
+				this.help_entry_name = help_entry.name;
+				this.help_entry_info_sprite = help_entry.info_sprite;
+				this.help_entry_title = help_entry.title;
+				this.help_entry_description = help_entry.description;
+			}
 
-			this.locale_tactics_title = locale_tactics.title;
-			this.locale_tactics_description = locale_tactics.description;
+			if (this.locale_tactics != null) {
+				this.locale_tactics_title = locale_tactics.title;
+				this.locale_tactics_description = locale_tactics.description;
+			}
 		}
 
 		public void OnAfterDeserialize() {

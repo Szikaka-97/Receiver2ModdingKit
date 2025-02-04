@@ -1,94 +1,40 @@
-using System.IO;
+using Receiver2ModdingKit.Assets.HeaderStructs;
 
 namespace Receiver2ModdingKit.Assets {
 	public class AssetInfo {
-		public AssetFileHeader header {
-			get;
-			private set;
-		}
+		public ObjectStruct backing_object;
+		public TypeStruct backing_type;
+		public long absolute_start;
 
-		public long path_id {
-			get;
-			private set;
-		}
+		public string name;
+		public uint total_size;
+		public AssetInfo[] dependencies;
+		public AssetDataReference[] references;
 
-		public uint start_offset {
-			get;
-			private set;
-		}
+		public void AddReferences(params AssetDataReference[] references_to_add) {
+			if (this.references == null) {
+				this.references = references_to_add;
 
-		public uint size {
-			get;
-			private set;
-		}
+				for (int i = 0; i < this.references.Length; i++) {
+					this.total_size += (uint) references_to_add[i].size;
+				}
 
-		public int type_index {
-			get;
-			private set;
-		}
-
-		public string name {
-			get;
-			set;
-		}
-
-		public AssetReferencePair[] dependencies_paths {
-			get;
-			set;
-		}
-
-		public AssetInfo[] dependencies {
-			get;
-			private set;
-		}
-
-		public StreamingInfo StreamingData {
-			get;
-			set;
-		}
-
-		public static AssetInfo FromObjectStruct(HeaderStructs.ObjectStruct obj, AssetFileHeader header) {
-			return new AssetInfo() {
-				path_id = obj.path_id,
-				start_offset = obj.start_offset,
-				size = obj.size_bytes,
-				type_index = obj.type_id,
-				header = header
-			};
-		}
-
-		public FileEncoder GetEncoder() {
-			if (this.header == null) {
-				return null;
+				return;
 			}
 
-			var encoder = 
-				(this.header.file_stream != null && this.header.file_stream.BackingStream.CanRead)
-				? this.header.file_stream.Clone()
-				: new FileEncoder(this.header.file_name, true, FileEncoder.Endianness.LittleEndian);
+			var new_references = new AssetDataReference[this.references.Length + references_to_add.Length];
 
-			encoder.Position = this.GetAbsoluteOffset();
-
-			return encoder;
-		}
-
-		public uint GetAbsoluteOffset() {
-			if (this.header == null) {
-				return this.start_offset;
+			for (int i = 0; i < this.references.Length; i++) {
+				new_references[i] = this.references[i];
 			}
 
-			return this.header.data_offset + this.start_offset;
-		}
+			for (int i = 0; i < references_to_add.Length; i++) {
+				new_references[this.references.Length + i] = references_to_add[i];
 
-		public HeaderStructs.TypeStruct GetTypeStruct() {
-			return this.header.Types[this.type_index];
-		}
+				this.total_size += (uint) references_to_add[i].size;
+			}
 
-		public byte[] GetBinaryData() {
-#warning fuck
-			var encoder = this.GetEncoder();
-
-			return encoder.ReadBytes(this.size);
+			this.references = new_references;
 		}
 	}
 }

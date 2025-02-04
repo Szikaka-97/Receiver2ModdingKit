@@ -3,12 +3,13 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Receiver2ModdingKit.Assets {
 	public class FileEncoder {
 		public enum Endianness {
+			LittleEndian,
 			BigEndian,
-			LittleEndian
 		}
 
 		public Stream BackingStream {
@@ -22,6 +23,18 @@ namespace Receiver2ModdingKit.Assets {
 		public bool CanWrite {
 			get;
 			private set;
+		}
+
+#warning Prepare some type of exception for crossing the limit
+		public long PositionLimit {
+			get;
+			set;
+		} = -1;
+
+		public bool IsLimited {
+			get {
+				return PositionLimit >= 0;
+			}
 		}
 
 		public long Position {
@@ -63,6 +76,10 @@ namespace Receiver2ModdingKit.Assets {
 
 		private T GetNumber<T>() where T : struct {
 			int count = Marshal.SizeOf<T>();
+
+			if (this.IsLimited && this.Position + count > this.PositionLimit) {
+				throw new Exception("Stream position out of assigned limit (" + this.Position + count + " > " + this.PositionLimit +")");
+			}
 
 			byte[] bytes = new byte[count];
 
@@ -126,13 +143,22 @@ namespace Receiver2ModdingKit.Assets {
 				result.Append((char) current_byte);
 				
 				current_byte = this.BackingStream.ReadByte();
+
+				if (this.IsLimited && this.Position > this.PositionLimit) {
+					throw new Exception("Stream position out of assigned limit");
+				}
 			}
+
 
 			return result.ToString();
 		}
 
 		public string ReadStringWithPrefix() {
 			int length = GetNumber<int>();
+
+			if (this.IsLimited && this.Position + length > this.PositionLimit) {
+				throw new Exception("Stream position out of assigned limit");
+			}
 
 			StringBuilder result = new StringBuilder(length);
 
@@ -146,6 +172,10 @@ namespace Receiver2ModdingKit.Assets {
 		}
 
 		public byte[] ReadBytes(uint count) {
+			if (this.IsLimited && this.Position + count > this.PositionLimit) {
+				throw new Exception("Stream position out of assigned limit");
+			}
+
 			byte[] buffer = new byte[count];
 
 			this.BackingStream.Read(buffer, 0, (int) count);
@@ -155,25 +185,23 @@ namespace Receiver2ModdingKit.Assets {
 #endregion
 
 #region Write
-
 		private void WriteNumber<T>(T item) where T : struct {
 			if (!this.CanWrite) {
 				return;
 			}
 
-			long buffer = (long)(object) item;
+			long buffer = Convert.ToInt64(item);
 
 			int count = Marshal.SizeOf<T>();
 
 			byte[] bytes = new byte[count];
 
-			if (this.Endian == Endianness.BigEndian) {
-				for (int i = count - 1; i >= 0; i--) {
-					bytes[i] = (byte) (buffer >> (8 * i));
+
+			for (int i = 0; i < count; i++) {
+				if (this.Endian == Endianness.BigEndian) {
+					bytes[count - 1 - i] = (byte) (buffer >> (8 * i));
 				}
-			}
-			else {
-				for (int i = 0; i < count; i++) {
+				else {
 					bytes[i] = (byte) (buffer >> (8 * i));
 				}
 			}
@@ -224,7 +252,8 @@ namespace Receiver2ModdingKit.Assets {
 		}
 
 		public FileEncoder WriteBool(bool value) {
-			WriteNumber(value);
+			// Bools are 4 bytes long for some reason
+			WriteNumber<byte>(Convert.ToByte(value));
 
 			return this;
 		}
@@ -287,6 +316,15 @@ namespace Receiver2ModdingKit.Assets {
 		public FileEncoder Clone() {
 			var clone = new FileEncoder(this.BackingStream, this.CanWrite, this.Endian) {
 				Position = this.Position
+			};
+
+			return clone;
+		}
+
+		public FileEncoder LimitedClone(long start, uint length) {
+			var clone = new FileEncoder(this.BackingStream, this.CanWrite, this.Endian) {
+				Position = start,
+				PositionLimit = start + length
 			};
 
 			return clone;

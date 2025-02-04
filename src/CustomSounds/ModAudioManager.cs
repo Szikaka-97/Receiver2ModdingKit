@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
@@ -9,7 +8,6 @@ using FMODUnity;
 using ImGuiNET;
 using Receiver2;
 using Receiver2ModdingKit.Editor;
-using System.Linq;
 using HarmonyLib;
 
 namespace Receiver2ModdingKit.CustomSounds {
