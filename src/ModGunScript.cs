@@ -519,6 +519,14 @@ namespace Receiver2ModdingKit {
 			return 2f * change / (time*time);
 		}
 
+		internal static float CalculateSlideAccelerationTime(GunScript __instance, float change, float time) {
+			if (__instance is ModGunScript) {
+				time = (__instance as ModGunScript).GetSlideReturnTime();
+			}
+
+			return (2f * change / (time*time)) * time;
+		}
+
 		public override string TypeName() { return "ModGunScript"; }
 
 		/// <summary>

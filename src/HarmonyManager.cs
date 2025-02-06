@@ -77,6 +77,10 @@ namespace Receiver2ModdingKit {
 				.MatchForward(false, 
 					new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(GunScript), "AccelFromChangeAndTime"))
 				).SetOperandAndAdvance(AccessTools.Method(typeof(ModGunScript), nameof(ModGunScript.CalculateSlideAcceleration)))
+				.MatchForward(false, 
+					new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(GunScript), "AccelFromChangeAndTime"))
+				).SetOperandAndAdvance(AccessTools.Method(typeof(ModGunScript), nameof(ModGunScript.CalculateSlideAccelerationTime)))
+				.RemoveInstructions(2)
 				.InstructionEnumeration();
 			}
 
