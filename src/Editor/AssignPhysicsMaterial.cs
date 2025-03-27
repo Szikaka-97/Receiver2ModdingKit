@@ -14,6 +14,8 @@ namespace Receiver2ModdingKit.Editor
 
 		public Receiver2PhysicsMaterials physicsMaterial;
 
+		private static PhysicsMaterialManager physicsMaterialManager;
+
 		private void Awake()
 		{
 			if (colliderToModify == null) colliderToModify = GetComponent<Collider>(); //in case there's only one collider and you can't be bothered
@@ -27,7 +29,8 @@ namespace Receiver2ModdingKit.Editor
 		{
 			PhysicMaterial physicMaterial = null;
 
-			var physicsMaterialManager = Object.FindObjectOfType<PhysicsMaterialManager>();
+			if (!physicsMaterialManager)
+				physicsMaterialManager = Object.FindObjectOfType<PhysicsMaterialManager>();
 
 			switch (receiver2PhysicsMaterials)
 			{

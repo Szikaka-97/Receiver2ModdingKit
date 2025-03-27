@@ -16,6 +16,9 @@ namespace Receiver2ModdingKit {
 	public static class Extensions {
 		internal static JSONObject current_gun_data;
 		internal static bool lah_force_bullet_display;
+		internal static bool unlock_cursor;
+		internal static bool confine_cursor;
+		internal static bool freeze_camera_rotation;
 
 		internal static Type konType = null;
 
@@ -93,6 +96,12 @@ namespace Receiver2ModdingKit {
 
 		public static void ShowBullets(this LocalAimHandler lah, bool show_bullets) {
 			lah_force_bullet_display = show_bullets;
+		}
+
+		public static void ForceCursorUnlock(bool unlock, bool confine)
+		{
+			unlock_cursor = unlock;
+			confine_cursor = confine;
 		}
 
 		/// <summary>

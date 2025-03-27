@@ -383,6 +383,36 @@ namespace Receiver2ModdingKit {
 			}
 		}
 
+		[HarmonyPatch(typeof(MenuManagerScript), "Update")]
+		[HarmonyPostfix]
+		private static void ForceCursorState()
+		{
+			if (Extensions.unlock_cursor)
+			{
+				Cursor.visible = true;
+				Cursor.lockState = (Extensions.confine_cursor ? CursorLockMode.Confined : CursorLockMode.None);
+			}
+		}
+
+		/*[HarmonyPatch(typeof(LocalAimHandler), nameof(LocalAimHandler.UpdateCameraRotationControls))]
+		[HarmonyTranspiler]
+		private static IEnumerable<CodeInstruction> AddFreezeGunCondition(IEnumerable<CodeInstruction> instructions)
+		{
+			var br = new SmartCodeMatcher(instructions)
+			.MatchForward(true,
+			new CodeMatch(OpCodes.Ldarg_0),
+			new CodeMatch(OpCodes.Ldarg_0),
+			new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(LocalAimHandler), "inspect_rotation_y")),
+			new CodeMatch(OpCodes.Ldc_R4, -70),
+			new CodeMatch(OpCodes.Ldc_R4, 70),
+			new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(Mathf), nameof(Mathf.Clamp), new Type[] { typeof(float), typeof(float), typeof(float) })),
+			new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(LocalAimHandler), "inspect_rotation_y")),
+			new CodeMatch(OpCodes.Br)
+			).Instruction.operand;
+
+
+		}*/
+
 		[HarmonyPatch(typeof(MagazineScript), "UpdateRoundPositions")]
 		[HarmonyPostfix]
 		private static void PatchMagazineRoundPositions(ref MagazineScript __instance) {

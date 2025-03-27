@@ -15,7 +15,7 @@ namespace Receiver2ModdingKit.Helpers {
     public static class CodeMatcherExtensions {
 
 		static AccessTools.FieldRef<CodeMatcher, ILGenerator> codeMatcherILGeneratorField = AccessTools.FieldRefAccess<CodeMatcher, ILGenerator>("generator");
-		static AccessTools.FieldRef<object ,CecilILGenerator> ilGeneratorMethodInfoField; //It's not actually an ILGenerator, it's an ILGeneratorProxy, which is a class that is generated at runtime for some ungodly reason, so you also have to do it a runtime, isn't it great? I love my wife.
+		static AccessTools.FieldRef<object, CecilILGenerator> ilGeneratorMethodInfoField; //It's not actually an ILGenerator, it's an ILGeneratorProxy, which is a class that is generated at runtime for some ungodly reason, so you also have to do it a runtime, isn't it great? I love my wife.
 
 		public static void Print(this CodeMatcher matcher, ManualLogSource logger = null, ConsoleColor consoleColor = ConsoleColor.Gray)
 		{
