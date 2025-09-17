@@ -72,6 +72,20 @@ namespace Receiver2ModdingKit {
 				// return codeMatcher.InstructionEnumeration();
 			}
 
+			[HarmonyPatch(typeof(GunScript), "UpdateSlide")]
+			[HarmonyTranspiler]
+			private static IEnumerable<CodeInstruction> GunScriptSlideTranspiler(IEnumerable<CodeInstruction> instructions) {
+				return new SmartCodeMatcher(instructions)
+				.MatchForward(false, 
+					new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(GunScript), "AccelFromChangeAndTime"))
+				).SetOperandAndAdvance(AccessTools.Method(typeof(ModGunScript), nameof(ModGunScript.CalculateSlideAcceleration)))
+				.MatchForward(false, 
+					new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(GunScript), "AccelFromChangeAndTime"))
+				).SetOperandAndAdvance(AccessTools.Method(typeof(ModGunScript), nameof(ModGunScript.CalculateSlideAccelerationTime)))
+				.RemoveInstructions(2)
+				.InstructionEnumeration();
+			}
+
 			[HarmonyPatch(typeof(RuntimeTileLevelGenerator), nameof(RuntimeTileLevelGenerator.PopulateItems))]
 			[HarmonyTranspiler]
 			private static IEnumerable<CodeInstruction> PopulateItemsTranspiler(IEnumerable<CodeInstruction> instructions) {
@@ -359,28 +373,17 @@ namespace Receiver2ModdingKit {
 
 		#region General Patches
 
-		internal static class GetConsoleColorPatch
-		{
-			internal static ConsoleColor consoleColor;
+		[HarmonyPatch(typeof(GunScript), nameof(GunScript.CanHolster))]
+		[HarmonyPrefix]
+		private static bool PatchGunHolster(GunScript __instance, ref bool __result) {
+			if (__instance is ModGunScript) {
+				__result = ((ModGunScript) __instance).CanHolster();
 
-			[HarmonyPatch(typeof(LogLevelExtensions), nameof(LogLevelExtensions.GetConsoleColor))]
-			[HarmonyPostfix]
-			internal static void ChangeGetColorResult(ref ConsoleColor __result)
-			{
-				__result = consoleColor;
+				return false;
 			}
 		}
 
-		internal static class LogEventArgsToStringPatch
-		{
-			internal static string levelName;
-
-			[HarmonyPatch(typeof(LogEventArgs), nameof(LogEventArgs.ToString))]
-			[HarmonyPostfix]
-			internal static void ChangeLogEventArgsLevel(LogEventArgs __instance, ref string __result)
-			{
-				__result = string.Format("[{0,-7}:{1,10}] {2}", levelName, __instance.Source.SourceName, __instance.Data);
-			}
+			return true;
 		}
 
 		[HarmonyPatch(typeof(MenuManagerScript), "Update")]

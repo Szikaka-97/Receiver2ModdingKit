@@ -6,75 +6,75 @@ using UnityEditor.IMGUI.Controls;
 using Receiver2;
 
 namespace Receiver2ModdingKit.Editor {
-    [CustomEditor(typeof(PegboardHanger))]
-    public class PegboardHangerEditor : UnityEditor.Editor{
-        private BoxBoundsHandle box = new BoxBoundsHandle();
-        private float scale = 1;
+	[CustomEditor(typeof(PegboardHanger))]
+	public class PegboardHangerEditor : UnityEditor.Editor{
+		private BoxBoundsHandle box = new BoxBoundsHandle();
+		private float scale = 1;
 
-        private float BoundsVolume(Bounds bounds) {
-            return bounds.size.x * bounds.size.y * bounds.size.z;
-        }
+		private float BoundsVolume(Bounds bounds) {
+			return bounds.size.x * bounds.size.y * bounds.size.z;
+		}
 
-        public override void OnInspectorGUI() {
-            serializedObject.Update();
+		public override void OnInspectorGUI() {
+			serializedObject.Update();
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("bounds"));
+			EditorGUILayout.PropertyField(serializedObject.FindProperty("bounds"));
 
-            GUILayout.Space(20);
+			GUILayout.Space(20);
 
-            if (GUILayout.Button("From Renderers")) {
-                Bounds new_bounds = new Bounds();
+			if (GUILayout.Button("From Renderers")) {
+				Bounds new_bounds = new Bounds();
 
-                GameObject hangable_item = (serializedObject.targetObject as PegboardHanger).gameObject;
+				GameObject hangable_item = (serializedObject.targetObject as PegboardHanger).gameObject;
 
-                while (hangable_item.GetComponent<PegboardHangableItem>() == null) {
-                    hangable_item = hangable_item.transform.parent.gameObject;
-                }
+				while (hangable_item.GetComponent<PegboardHangableItem>() == null) {
+					hangable_item = hangable_item.transform.parent.gameObject;
+				}
 
-                foreach (var renderer in hangable_item.GetComponentsInChildren<MeshRenderer>()) {
-                    if (BoundsVolume(renderer.bounds) > 0.5) {
-                        Debug.Log("Bounds of renderer " + renderer.name + " are very large, maybe you should use a SkinnedMeshRenderer and set them manually?");
-                    }
-                    
-                    new_bounds.Encapsulate(renderer.bounds);
-                }
+				foreach (var renderer in hangable_item.GetComponentsInChildren<MeshRenderer>()) {
+					if (BoundsVolume(renderer.bounds) > 0.5) {
+						Debug.Log("Bounds of renderer " + renderer.name + " are very large, maybe you should use a SkinnedMeshRenderer and set them manually?");
+					}
+					
+					new_bounds.Encapsulate(renderer.bounds);
+				}
 
-                // new_bounds.center = new_bounds.center - (target as PegboardHanger).transform.position;
+				// new_bounds.center = new_bounds.center - (target as PegboardHanger).transform.position;
 
-                new_bounds.size = new_bounds.size * scale;
+				new_bounds.size = new_bounds.size * scale;
 
-                // if (new_bounds.size.x > new_bounds.size.z) {
-                //     new_bounds.size = new Vector3(new_bounds.size.x, new_bounds.size.y, new_bounds.size.x);
-                // }
-                // else {
-                //     new_bounds.size = new Vector3(new_bounds.size.z, new_bounds.size.y, new_bounds.size.z);
-                // }
+				// if (new_bounds.size.x > new_bounds.size.z) {
+				//     new_bounds.size = new Vector3(new_bounds.size.x, new_bounds.size.y, new_bounds.size.x);
+				// }
+				// else {
+				//     new_bounds.size = new Vector3(new_bounds.size.z, new_bounds.size.y, new_bounds.size.z);
+				// }
 
-                serializedObject.FindProperty("bounds").boundsValue = new_bounds;
-            }
+				serializedObject.FindProperty("bounds").boundsValue = new_bounds;
+			}
 
-            scale = EditorGUILayout.FloatField("Expansion:", scale);
+			scale = EditorGUILayout.FloatField("Expansion:", scale);
 
-            serializedObject.ApplyModifiedProperties();
-        }
+			serializedObject.ApplyModifiedProperties();
+		}
 
-        protected void OnSceneGUI() {
-            box.center = serializedObject.FindProperty("bounds").boundsValue.center;
-            box.size = serializedObject.FindProperty("bounds").boundsValue.size;
+		protected void OnSceneGUI() {
+			box.center = serializedObject.FindProperty("bounds").boundsValue.center;
+			box.size = serializedObject.FindProperty("bounds").boundsValue.size;
 
-            EditorGUI.BeginChangeCheck();
+			EditorGUI.BeginChangeCheck();
 
-            box.DrawHandle();
+			box.DrawHandle();
 
-            if (EditorGUI.EndChangeCheck()) {
-                Bounds new_bounds = new Bounds(box.center, box.size);
+			if (EditorGUI.EndChangeCheck()) {
+				Bounds new_bounds = new Bounds(box.center, box.size);
 
-                serializedObject.FindProperty("bounds").boundsValue = new_bounds;
+				serializedObject.FindProperty("bounds").boundsValue = new_bounds;
 
-                serializedObject.ApplyModifiedProperties();
-            }
-        }
-    }
+				serializedObject.ApplyModifiedProperties();
+			}
+		}
+	}
 }
 
 #endif

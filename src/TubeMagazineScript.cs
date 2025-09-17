@@ -219,16 +219,15 @@ namespace Receiver2ModdingKit {
 				}
 			}
 
-			for (int round_index = first_round_index; round_index < round_count; round_index++) {
-				rounds_array[round_index].transform.localPosition = Vector3.forward * (this.cartridge_length * round_index + offset);
+			Vector3 end_pos = this.first_round_position.position + this.transform.forward * offset;
+
+			foreach (var round in rounds_array) {
+				round.transform.position = end_pos;
+
+				end_pos += this.transform.forward * this.cartridge_length;
 			}
 
-			if (this.round_count == 0 || (this.round_count == 1 && offset <= -this.cartridge_length)) {
-				this.follower.localPosition = Vector3.MoveTowards(this.follower.localPosition, this.orig_follower_position, Time.deltaTime / this.round_remove_time);
-			}
-			else {
-				this.follower.position = this.first_round_position.TransformPoint(Vector3.forward * (this.cartridge_length * (this.round_count - 1) + offset + this.follower_offset));
-			}
+			this.follower.position = end_pos + this.transform.forward * this.follower_offset;
 		}
 
 		private void Update() {

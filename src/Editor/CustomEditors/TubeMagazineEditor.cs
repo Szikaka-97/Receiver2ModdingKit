@@ -90,7 +90,7 @@ namespace Receiver2ModdingKit.Editor {
 					index = IndexOf(current_insert_animation, gun_animations);
 				}
 
-				index = EditorGUILayout.Popup("Remove animation", index, gun_animations);
+				index = EditorGUILayout.Popup("Insert round animation", index, gun_animations);
 
 				serializedObject.FindProperty("insert_round_animation_path").stringValue = index != 0 ? gun_animations[index] : "";
 
@@ -100,7 +100,7 @@ namespace Receiver2ModdingKit.Editor {
 					index = IndexOf(current_remove_animation, gun_animations);
 				}
 
-				index = EditorGUILayout.Popup("Remove animation", index, gun_animations);
+				index = EditorGUILayout.Popup("Remove round animation", index, gun_animations);
 
 				serializedObject.FindProperty("remove_round_animation_path").stringValue = index != 0 ? gun_animations[index] : "";
 			}

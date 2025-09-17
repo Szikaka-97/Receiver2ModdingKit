@@ -166,6 +166,8 @@ namespace Receiver2ModdingKit.Editor {
 					mover_property.FindPropertyRelative("component_name").stringValue = animated_mover.component_name;
 				}
 			}
+
+			serialized_gun.ApplyModifiedProperties();
 		}        
 
 		private void PopulateGunPartMaterials() {

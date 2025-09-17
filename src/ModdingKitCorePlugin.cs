@@ -6,10 +6,9 @@ using TMPro;
 using BepInEx;
 using Receiver2;
 using Receiver2ModdingKit.ModInstaller;
-using Receiver2ModdingKit.Assets;
 
 namespace Receiver2ModdingKit {
-#if false
+#if UNITY_EDITOR
 	public class ModdingKitCorePlugin : MonoBehaviour {
 		public static ModdingKitCorePlugin instance {
 			get;
@@ -25,7 +24,6 @@ namespace Receiver2ModdingKit {
 
 			try {
 				ReflectionManager.Initialize();
-			} catch (ReflectionManager.MissingFieldException e) {
 			} catch (MissingFieldException e) {
 				Debug.LogError(e);
 			}
@@ -123,7 +121,7 @@ namespace Receiver2ModdingKit {
 			}
 
 			ModdingKitEvents.AddTaskAtCoreStartup( () => {
-				AssetDomain.Create(@"D:\Gry\Steam\steamapps\common\Receiver 2\Receiver2_Data");
+				// AssetDomain.Create(@"D:\Gry\Steam\steamapps\common\Receiver 2\Receiver2_Data");
 			} );
 
 			try {
