@@ -95,9 +95,18 @@ namespace Receiver2ModdingKit.CustomSounds {
 		[HarmonyPatch(typeof(FMOD.Studio.System), "getEventByID")]
 		[HarmonyPostfix]
 		private static RESULT PatchGetEventByID(RESULT __result, FMOD.Studio.System __instance, Guid id, ref EventDescription _event) {
-			if (!ModAudioManager.mod_system.isValid() || ModAudioManager.mod_system.handle == __instance.handle) return __result;
+			var isValid = !ModAudioManager.mod_system.isValid();
 
-			if (__result == RESULT.ERR_EVENT_NOTFOUND) {
+			var isSameHandleAAAAAAAAAA = ModAudioManager.mod_system.handle == __instance.handle;
+
+			if (isValid || isSameHandleAAAAAAAAAA)
+			{
+				return __result;
+			}
+
+			var isEventNotFound = __result == RESULT.ERR_EVENT_NOTFOUND;
+
+			if (isEventNotFound) {
 				__result = ModAudioManager.mod_system.getEventByID(id, out _event);
 			}
 
