@@ -221,7 +221,11 @@ namespace Receiver2ModdingKit {
 
 			Vector3 end_pos = this.first_round_position.position + this.transform.forward * offset;
 
-			foreach (var round in rounds_array) {
+			end_pos += this.transform.forward * this.cartridge_length * first_round_index;
+
+			for (int i = first_round_index; i < rounds_array.Length; i++) {
+				var round = rounds_array[i];
+
 				round.transform.position = end_pos;
 
 				end_pos += this.transform.forward * this.cartridge_length;
@@ -252,12 +256,18 @@ namespace Receiver2ModdingKit {
 				return false;
 			}
 
-			round.Move(this.slot);
+			if (LocalAimHandler.TryGetInstance(out var lah)) {
+				lah.MoveInventoryItem(round, this.slot);
+			}
+			else {
+				round.Move(this.slot);
+			}
 
 			this.rounds.Push(round);
 
 			round.transform.SetParent(this.first_round_position);
 
+			round.transform.localScale = Vector3.one;
 			round.transform.localPosition = Vector3.zero;
 			round.transform.localRotation = Quaternion.identity;
 
