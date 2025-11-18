@@ -260,6 +260,7 @@ namespace Receiver2ModdingKit {
 
 			round.transform.localPosition = Vector3.zero;
 			round.transform.localRotation = Quaternion.identity;
+			round.transform.localScale = Vector3.one;
 
 			if (this.gun != null && !string.IsNullOrWhiteSpace(this.insert_round_animation_path)) {
 				this.gun.ApplyTransform(this.insert_round_animation_path, 0, round.transform);

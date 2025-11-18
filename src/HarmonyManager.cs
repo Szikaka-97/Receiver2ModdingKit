@@ -376,12 +376,11 @@ namespace Receiver2ModdingKit {
 		[HarmonyPatch(typeof(GunScript), nameof(GunScript.CanHolster))]
 		[HarmonyPrefix]
 		private static bool PatchGunHolster(GunScript __instance, ref bool __result) {
-			if (__instance is ModGunScript) {
-				__result = ((ModGunScript) __instance).CanHolster();
+			if (__instance is ModGunScript script) {
+				__result = script.CanHolster();
 
 				return false;
 			}
-		}
 
 			return true;
 		}
@@ -793,7 +792,7 @@ namespace Receiver2ModdingKit {
 			}
 		}
 
-	// Maybe later
+		// Maybe later
 		// [HarmonyPatch(typeof(ReceiverCoreScript), "SpawnPlayer")]
 		// [HarmonyPostfix]
 		// private static void PatchStartIntro(ReceiverCoreScript __instance) {
@@ -819,7 +818,7 @@ namespace Receiver2ModdingKit {
 		// 			if (replacement_gun.two_handed) {
 		// 				gun_position += Vector3.up * 0.5f;
 		// 			}
-					
+
 		// 			UnityEngine.Object.DestroyImmediate(gun.gameObject);
 
 		// 			UnityEngine.Object.Instantiate(replacement_gun, gun_position, gun_rotation, tile_with_gun.transform).Move(null);
@@ -828,6 +827,30 @@ namespace Receiver2ModdingKit {
 		// }
 
 		#endregion
+
+		internal static class GetConsoleColorPatch
+		{
+			internal static ConsoleColor consoleColor;
+
+			[HarmonyPatch(typeof(LogLevelExtensions), nameof(LogLevelExtensions.GetConsoleColor))]
+			[HarmonyPostfix]
+			internal static void ChangeGetColorResult(ref ConsoleColor __result)
+			{
+				__result = consoleColor;
+			}
+		}
+
+		internal static class LogEventArgsToStringPatch
+		{
+			internal static string levelName;
+
+			[HarmonyPatch(typeof(LogEventArgs), nameof(LogEventArgs.ToString))]
+			[HarmonyPostfix]
+			internal static void ChangeLogEventArgsLevel(LogEventArgs __instance, ref string __result)
+			{
+				__result = string.Format("[{0,-7}:{1,10}] {2}", levelName, __instance.Source.SourceName, __instance.Data);
+			}
+		}
 
 		internal static void UnpatchAll() {
 			foreach(var field in typeof(HarmonyInstances).GetFields()) {

@@ -88,7 +88,7 @@ namespace Receiver2ModdingKit.ModInstaller {
 				edited_asset.OperatingSystem = operating_systems[os_index];
 
 				edited_asset.GameVersion = ReceiverCoreScript.Instance().build_info.version;
-				edited_asset.ModdingKitVersion = ModdingKitCorePlugin.instance.Info.Metadata.Version.ToString();
+				edited_asset.ModdingKitVersion = PluginInfo.PLUGIN_VERSION;
 
 				if (ImGui.Button("Clear")) {
 					edited_asset = new ModInfoAsset();

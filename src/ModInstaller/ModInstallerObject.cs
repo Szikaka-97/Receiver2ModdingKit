@@ -172,9 +172,9 @@ namespace Receiver2ModdingKit.ModInstaller {
 
 			var modinfo = mod_dir_info.mod_info;
 
-			if (modinfo.ModdingKitVersion != ModdingKitCorePlugin.instance.Info.Metadata.Version.ToString()) {
+			if (modinfo.ModdingKitVersion != PluginInfo.PLUGIN_VERSION) {
 				if (prompt_result != null) {
-					if (prompt_result == true) modinfo.ModdingKitVersion = ModdingKitCorePlugin.instance.Info.Metadata.Version.ToString();
+					if (prompt_result == true) modinfo.ModdingKitVersion = PluginInfo.PLUGIN_VERSION;
 					else {
 						current_state = InstallerState.Finishing;
 						return;

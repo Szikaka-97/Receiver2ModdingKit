@@ -131,7 +131,7 @@ public class MultiOSBuild : PipelineJob
 
 		for (int buildNameIndex = 0; buildNameIndex < baseNames.Length; buildNameIndex++)
 		{
-			baseNames[buildNameIndex] = builds[buildNameIndex].assetBundleName;
+			baseNames[buildNameIndex] = Path.GetFileNameWithoutExtension(builds[buildNameIndex].assetBundleName);
 		}
 
 		for (int target = 0; target < 3; target++)
