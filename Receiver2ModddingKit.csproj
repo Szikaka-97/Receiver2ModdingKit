@@ -4,7 +4,7 @@
 		<TargetFramework>net46</TargetFramework>
 		<AssemblyName>Receiver2ModdingKit</AssemblyName>
 		<Description>Modding Kit Plugin for Receiver 2 Gun Mods</Description>
-		<Version>1.3.0</Version>
+		<Version>1.5.0</Version>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>latest</LangVersion>
 		<RootNamespace>Receiver2ModdingKit</RootNamespace>

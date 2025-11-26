@@ -29,7 +29,7 @@ namespace Receiver2ModdingKit.Thunderstore {
 		}
 
 		public static void Initialize() {
-			var cmd_args = Environment.GetCommandLineArgs();
+			var cmd_args = string.Join(" ", Environment.GetCommandLineArgs());
 
 			if (cmd_args.Length > 1) {
 				//Started with command line arguments, likely from r2modman
@@ -37,9 +37,8 @@ namespace Receiver2ModdingKit.Thunderstore {
 				int doorstop_arg_index = 0;
 
 				if (
-					(doorstop_arg_index = Array.FindIndex(cmd_args, arg => arg == "--doorstop-enable")) >= 0
-					&&
-					doorstop_arg_index < cmd_args.Length && cmd_args[doorstop_arg_index + 1] == "true"
+					//UnityDoorstop 3.0 uses --doorstop-enable, 4.0 uses --doorstop-enabled
+					cmd_args.Contains("--doorstop-enable true") || cmd_args.Contains("--doorstop-enabled true")
 				) {
 					m_launched_with_r2mm = true;
 				}

@@ -31,7 +31,7 @@ namespace Receiver2ModdingKit {
 	}
 
 #else
-	[BepInPlugin("pl.szikaka.receiver_2_modding_kit", "Receiver 2 Modding Kit", "1.4.0")]
+	[BepInPlugin("pl.szikaka.receiver_2_modding_kit", "Receiver 2 Modding Kit", "1.5.0")]
 	[BepInProcess("Receiver2")]
 	public class ModdingKitCorePlugin : BaseUnityPlugin {
 		public static ModdingKitCorePlugin instance {
@@ -95,6 +95,15 @@ namespace Receiver2ModdingKit {
 
 		private void Awake() {
 			instance = this;
+
+			foreach (Type type in typeof(BepInPlugin).Assembly.GetTypes()) //needs to be at beginning, other the Kon won't get assigned until later
+			{
+				if (type.FullName == "BepInEx.ConsoleUtil.Kon")
+				{
+					Extensions.konType = type;
+					break;
+				}
+			}
 
 			try {
 				if (Thunderstore.Thunderstore.LaunchedWithR2ModMan) {

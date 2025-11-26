@@ -4,9 +4,96 @@ using UnityEngine;
 using HarmonyLib;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using System.Linq;
+using BepInEx.Logging;
+using System.Runtime.CompilerServices;
+using System.Reflection.Emit;
+using Receiver2;
+using MonoMod.Utils.Cil;
 
 namespace Receiver2ModdingKit.Helpers {
     public static class CodeMatcherExtensions {
+
+		static AccessTools.FieldRef<CodeMatcher, ILGenerator> codeMatcherILGeneratorField = AccessTools.FieldRefAccess<CodeMatcher, ILGenerator>("generator");
+		static AccessTools.FieldRef<object, CecilILGenerator> ilGeneratorMethodInfoField; //It's not actually an ILGenerator, it's an ILGeneratorProxy, which is a class that is generated at runtime for some ungodly reason, so you also have to do it a runtime, isn't it great? I love my wife.
+
+		public static void Print(this CodeMatcher matcher, ManualLogSource logger = null, ConsoleColor consoleColor = ConsoleColor.Gray)
+		{
+			var instructions = matcher.InstructionEnumeration().ToArray();
+
+			var ilGen = codeMatcherILGeneratorField.Invoke(matcher);
+
+			if (ilGen != null)
+			{
+				if (ilGeneratorMethodInfoField == null) ilGeneratorMethodInfoField = AccessTools.FieldRefAccess<CecilILGenerator>(ilGen.GetType(), "Target");
+
+				var methodInfo = ilGeneratorMethodInfoField.Invoke(ilGen).IL.Body.Method;
+
+				if (methodInfo != null)
+				{
+					string pattern = "------ " + methodInfo.Name + " ------";
+
+					if (logger == null)
+					{
+						Debug.Log("");
+						Debug.Log(pattern);
+						Debug.Log("");
+					}
+					else
+					{
+						logger.LogInfoWithColor("", consoleColor);
+						logger.LogInfoWithColor(pattern, consoleColor);
+						logger.LogInfoWithColor("", consoleColor);
+					}
+				}
+			}
+
+			for (int instructionIndex = 0; instructionIndex < instructions.Length; instructionIndex++)
+			{
+				if (logger == null)
+				{
+					Debug.Log(instructions[instructionIndex]);
+				}
+				else
+				{
+					logger.LogInfoWithColor(instructions[instructionIndex], consoleColor);
+				}
+			}
+		}
+
+		static List<string> originalInstructionsHelp = new List<string>();
+		static List<string> currentInstructionsHelp = new List<string>();
+
+		public static void Print(this MethodBase method, ManualLogSource logger, CodeMatcher currentMatcher, ConsoleColor differenceColor = ConsoleColor.Yellow, ConsoleColor duplicateColor = ConsoleColor.DarkGray) {
+			var originalInstructions = PatchProcessor.GetOriginalInstructions(method);
+			var currentInstructions = currentMatcher.InstructionEnumeration().ToList();
+
+			for (int i = 0; i < originalInstructions.Count; i++)
+			{
+				originalInstructionsHelp.Add(originalInstructions[i].opcode.ToString() + " " + (originalInstructions[i].operand == null ? "" : originalInstructions[i].operand.ToString()));
+			}
+
+			for (int x = 0; x < currentInstructions.Count; x++)
+			{
+				currentInstructionsHelp.Add(currentInstructions[x].opcode.ToString() + " " + (currentInstructions[x].operand == null ? "" : currentInstructions[x].operand.ToString()));
+			}
+
+			int catchUp = 0;
+
+			for (int instructionIndex = 0; instructionIndex < currentInstructions.Count; instructionIndex++) {
+				if (currentInstructions[instructionIndex].opcode == originalInstructions[instructionIndex - catchUp].opcode && currentInstructions[instructionIndex].operand == originalInstructions[instructionIndex - catchUp].operand)
+				{
+					logger.LogInfoWithColor(currentInstructions[instructionIndex], duplicateColor);
+				}
+				else
+				{
+					logger.LogInfoWithColor(currentInstructions[instructionIndex], differenceColor);
+					logger.LogInfoWithColor($"{currentInstructions[instructionIndex]} doesn't match with {originalInstructions[instructionIndex - catchUp]}", ConsoleColor.DarkYellow);
+					catchUp++;
+				}
+			}
+		}
+
         public static MethodInfo GetMethod(this System.Type type, string method_signature) {
             // Przepisać żeby działało coś w stylu Wolfire.Receiver2@Receiver2.LinearMover.UpdateDisplay();
 

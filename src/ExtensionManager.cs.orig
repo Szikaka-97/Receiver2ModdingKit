@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Receiver2;
 using System.IO;
@@ -16,7 +18,9 @@ namespace Receiver2ModdingKit {
 	public static class Extensions {
 		internal static JSONObject current_gun_data;
 		internal static bool lah_force_bullet_display;
+<<<<<<< HEAD
 		internal static Queue<Tuple<PoseSpring, float>> pose_spring_overrides = new Queue<Tuple<PoseSpring, float>>();
+=======
 		internal static bool unlock_cursor;
 		internal static bool confine_cursor;
 		internal static bool freeze_camera_rotation;
@@ -29,6 +33,7 @@ namespace Receiver2ModdingKit {
 			set { konType?.GetProperty("BackgroundColor").SetMethod.Invoke(null, new object[] { value }); }
 		}
 
+>>>>>>> CiarencesShit
 		/// <summary>
 		/// Fetch a round with of a specified type from player's inventory
 		/// </summary>

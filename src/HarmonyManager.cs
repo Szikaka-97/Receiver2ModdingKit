@@ -12,6 +12,8 @@ using Receiver2;
 using Receiver2ModdingKit.ModInstaller;
 using Receiver2ModdingKit.Editor;
 using Receiver2ModdingKit.Helpers;
+using Wolfire;
+using BepInEx.Logging;
 
 namespace Receiver2ModdingKit {
 	public static class HarmonyManager {
@@ -458,6 +460,49 @@ namespace Receiver2ModdingKit {
 					new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Thunderstore.Thunderstore), nameof(Thunderstore.Thunderstore.InstallTiles)))
 				).InstructionEnumeration();
 			}
+
+			/*[HarmonyPatch(typeof(PlayerInputTutorialScript), "UpdateUI")]
+			[HarmonyPostfix]
+			private static IEnumerable<CodeInstruction> TranspileAddBurstMessage(IEnumerable<CodeInstruction> instructions)
+			{
+				var codeMatcher = new SmartCodeMatcher(instructions)
+				 .MatchForward(true,
+					new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(PlayerInputTutorialScript), "show_safety_help")),
+					new CodeMatch(OpCodes.Callvirt, AccessTools.PropertyGetter(typeof(DirtyWatcherBase<bool>), nameof(DirtyWatcherBase<bool>.Value))),
+					new CodeMatch(OpCodes.Stloc_S),
+					new CodeMatch(OpCodes.Ldloc_S),
+					new CodeMatch(OpCodes.Switch)
+				 )
+				 .Advance(1);
+
+				var endLabel = codeMatcher.Operand;
+
+				codeMatcher
+				 .InsertAndAdvance(OpCodes.Ldarg_0);
+
+				codeMatcher.CreateLabel(out var label);
+
+				codeMatcher.Advance(-1).Instruction.labels.Add(label);
+
+				codeMatcher.Advance(2)
+					.InsertAndAdvance(
+					new CodeInstruction(OpCodes.Ldc_I4, 0x00000381),
+					new CodeInstruction(OpCodes.Newarr, typeof(System.String)),
+					new CodeInstruction(OpCodes.Dup),
+					new CodeInstruction(OpCodes.Ldc_I4_0),
+					new CodeInstruction(OpCodes.Call, AccessTools.PropertyGetter(typeof(PlayerInputTutorialScript), nameof(PlayerInputTutorialScript.label_firemode))),
+					new CodeInstruction(OpCodes.Stelem_Ref),
+					new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(PlayerInputTutorialScript), nameof(PlayerInputTutorialScript.FormatUIString))),
+					new CodeInstruction(OpCodes.Ldloc_S, 11),
+					new CodeInstruction(OpCodes.Ldloc_S, 11),
+					new CodeInstruction(OpCodes.Ldc_I4_0),
+					new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(PlayerInputTutorialScript), "AddDisplayLine")),
+					new CodeInstruction(OpCodes.Br, endLabel)
+					);
+
+
+				return codeMatcher.InstructionEnumeration();
+			}*/
 		}
 
 		#endregion
@@ -467,14 +512,44 @@ namespace Receiver2ModdingKit {
 		[HarmonyPatch(typeof(GunScript), nameof(GunScript.CanHolster))]
 		[HarmonyPrefix]
 		private static bool PatchGunHolster(GunScript __instance, ref bool __result) {
-			if (__instance is ModGunScript) {
-				__result = ((ModGunScript) __instance).CanHolster();
+			if (__instance is ModGunScript script) {
+				__result = script.CanHolster();
 
 				return false;
 			}
 
 			return true;
 		}
+
+		[HarmonyPatch(typeof(MenuManagerScript), "Update")]
+		[HarmonyPostfix]
+		private static void ForceCursorState()
+		{
+			if (Extensions.unlock_cursor)
+			{
+				Cursor.visible = true;
+				Cursor.lockState = (Extensions.confine_cursor ? CursorLockMode.Confined : CursorLockMode.None);
+			}
+		}
+
+		/*[HarmonyPatch(typeof(LocalAimHandler), nameof(LocalAimHandler.UpdateCameraRotationControls))]
+		[HarmonyTranspiler]
+		private static IEnumerable<CodeInstruction> AddFreezeGunCondition(IEnumerable<CodeInstruction> instructions)
+		{
+			var br = new SmartCodeMatcher(instructions)
+			.MatchForward(true,
+			new CodeMatch(OpCodes.Ldarg_0),
+			new CodeMatch(OpCodes.Ldarg_0),
+			new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(LocalAimHandler), "inspect_rotation_y")),
+			new CodeMatch(OpCodes.Ldc_R4, -70),
+			new CodeMatch(OpCodes.Ldc_R4, 70),
+			new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(Mathf), nameof(Mathf.Clamp), new Type[] { typeof(float), typeof(float), typeof(float) })),
+			new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(LocalAimHandler), "inspect_rotation_y")),
+			new CodeMatch(OpCodes.Br)
+			).Instruction.operand;
+
+
+		}*/
 
 		[HarmonyPatch(typeof(MagazineScript), "UpdateRoundPositions")]
 		[HarmonyPostfix]
@@ -509,6 +584,16 @@ namespace Receiver2ModdingKit {
 					round.transform.localPosition.y,
 					round.transform.localPosition.z
 				);
+			}
+		}
+
+		[HarmonyPatch(typeof(MagazineScript), nameof(MagazineScript.Awake))]
+		[HarmonyPostfix]
+		private static void UpdateSpringOnAwake(MagazineScript __instance)
+		{
+			if (__instance.spring)
+			{
+				__instance.spring.UpdateScale();
 			}
 		}
 
@@ -548,6 +633,22 @@ namespace Receiver2ModdingKit {
 				return false;
 			}
 			return true;
+		}
+
+		public static void PrintMethodIL(Type type, string name, bool original = false)
+		{
+			PrintMethodIL(AccessTools.Method(type, name), original);
+		}
+
+		public static void PrintMethodIL(MethodInfo method, bool original = false)
+		{
+			var shitfuck = (original) ? PatchProcessor.GetOriginalInstructions(method) : PatchProcessor.GetCurrentInstructions(method);
+
+			var shitfuckCount = shitfuck.Count;
+			for (int instructionIndex = 0; instructionIndex < shitfuckCount; instructionIndex++)
+			{
+				Debug.Log(shitfuck[instructionIndex]);
+			}
 		}
 
 		[HarmonyPatch(typeof(ReceiverCoreScript), "Awake")]
@@ -843,7 +944,7 @@ namespace Receiver2ModdingKit {
 			}
 		}
 
-	// Maybe later
+		// Maybe later
 		// [HarmonyPatch(typeof(ReceiverCoreScript), "SpawnPlayer")]
 		// [HarmonyPostfix]
 		// private static void PatchStartIntro(ReceiverCoreScript __instance) {
@@ -869,7 +970,7 @@ namespace Receiver2ModdingKit {
 		// 			if (replacement_gun.two_handed) {
 		// 				gun_position += Vector3.up * 0.5f;
 		// 			}
-					
+
 		// 			UnityEngine.Object.DestroyImmediate(gun.gameObject);
 
 		// 			UnityEngine.Object.Instantiate(replacement_gun, gun_position, gun_rotation, tile_with_gun.transform).Move(null);
@@ -878,6 +979,30 @@ namespace Receiver2ModdingKit {
 		// }
 
 		#endregion
+
+		internal static class GetConsoleColorPatch
+		{
+			internal static ConsoleColor consoleColor;
+
+			[HarmonyPatch(typeof(LogLevelExtensions), nameof(LogLevelExtensions.GetConsoleColor))]
+			[HarmonyPostfix]
+			internal static void ChangeGetColorResult(ref ConsoleColor __result)
+			{
+				__result = consoleColor;
+			}
+		}
+
+		internal static class LogEventArgsToStringPatch
+		{
+			internal static string levelName;
+
+			[HarmonyPatch(typeof(LogEventArgs), nameof(LogEventArgs.ToString))]
+			[HarmonyPostfix]
+			internal static void ChangeLogEventArgsLevel(LogEventArgs __instance, ref string __result)
+			{
+				__result = string.Format("[{0,-7}:{1,10}] {2}", levelName, __instance.Source.SourceName, __instance.Data);
+			}
+		}
 
 		internal static void UnpatchAll() {
 			foreach(var field in typeof(HarmonyInstances).GetFields()) {
@@ -895,6 +1020,20 @@ namespace Receiver2ModdingKit {
 				if(patch.Owners.Count == 1) yield break; //All is well, no need to do anything
 
 				HarmonyInstances.CustomSounds.Unpatch(method, HarmonyPatchType.Prefix, patch.Owners.First(ownerID => ownerID != HarmonyInstances.CustomSounds.Id));
+			}
+		}
+
+		private static System.Collections.IEnumerator WaitForModel10ToSpawn()
+		{
+			var guns = UnityEngine.Object.FindObjectsOfType<GunScript>();
+			for (int gunIndex = 0; gunIndex < guns.Length; gunIndex++)
+			{
+				if (guns[gunIndex].gun_model == GunModel.Model10)
+				{
+					UnityEngine.Object.Instantiate(ReceiverCoreScript.Instance().GetGunPrefab(ReceiverCoreScript.Instance().CurrentLoadout.gun_internal_name), guns[gunIndex].transform.position, guns[gunIndex].transform.rotation);
+					guns[gunIndex].gameObject.SetActive(false);
+					yield break;
+				}
 			}
 		}
 

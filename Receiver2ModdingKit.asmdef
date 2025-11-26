@@ -1,22 +1,25 @@
 {
     "name": "Receiver2ModdingKit",
-    "references": [],
+    "references": [
+        "GUID:280569ac301428d4d950fdf647900922"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
+        "0Harmony.dll",
         "FMODDef.dll",
         "Wolfire.Receiver2.dll",
         "ImGui.dll",
         "SimpleJSON.dll",
+        "BepInEx.dll",
+        "Mono.Cecil.dll",
         "Wolfire.dll",
         "Rewired_Core.dll",
         "UnityEngine.UI.dll",
         "Unity.TextMeshPro.dll",
-        "0Harmony.dll",
-        "BepInEx.dll",
-        "Mono.Cecil.dll"
+        "MonoMod.Utils.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],
