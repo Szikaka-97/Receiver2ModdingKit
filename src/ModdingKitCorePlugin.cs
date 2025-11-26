@@ -130,6 +130,7 @@ namespace Receiver2ModdingKit {
 
 			mod_help = gameObject.AddComponent<ModHelpEntryManager>();
 			mod_tapes = gameObject.AddComponent<ModTapeManager>();
+			gameObject.AddComponent<Gamemodes.ModGameModeManager>();
 
 			CustomSounds.ModAudioManager.Initialize();
 

@@ -37,6 +37,8 @@ namespace Receiver2ModdingKit {
 	}
 }
 #else
+using UnityEngine;
+
 namespace Receiver2ModdingKit {
 	class EditorInput {
 		public static bool GetKeyDown(KeyCode key) { return false; }

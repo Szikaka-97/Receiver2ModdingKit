@@ -22,6 +22,7 @@ namespace Receiver2ModdingKit {
 			public static Harmony Thunderstore;
 			public static Harmony CustomSounds;
 			public static Harmony ModHelpEntry;
+			public static Harmony ModGameMode;
 		}
 
 		private static void DisplayInstructions(CodeMatcher code_matcher, int breadth) {
@@ -226,6 +227,141 @@ namespace Receiver2ModdingKit {
 				)
 				.RemoveInstruction()
 				.InstructionEnumeration();
+			}
+
+			[HarmonyPatch(typeof(MenuManagerScript), "Update")]
+			[HarmonyTranspiler]
+			private static IEnumerable<CodeInstruction> ModGameModeSupressMenu(IEnumerable<CodeInstruction> instructions) {
+				return new SmartCodeMatcher(instructions)
+				.MatchForward(false,
+					new CodeMatch(OpCodes.Ldc_I4_0),
+					new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(Cursor), "set_visible"))
+				).SetInstruction(
+					new CodeInstruction(
+						OpCodes.Ldsfld,
+						AccessTools.Field(typeof(Gamemodes.ModGameModeManager), nameof(Gamemodes.ModGameModeManager.DisplayGameModeMenu))
+					)
+				).Advance(
+					2
+				).SetInstruction(
+					new CodeInstruction(
+						OpCodes.Ldsfld,
+						AccessTools.Field(typeof(Gamemodes.ModGameModeManager), nameof(Gamemodes.ModGameModeManager.DisplayGameModeMenu))
+					)
+				).Advance(
+					1
+				).Insert(
+					new CodeInstruction(
+						OpCodes.Ldc_I4_0,
+						null
+					),
+					new CodeInstruction(
+						OpCodes.Ceq,
+						null
+					)
+				).InstructionEnumeration();
+			}
+
+			private static Gamemodes.GameModeMusicSpec current_working_music_spec;
+
+			[HarmonyPatch(typeof(MusicScript), "Update")]
+			[HarmonyTranspiler]
+			private static IEnumerable<CodeInstruction> ModGameModeMusic(IEnumerable<CodeInstruction> instructions, ILGenerator generator) {
+				SmartCodeMatcher matcher = new SmartCodeMatcher(instructions, generator);
+
+				matcher.MatchForward(false,
+					new CodeMatch(OpCodes.Ldarg_0),
+					new CodeMatch(OpCodes.Ldc_R4, 1.0f),
+					new CodeMatch(OpCodes.Stfld, AccessTools.Field(typeof(MusicScript), "main_menu"))
+				);
+
+				matcher.Advance(1).RemoveInstructions(2).Advance(-1);
+
+				matcher.SetAndAdvance(
+					OpCodes.Ldloc_0, null
+				).InsertAndAdvance(
+					new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(ReceiverCoreScript), nameof(ReceiverCoreScript.game_mode))),
+					new CodeInstruction(OpCodes.Ldnull),
+					new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(UnityEngine.Object), "op_Inequality"))
+				);
+
+				matcher.CreateBranch(
+					OpCodes.Brfalse,
+					new CodeInstruction[] {
+						new CodeInstruction(OpCodes.Ldloc_0),
+						new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(ReceiverCoreScript), nameof(ReceiverCoreScript.game_mode))),
+						new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(GameModeBase), nameof(GameModeBase.GetGameMode))),
+						new CodeInstruction(OpCodes.Ldsfld, AccessTools.Field(typeof(Gamemodes.ModGameModeBase), nameof(Gamemodes.ModGameModeBase.ModGameMode))),
+					},
+					new CodeInstruction[] {
+						new CodeInstruction(OpCodes.Ldarg_0),
+						new CodeInstruction(OpCodes.Ldc_R4, 1.0f),
+						new CodeInstruction(OpCodes.Stfld, AccessTools.Field(typeof(MusicScript), "main_menu"))
+					}
+				);
+
+				matcher.MatchBack(false, new CodeMatch(OpCodes.Brfalse));
+
+				CodeInstruction break_instruction = new CodeInstruction(matcher.Instruction);
+				break_instruction.opcode = OpCodes.Bne_Un;
+
+				matcher.Advance(5);
+
+				matcher.InsertAndAdvance(
+					break_instruction,
+					new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Gamemodes.ModGameModeManager), "get_" + nameof(Gamemodes.ModGameModeManager.CurrentGameMode))),
+					new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(Gamemodes.ModGameModeBase), nameof(Gamemodes.ModGameModeBase.GetMusicParams))),
+					new CodeInstruction(OpCodes.Stsfld, AccessTools.Field(typeof(HarmonyManager.Transpilers), nameof(HarmonyManager.Transpilers.current_working_music_spec))), // Wouldn't it be cool if we could add local variables?
+					new CodeInstruction(OpCodes.Ldarg_0),
+					new CodeInstruction(OpCodes.Ldsfld, AccessTools.Field(typeof(HarmonyManager.Transpilers), nameof(HarmonyManager.Transpilers.current_working_music_spec))),
+					new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(Gamemodes.GameModeMusicSpec), nameof(Gamemodes.GameModeMusicSpec.target_global_gain))),
+					new CodeInstruction(OpCodes.Stfld, AccessTools.Field(typeof(MusicScript), "target_global_gain")),
+					new CodeInstruction(OpCodes.Ldarg_0),
+					new CodeInstruction(OpCodes.Ldsfld, AccessTools.Field(typeof(HarmonyManager.Transpilers), nameof(HarmonyManager.Transpilers.current_working_music_spec))),
+					new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(Gamemodes.GameModeMusicSpec), nameof(Gamemodes.GameModeMusicSpec.gain_recover_delay))),
+					new CodeInstruction(OpCodes.Stfld, AccessTools.Field(typeof(MusicScript), "gain_recover_delay")),
+					new CodeInstruction(OpCodes.Ldarg_0),
+					new CodeInstruction(OpCodes.Ldsfld, AccessTools.Field(typeof(HarmonyManager.Transpilers), nameof(HarmonyManager.Transpilers.current_working_music_spec))),
+					new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(Gamemodes.GameModeMusicSpec), nameof(Gamemodes.GameModeMusicSpec.danger))),
+					new CodeInstruction(OpCodes.Stfld, AccessTools.Field(typeof(MusicScript), "danger")),
+					new CodeInstruction(OpCodes.Ldarg_0),
+					new CodeInstruction(OpCodes.Ldsfld, AccessTools.Field(typeof(HarmonyManager.Transpilers), nameof(HarmonyManager.Transpilers.current_working_music_spec))),
+					new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(Gamemodes.GameModeMusicSpec), nameof(Gamemodes.GameModeMusicSpec.mystical))),
+					new CodeInstruction(OpCodes.Stfld, AccessTools.Field(typeof(MusicScript), "mystical")),
+					new CodeInstruction(OpCodes.Ldarg_0),
+					new CodeInstruction(OpCodes.Ldc_R4, 0.0f),
+					new CodeInstruction(OpCodes.Stfld, AccessTools.Field(typeof(MusicScript), "main_menu"))
+				);
+
+				return matcher.InstructionEnumeration();
+			}
+
+			[HarmonyPatch(typeof(ReceiverCoreScript), nameof(ReceiverCoreScript.LoadCheckpoint))]
+			[HarmonyTranspiler]
+			private static IEnumerable<CodeInstruction> ModGameModeLoad(IEnumerable<CodeInstruction> instructions) {
+				return new SmartCodeMatcher(instructions)
+				.MatchForward(false,
+					new CodeMatch(OpCodes.Stloc_3)
+				).InsertAndAdvance(
+					new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Gamemodes.ModGameModeManager), nameof(Gamemodes.ModGameModeManager.ChooseGameModeFromJSON)))
+				).InstructionEnumeration();
+			}
+
+			[HarmonyPatch(typeof(ReceiverCoreScript), nameof(ReceiverCoreScript.TriggerCheckpoint))]
+			[HarmonyTranspiler]
+			private static IEnumerable<CodeInstruction> ModGameModeSave(IEnumerable<CodeInstruction> instructions) {
+				SmartCodeMatcher matcher = new SmartCodeMatcher(instructions);
+
+				matcher.MatchForward(true,
+					new CodeMatch(OpCodes.Constrained, typeof(GameMode)),
+					new CodeMatch(OpCodes.Callvirt)
+				);
+
+				matcher.Advance(1);
+				matcher.InsertAndAdvance(OpCodes.Pop);
+				matcher.Insert(OpCodes.Call, AccessTools.Method(typeof(Gamemodes.ModGameModeManager), nameof(Gamemodes.ModGameModeManager.GetGameModeName)));
+
+				return matcher.InstructionEnumeration();
 			}
 		}
 
@@ -767,6 +903,7 @@ namespace Receiver2ModdingKit {
 			HarmonyInstances.Transpilers = Harmony.CreateAndPatchAll(typeof(Transpilers));
 			HarmonyInstances.ModHelpEntry = Harmony.CreateAndPatchAll(typeof(ModHelpEntryManager));
 			HarmonyInstances.CustomSounds = Harmony.CreateAndPatchAll(typeof(CustomSounds.ModAudioPatches));
+			HarmonyInstances.ModGameMode = Harmony.CreateAndPatchAll(typeof(Gamemodes.ModGameModeManager));
 
 			#if DEBUG
 			HarmonyInstances.DebugPatches = Harmony.CreateAndPatchAll(typeof(DebugTranspilers));
