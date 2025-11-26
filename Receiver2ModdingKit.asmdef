@@ -6,17 +6,17 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "0Harmony.dll",
         "FMODDef.dll",
         "Wolfire.Receiver2.dll",
         "ImGui.dll",
         "SimpleJSON.dll",
-        "BepInEx.dll",
-        "Mono.Cecil.dll",
         "Wolfire.dll",
         "Rewired_Core.dll",
         "UnityEngine.UI.dll",
-        "Unity.TextMeshPro.dll"
+        "Unity.TextMeshPro.dll",
+        "0Harmony.dll",
+        "BepInEx.dll",
+        "Mono.Cecil.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],
