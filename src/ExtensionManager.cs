@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Receiver2;
 using System.IO;
@@ -10,7 +12,7 @@ namespace Receiver2ModdingKit {
 	public static class Extensions {
 		internal static JSONObject current_gun_data;
 		internal static bool lah_force_bullet_display;
-
+		internal static Queue<Tuple<PoseSpring, float>> pose_spring_overrides = new Queue<Tuple<PoseSpring, float>>();
 		/// <summary>
 		/// Fetch a round with of a specified type from player's inventory
 		/// </summary>
@@ -104,6 +106,10 @@ namespace Receiver2ModdingKit {
 			}
 
 			return ((Spring) ReflectionManager.LAH_pose_springs[spring].GetValue(lah)).state;
+		}
+
+		public static void OverrideSpringState(this LocalAimHandler lah, PoseSpring spring, float amount) {
+			pose_spring_overrides.Enqueue(new Tuple<PoseSpring, float>(spring, amount));
 		}
 
 		/// <summary>

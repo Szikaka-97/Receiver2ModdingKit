@@ -690,6 +690,22 @@ namespace Receiver2ModdingKit {
 				}
 			}
 		}
+		
+		[HarmonyPatch(typeof(LocalAimHandler), nameof(LocalAimHandler.HandleGunControls))]
+		[HarmonyPostfix]
+		private static void PatchHandleSprings() {
+			LocalAimHandler lah;
+
+			if (!LocalAimHandler.TryGetInstance(out lah)) {
+				return;
+			}
+
+			while (Extensions.pose_spring_overrides.Count > 0) {
+				var spring_state = Extensions.pose_spring_overrides.Dequeue();
+
+				((Spring) ReflectionManager.LAH_pose_springs[spring_state.Item1].GetValue(lah)).target_state = spring_state.Item2;
+			}
+		}
 
 	// Maybe later
 		// [HarmonyPatch(typeof(ReceiverCoreScript), "SpawnPlayer")]
