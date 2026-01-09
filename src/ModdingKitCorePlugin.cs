@@ -15,7 +15,7 @@ namespace Receiver2ModdingKit {
 			private set;
 		}
 
-		public PluginInfo Info;
+		public BepInEx.PluginInfo Info;
 
 		public static Stream GetResourceStream(string resource_name) { return null; }
 

@@ -29,13 +29,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77f65d4371163fb4695da79ab8df0e84, type: 3}
   m_Name: ExecuteProcess
   m_EditorClassIdentifier: 
-  Active: 1
+  Active: 0
   PerManifest: 0
   ListType: 0
   Manifests: []
   workingDirectory: <GamePath>
   executable: Receiver2.exe
-  arguments: []
+  arguments:
+  - --doorstop-enable true
+  - '--doorstop-target "C:\Users\coren\AppData\Roaming\r2modmanPlus-local\Receiver2\profiles\Default\BepInEx\core\BepInEx.Preloader.dll" '
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0

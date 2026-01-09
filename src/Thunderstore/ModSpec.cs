@@ -7,6 +7,7 @@ using SimpleJSON;
 using Receiver2;
 using System.Linq;
 using UnityEngine.UI;
+using Receiver2ModdingKit.Gamemodes;
 
 namespace Receiver2ModdingKit.Thunderstore {
 	/// <summary>
@@ -216,6 +217,11 @@ namespace Receiver2ModdingKit.Thunderstore {
 
 		public void InstallTiles(ModulePrefabsList instance) {
 			instance.LoadModTile(BaseDir.FullName, true);
+		}
+
+		public void InstallGameModes()
+		{
+			ModGameModeManager.Instance.StartCoroutine(ModGameModeManager.Instance.FindGamemodes(BaseDir.FullName));
 		}
 
 		public void UninstallCampaign() {

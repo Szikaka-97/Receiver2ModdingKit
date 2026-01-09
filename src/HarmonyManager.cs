@@ -427,8 +427,14 @@ namespace Receiver2ModdingKit {
 					new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Thunderstore.Thunderstore), nameof(Thunderstore.Thunderstore.InstallGuns)))
 				).InstructionEnumeration();
 			}
-			
 
+			[HarmonyPatch(typeof(ReceiverCoreScript), "Awake")]
+			[HarmonyPostfix]
+			private static void InstallGameModesSmile()
+			{
+				Thunderstore.Thunderstore.InstallGameModes();
+			}
+			
 			[HarmonyPatch(typeof(TapeManager), "OnEnable")]
 			[HarmonyTranspiler]
 			private static IEnumerable<CodeInstruction> R2MMTapesTranspiler(IEnumerable<CodeInstruction> instructions) {

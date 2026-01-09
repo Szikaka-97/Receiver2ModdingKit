@@ -6,6 +6,7 @@ using Rewired;
 using System.IO;
 using System.Collections.Generic;
 using SimpleJSON;
+using System.Linq;
 
 namespace Receiver2ModdingKit.Gamemodes {
 	public class ModGameModeManager : MonoBehaviour {
@@ -37,23 +38,37 @@ namespace Receiver2ModdingKit.Gamemodes {
 
 		private static ModGameModeLoadData current_game_mode;
 
-		private System.Collections.IEnumerator FindGamemodes() {
-			DirectoryInfo game_mode_dir = new DirectoryInfo(Path.Combine(Application.persistentDataPath, "Gamemodes"));
+		internal System.Collections.IEnumerator FindGamemodes(string path) {
+			DirectoryInfo game_mode_dir = new DirectoryInfo(path);
 
 			if (!game_mode_dir.Exists) {
 				game_mode_dir.Create();
 			}
 
 			foreach (FileInfo game_mode_file in game_mode_dir.EnumerateFiles("*." + SystemInfo.operatingSystemFamily.ToString().ToLower(), SearchOption.AllDirectories)) {
+
+				var sex2 = Resources.FindObjectsOfTypeAll<AssetBundle>().Where((e) => game_mode_file.Name.Contains(e.name));
+
+				AssetBundle bundle;
+
 				Debug.Log("Searching file " + game_mode_file.Name);
 
-				var bundle_request = AssetBundle.LoadFromFileAsync(game_mode_file.FullName);
+				//fuck you and your stupid ass fucking brackets
+				if (!sex2.Any())
+				{
+					var bundle_request = AssetBundle.LoadFromFileAsync(game_mode_file.FullName);
 
-				while (!bundle_request.isDone) {
-					yield return null;
+					while (!bundle_request.isDone)
+					{
+						yield return null;
+					}
+
+					bundle = bundle_request.assetBundle;
 				}
-
-				AssetBundle bundle = bundle_request.assetBundle;
+				else
+				{
+					bundle = sex2.First();
+				}
 
 				if (bundle.isStreamedSceneAssetBundle) {
 					bundle.Unload(true);
@@ -72,8 +87,15 @@ namespace Receiver2ModdingKit.Gamemodes {
 								game_mode = gamemode,
 								scene_bundle_file = assets_file
 							};
-							
-							ReceiverCoreScript.Instance().level_manager.level_list.scenes.Add(new SceneReferenceInstance() {
+
+							//it might be null so we do dat shit fuck yu
+							while (ReceiverCoreScript.Instance() == null || ReceiverCoreScript.Instance().level_manager == null)
+							{
+								yield return null;
+							}
+
+							ReceiverCoreScript.Instance().level_manager.level_list.scenes.Add(new SceneReferenceInstance()
+							{
 								id = gamemode.GameModeName,
 								name = gamemode.SceneName
 							});
@@ -103,7 +125,7 @@ namespace Receiver2ModdingKit.Gamemodes {
 			Instance = this;
 
 			ModdingKitEvents.AddTaskAtCoreStartup(() => {
-				StartCoroutine(FindGamemodes());
+				StartCoroutine(FindGamemodes(Path.Combine(Application.persistentDataPath, "Gamemodes")));
 
 				ReceiverCoreScript.Instance().game_mode_prefabs.Add(PrepareDummyGameMode());
 			});
@@ -152,6 +174,30 @@ namespace Receiver2ModdingKit.Gamemodes {
 			else {
 				SuppressMenu = false;
 			}
+		}
+
+		public static bool RegisterGameMode(string gamemodeSceneAssetBundleName)
+		{
+			var loaded = AssetBundle.GetAllLoadedAssetBundles().Where(e => e.name.Contains(gamemodeSceneAssetBundleName)).FirstOrDefault();
+
+			if (loaded == null)
+			{
+				foreach (var fuck in Directory.GetFiles(new System.Diagnostics.StackTrace().GetFrame(0).GetMethod().DeclaringType.Assembly.Location, "*", SearchOption.AllDirectories))
+				{
+					if (fuck.EndsWith(gamemodeSceneAssetBundleName + "." + SystemInfo.operatingSystemFamily.ToString().ToLower()))
+					{
+						loaded = AssetBundle.LoadFromFile(fuck);
+					}
+				}
+			}
+
+			if (loaded != null)
+			{
+				//idk
+				return true;
+			}
+
+			return false;
 		}
 
 		public static void StartModGameMode(ModGameModeBase game_mode, JSONObject checkpoint) {

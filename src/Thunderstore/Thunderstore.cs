@@ -34,8 +34,6 @@ namespace Receiver2ModdingKit.Thunderstore {
 			if (cmd_args.Length > 1) {
 				//Started with command line arguments, likely from r2modman
 
-				int doorstop_arg_index = 0;
-
 				if (
 					//UnityDoorstop 3.0 uses --doorstop-enable, 4.0 uses --doorstop-enabled
 					cmd_args.Contains("--doorstop-enable true") || cmd_args.Contains("--doorstop-enabled true")
@@ -120,6 +118,25 @@ namespace Receiver2ModdingKit.Thunderstore {
 					} catch (NullReferenceException) { }
 				}
 			}
+		}
+
+		//format this fuck you
+		public static void InstallGameModes()
+		{
+			if (LaunchedWithR2ModMan)
+			{
+				#if DEBUG
+				Debug.Log("I ❤️ eating shit");
+#endif
+
+                foreach (var mod in installed_mods)
+                {
+					try
+					{
+						mod.InstallGameModes();
+					} catch (NullReferenceException) { }
+                }
+            }
 		}
 
 		public static void CleanupMods() {
