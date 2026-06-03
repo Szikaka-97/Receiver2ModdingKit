@@ -26,6 +26,10 @@ public class MultiOSBuild : PipelineJob
 
 	[PathReferenceResolver] public string bundleArtifactPath = "<AssetBundleStaging>";
 
+	const string k_WindowsName = "Windows";
+	const string k_LinuxName = "Linux";
+	const string k_MacOSXName = "MacOSX";
+
 	public override Task Execute(Pipeline pipeline)
 	{
 		var excludedExtensions = new[] { ".dll", ".cs", ".meta" };
@@ -134,32 +138,49 @@ public class MultiOSBuild : PipelineJob
 			baseNames[buildNameIndex] = Path.GetFileNameWithoutExtension(builds[buildNameIndex].assetBundleName);
 		}
 
-		for (int target = 0; target < 3; target++)
+		if (onlyBuildCurrentPlatform)
 		{
-			BuildTarget buildTarget;
+			BuildBundle(EditorUserBuildSettings.activeBuildTarget);
+		}
+		else
+		{
+			for (int target = 0; target < 3; target++)
+			{
+				switch (target)
+				{
+					case 0:
+						BuildBundle(BuildTarget.StandaloneWindows64);
+						break;
+					case 1:
+						BuildBundle(BuildTarget.StandaloneLinux64);
+						break;
+					case 2:
+						BuildBundle(BuildTarget.StandaloneOSX);
+						break;
+					default:
+						break;
+				}
+			}
+
+			File.Delete(Path.Combine(resolvedBundleArtifactPath, Path.GetFileName(resolvedBundleArtifactPath)));
+			File.Delete(Path.Combine(resolvedBundleArtifactPath, Path.GetFileName(resolvedBundleArtifactPath) + ".manifest"));
+		}
+
+		void BuildBundle(BuildTarget buildTarget)
+		{
 			string additionalPath;
 
-			if (target == 0)
+			if (buildTarget == BuildTarget.StandaloneOSX)
 			{
-				buildTarget = BuildTarget.StandaloneOSX;
-				additionalPath = "MacOSX";
+				additionalPath = k_MacOSXName;
 			}
-			else if (target == 1)
+			else if (buildTarget == BuildTarget.StandaloneLinux64)
 			{
-				buildTarget = BuildTarget.StandaloneLinux64;
-				additionalPath = "Linux";
+				additionalPath = k_LinuxName;
 			}
 			else
 			{
-				buildTarget = BuildTarget.StandaloneWindows64;
-				additionalPath = "Windows";
-			}
-
-			if (onlyBuildCurrentPlatform)
-			{
-				pipeline.Log(LogLevel.Information, "build Target: " + buildTarget + " vs active build target " + EditorUserBuildSettings.activeBuildTarget);
-				if (buildTarget != EditorUserBuildSettings.activeBuildTarget)
-					continue;
+				additionalPath = k_WindowsName;
 			}
 
 			AssetBundleBuild[] platformBuilds = builds;
@@ -169,10 +190,17 @@ public class MultiOSBuild : PipelineJob
 				platformBuilds[buildIndex].assetBundleName = baseNames[buildIndex] + "." + additionalPath.ToString().ToLowerInvariant();
 			}
 
-			var fullBundleArtifactPath = Path.Combine(resolvedBundleArtifactPath, additionalPath);
+			//var fullBundleArtifactPath = Path.Combine(resolvedBundleArtifactPath, additionalPath);
+			var fullBundleArtifactPath = resolvedBundleArtifactPath;
 			Directory.CreateDirectory(fullBundleArtifactPath);
 
 			BuildPipeline.BuildAssetBundles(fullBundleArtifactPath, builds, assetBundleOptions, buildTarget);
+
+			//delete the Windows/Linux/MacOSX empty assetbundles
+			foreach (var bundle in platformBuilds)
+			{
+				File.Delete(Path.Combine(fullBundleArtifactPath, bundle.assetBundleName + ".manifest"));
+			}
 
 			/*if (sendCurrentPlatformAssetBundleToManifestStagingPath)
 			{
