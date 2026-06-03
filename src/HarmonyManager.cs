@@ -14,6 +14,8 @@ using Receiver2ModdingKit.Editor;
 using Receiver2ModdingKit.Helpers;
 using Wolfire;
 using BepInEx.Logging;
+using SharpCompress.Archives.SevenZip;
+using SharpCompress.Archives;
 
 namespace Receiver2ModdingKit {
 	public static class HarmonyManager {
@@ -514,6 +516,31 @@ namespace Receiver2ModdingKit {
 		#endregion
 
 		#region General Patches
+
+		[HarmonyPatch(typeof(ReceiverCoreScript), nameof(ReceiverCoreScript.LoadModGun))]
+		[HarmonyPrefix]                                  					 //hello my name is sizwaz and I love K&R braces
+		private static void CheckFolderForSigmaBundles(string directoryName) {
+			const string k_CompressedBundlesExtension = ".sigma";
+
+			foreach (var file in Directory.GetFiles(directoryName)) {
+				if (Path.GetExtension(file) == k_CompressedBundlesExtension) {
+					using (var archive = ArchiveFactory.Open(file)) {
+						foreach (var entry in archive.Entries) {
+							if (Path.GetExtension(entry.Key).Contains(SystemInfo.operatingSystemFamily.ToString().ToLower())) {
+								using (var bundleStream = entry.OpenEntryStream()) {
+									byte[] buffer = new byte[entry.Size];
+									bundleStream.Read(buffer, 0, (int)entry.Size);
+									using (var decompressedFile = File.Create(Path.Combine(directoryName, entry.Key))) {
+										decompressedFile.Write(buffer, 0, buffer.Length);
+									}
+								}
+							}
+						}
+					}
+					File.Delete(file);
+				}
+			}
+		}
 
 		[HarmonyPatch(typeof(GunScript), nameof(GunScript.CanHolster))]
 		[HarmonyPrefix]
