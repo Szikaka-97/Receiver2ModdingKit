@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="EffectPreset" id="{0804ea7e-eef5-40ac-991c-ed61463fd72e}">
+		<property name="name">
+			<value>Robot Damage</value>
+		</property>
+		<relationship name="folder">
+			<destination>{caf1f488-312a-40fd-9422-8544fc419b94}</destination>
+		</relationship>
+		<relationship name="effect">
+			<destination>{5347a15c-9426-4618-8482-45a137128fe1}</destination>
+		</relationship>
+	</object>
+	<object class="SpatialiserEffect" id="{5347a15c-9426-4618-8482-45a137128fe1}">
+		<property name="bypass">
+			<value>true</value>
+		</property>
+		<property name="minimumDistance">
+			<value>2</value>
+		</property>
+		<property name="maximumDistance">
+			<value>30</value>
+		</property>
+	</object>
+</objects>

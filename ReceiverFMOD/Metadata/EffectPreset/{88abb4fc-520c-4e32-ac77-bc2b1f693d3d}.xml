@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="EffectPreset" id="{88abb4fc-520c-4e32-ac77-bc2b1f693d3d}">
+		<property name="name">
+			<value>IntercomHighpass</value>
+		</property>
+		<relationship name="folder">
+			<destination>{caf1f488-312a-40fd-9422-8544fc419b94}</destination>
+		</relationship>
+		<relationship name="effect">
+			<destination>{8b0b156e-a2c1-44d3-8ba5-df01a47b2503}</destination>
+		</relationship>
+	</object>
+	<object class="HighpassEffect" id="{8b0b156e-a2c1-44d3-8ba5-df01a47b2503}">
+		<property name="cutoff">
+			<value>440</value>
+		</property>
+		<relationship name="automators">
+			<destination>{f6b3e029-813e-4b69-b47c-1d16e6497a7d}</destination>
+		</relationship>
+	</object>
+	<object class="Automator" id="{f6b3e029-813e-4b69-b47c-1d16e6497a7d}">
+		<property name="nameOfPropertyBeingAutomated">
+			<value>cutoff</value>
+		</property>
+		<relationship name="automationCurves">
+			<destination>{3e480409-62a1-46f0-a190-1915a7f3ab61}</destination>
+		</relationship>
+	</object>
+	<object class="AutomationCurve" id="{3e480409-62a1-46f0-a190-1915a7f3ab61}">
+		<relationship name="parameter">
+			<destination>{58972552-6770-48c1-b274-38d2b676cf60}</destination>
+		</relationship>
+		<relationship name="automationPoints">
+			<destination>{c1653a8c-70fb-4068-8473-40b474237c02}</destination>
+			<destination>{d00075e8-3030-479a-9f1f-fd48831fb088}</destination>
+			<destination>{51e660ef-2ac3-4178-8f2e-07f80b41c048}</destination>
+		</relationship>
+	</object>
+	<object class="AutomationPoint" id="{c1653a8c-70fb-4068-8473-40b474237c02}">
+		<property name="position">
+			<value>4.9646892655367232</value>
+		</property>
+		<property name="value">
+			<value>440</value>
+		</property>
+	</object>
+	<object class="AutomationPoint" id="{d00075e8-3030-479a-9f1f-fd48831fb088}">
+		<property name="position">
+			<value>0</value>
+		</property>
+		<property name="value">
+			<value>10</value>
+		</property>
+		<property name="curveShape">
+			<value>1</value>
+		</property>
+	</object>
+	<object class="AutomationPoint" id="{51e660ef-2ac3-4178-8f2e-07f80b41c048}">
+		<property name="position">
+			<value>4.4000000000000004</value>
+		</property>
+		<property name="value">
+			<value>60</value>
+		</property>
+		<property name="curveShape">
+			<value>0.142196611</value>
+		</property>
+	</object>
+</objects>

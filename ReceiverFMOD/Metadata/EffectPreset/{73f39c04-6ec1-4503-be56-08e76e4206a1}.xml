@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="EffectPreset" id="{73f39c04-6ec1-4503-be56-08e76e4206a1}">
+		<property name="name">
+			<value>IndoorOutdoorEQ</value>
+		</property>
+		<relationship name="folder">
+			<destination>{caf1f488-312a-40fd-9422-8544fc419b94}</destination>
+		</relationship>
+		<relationship name="effect">
+			<destination>{4af59c89-1305-448f-b644-f1e86da06e9b}</destination>
+		</relationship>
+	</object>
+	<object class="MultibandEqEffect" id="{4af59c89-1305-448f-b644-f1e86da06e9b}">
+		<relationship name="automators">
+			<destination>{165fe7b6-b79a-4418-b8a1-453142507216}</destination>
+		</relationship>
+	</object>
+	<object class="Automator" id="{165fe7b6-b79a-4418-b8a1-453142507216}">
+		<property name="nameOfPropertyBeingAutomated">
+			<value>frequencyA</value>
+		</property>
+		<relationship name="automationCurves">
+			<destination>{82d0c258-5155-4c7b-ac41-56417ab7fe4b}</destination>
+		</relationship>
+	</object>
+	<object class="AutomationCurve" id="{82d0c258-5155-4c7b-ac41-56417ab7fe4b}">
+		<relationship name="parameter">
+			<destination>{c9d96a75-e596-423c-948e-633a2aa7aca8}</destination>
+		</relationship>
+		<relationship name="automationPoints">
+			<destination>{06c1b743-4ad3-435d-bdea-7b7d92f2b258}</destination>
+			<destination>{6ee2b040-862f-4e5f-a055-3539a71b4790}</destination>
+		</relationship>
+	</object>
+	<object class="AutomationPoint" id="{06c1b743-4ad3-435d-bdea-7b7d92f2b258}">
+		<property name="position">
+			<value>0.0049261083743842365</value>
+		</property>
+		<property name="value">
+			<value>660</value>
+		</property>
+	</object>
+	<object class="AutomationPoint" id="{6ee2b040-862f-4e5f-a055-3539a71b4790}">
+		<property name="position">
+			<value>1</value>
+		</property>
+		<property name="value">
+			<value>20000</value>
+		</property>
+	</object>
+</objects>

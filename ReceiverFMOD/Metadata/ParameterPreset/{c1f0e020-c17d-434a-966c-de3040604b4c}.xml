@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="ParameterPreset" id="{c1f0e020-c17d-434a-966c-de3040604b4c}">
+		<property name="name">
+			<value>HelipadOcclusion</value>
+		</property>
+		<relationship name="folder">
+			<destination>{d5dd0780-d670-476a-91a9-e42e073e9cb6}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{23ab2303-6688-49d9-a7a6-f2e332df7a2f}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{23ab2303-6688-49d9-a7a6-f2e332df7a2f}">
+		<property name="isGlobal">
+			<value>true</value>
+		</property>
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+		<property name="seekSpeed">
+			<value>0.58000004291534424</value>
+		</property>
+		<property name="isExposedRecursively">
+			<value>false</value>
+		</property>
+	</object>
+</objects>

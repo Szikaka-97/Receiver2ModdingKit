@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="ParameterPreset" id="{4049e9d8-463e-4a02-a277-622a09898aa6}">
+		<property name="name">
+			<value>elevatorEnd</value>
+		</property>
+		<relationship name="folder">
+			<destination>{d5dd0780-d670-476a-91a9-e42e073e9cb6}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{c72c6c28-0d47-48ab-8b05-52d761dd392e}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{c72c6c28-0d47-48ab-8b05-52d761dd392e}">
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+		<property name="seekSpeed">
+			<value>0.28000003099441528</value>
+		</property>
+	</object>
+</objects>

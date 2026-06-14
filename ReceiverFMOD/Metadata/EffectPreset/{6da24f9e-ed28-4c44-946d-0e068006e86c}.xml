@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="EffectPreset" id="{6da24f9e-ed28-4c44-946d-0e068006e86c}">
+		<property name="name">
+			<value>RoboDamageCompressor</value>
+		</property>
+		<relationship name="folder">
+			<destination>{caf1f488-312a-40fd-9422-8544fc419b94}</destination>
+		</relationship>
+		<relationship name="effect">
+			<destination>{03095c3d-50c0-4d29-827f-99029f1acd06}</destination>
+		</relationship>
+	</object>
+	<object class="CompressorEffect" id="{03095c3d-50c0-4d29-827f-99029f1acd06}">
+		<property name="gain">
+			<value>9.5</value>
+		</property>
+	</object>
+</objects>

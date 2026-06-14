@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="ParameterPreset" id="{24def65d-5652-4251-a19d-c3636f9d46d3}">
+		<property name="name">
+			<value>Delay</value>
+		</property>
+		<relationship name="folder">
+			<destination>{d5dd0780-d670-476a-91a9-e42e073e9cb6}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{5c01aa64-bb3c-4f35-97d4-f34902e0b13d}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{5c01aa64-bb3c-4f35-97d4-f34902e0b13d}">
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+	</object>
+</objects>

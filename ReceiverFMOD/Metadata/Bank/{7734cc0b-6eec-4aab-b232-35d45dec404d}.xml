@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="Bank" id="{7734cc0b-6eec-4aab-b232-35d45dec404d}">
+		<property name="name">
+			<value>Cube Heads</value>
+		</property>
+		<relationship name="folder">
+			<destination>{ccab2104-5e00-4b01-b8a7-c444075af6ab}</destination>
+		</relationship>
+	</object>
+</objects>

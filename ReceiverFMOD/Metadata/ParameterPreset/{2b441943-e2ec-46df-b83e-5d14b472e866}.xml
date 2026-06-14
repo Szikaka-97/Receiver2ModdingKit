@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="ParameterPreset" id="{2b441943-e2ec-46df-b83e-5d14b472e866}">
+		<property name="name">
+			<value>InHellipad</value>
+		</property>
+		<relationship name="folder">
+			<destination>{d5dd0780-d670-476a-91a9-e42e073e9cb6}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{8427b0ed-34ed-48a8-af33-77ea8925cc84}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{8427b0ed-34ed-48a8-af33-77ea8925cc84}">
+		<property name="isGlobal">
+			<value>true</value>
+		</property>
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+		<property name="seekSpeed">
+			<value>0.6600000262260437</value>
+		</property>
+		<property name="isExposedRecursively">
+			<value>false</value>
+		</property>
+	</object>
+</objects>

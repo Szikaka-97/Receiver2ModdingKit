@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="MixerGroup" id="{1b04e5d6-8ea0-43a3-92e9-56d6abfee1d5}">
+		<property name="overridingInputFormat">
+			<value>1</value>
+		</property>
+		<property name="inputFormatOverridden">
+			<value>true</value>
+		</property>
+		<property name="name">
+			<value>Voice</value>
+		</property>
+		<relationship name="effectChain">
+			<destination>{d7cb2974-4e3d-4ca1-9a5a-ad6d9ec3ce82}</destination>
+		</relationship>
+		<relationship name="panner">
+			<destination>{fd67c80a-601b-4c67-bc3c-f8c718de5c10}</destination>
+		</relationship>
+		<relationship name="output">
+			<destination>{c2992632-8f0e-4f9c-a711-e896078107f9}</destination>
+		</relationship>
+	</object>
+	<object class="MixerBusEffectChain" id="{d7cb2974-4e3d-4ca1-9a5a-ad6d9ec3ce82}">
+		<relationship name="effects">
+			<destination>{17d96be7-d3d9-4bdf-ba68-cb1667fae42b}</destination>
+			<destination>{54454f82-628a-474a-aee8-533f3e2356b3}</destination>
+		</relationship>
+	</object>
+	<object class="MixerBusPanner" id="{fd67c80a-601b-4c67-bc3c-f8c718de5c10}" />
+	<object class="MixerBusFader" id="{17d96be7-d3d9-4bdf-ba68-cb1667fae42b}" />
+	<object class="Sidechain" id="{54454f82-628a-474a-aee8-533f3e2356b3}" />
+</objects>

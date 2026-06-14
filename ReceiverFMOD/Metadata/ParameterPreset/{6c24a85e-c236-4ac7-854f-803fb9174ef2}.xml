@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="ParameterPreset" id="{6c24a85e-c236-4ac7-854f-803fb9174ef2}">
+		<property name="name">
+			<value>VentFanOcclusion</value>
+		</property>
+		<relationship name="folder">
+			<destination>{d5dd0780-d670-476a-91a9-e42e073e9cb6}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{28815725-492d-4d1b-9edb-f0f8018facc7}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{28815725-492d-4d1b-9edb-f0f8018facc7}">
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+		<property name="seekSpeed">
+			<value>0.47000002861022949</value>
+		</property>
+	</object>
+</objects>

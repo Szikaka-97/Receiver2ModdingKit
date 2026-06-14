@@ -14,7 +14,6 @@ using Receiver2ModdingKit.Editor;
 using Receiver2ModdingKit.Helpers;
 using Wolfire;
 using BepInEx.Logging;
-using SharpCompress.Archives.SevenZip;
 using SharpCompress.Archives;
 
 namespace Receiver2ModdingKit {
@@ -516,6 +515,12 @@ namespace Receiver2ModdingKit {
 		#endregion
 
 		#region General Patches
+
+		[HarmonyPatch(typeof(TapesMenuScript), "Awake")]
+		[HarmonyPrefix]
+		private static void AddMissingTapeEntryCategory(Dictionary<TapeGroupID, MenuEntryCategories> ___menuCategoryMappings) {
+			___menuCategoryMappings.Add(TapeGroupID.Classic, MenuEntryCategories.Classic);
+		}
 
 		[HarmonyPatch(typeof(ReceiverCoreScript), nameof(ReceiverCoreScript.LoadModGun))]
 		[HarmonyPrefix]                                  					 //hello my name is sizwaz and I love K&R braces

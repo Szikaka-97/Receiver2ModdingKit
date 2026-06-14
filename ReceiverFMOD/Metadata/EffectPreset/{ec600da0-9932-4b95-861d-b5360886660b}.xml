@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="EffectPreset" id="{ec600da0-9932-4b95-861d-b5360886660b}">
+		<property name="name">
+			<value>object grab</value>
+		</property>
+		<relationship name="folder">
+			<destination>{caf1f488-312a-40fd-9422-8544fc419b94}</destination>
+		</relationship>
+		<relationship name="effect">
+			<destination>{51a52549-771b-4bc4-9731-5f6cc92da425}</destination>
+		</relationship>
+	</object>
+	<object class="SpatialiserEffect" id="{51a52549-771b-4bc4-9731-5f6cc92da425}">
+		<property name="distanceRolloffType">
+			<value>2</value>
+		</property>
+		<property name="minimumDistance">
+			<value>0.100000001</value>
+		</property>
+	</object>
+</objects>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="ParameterPreset" id="{e5fdde1c-1a72-4ba1-bc2d-18f749a66260}">
+		<property name="name">
+			<value>DamagedMedia</value>
+		</property>
+		<relationship name="folder">
+			<destination>{d5dd0780-d670-476a-91a9-e42e073e9cb6}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{e011ec6a-c7ab-4b52-aef4-fe2edd7be0bf}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{e011ec6a-c7ab-4b52-aef4-fe2edd7be0bf}">
+		<property name="initialValue">
+			<value>0.1900000125169754</value>
+		</property>
+	</object>
+</objects>

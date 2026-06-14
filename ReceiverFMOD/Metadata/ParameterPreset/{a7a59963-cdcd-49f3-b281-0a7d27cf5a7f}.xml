@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="ParameterPreset" id="{a7a59963-cdcd-49f3-b281-0a7d27cf5a7f}">
+		<property name="name">
+			<value>HackSafe</value>
+		</property>
+		<relationship name="folder">
+			<destination>{d5dd0780-d670-476a-91a9-e42e073e9cb6}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{8ea6af0c-307c-411e-90f6-d2a355859de1}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{8ea6af0c-307c-411e-90f6-d2a355859de1}">
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+	</object>
+</objects>

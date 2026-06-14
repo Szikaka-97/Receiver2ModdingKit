@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="ParameterPreset" id="{593fcec8-63fd-49ac-95c5-225f45cf4236}">
+		<property name="name">
+			<value>SensoryDepTank</value>
+		</property>
+		<relationship name="folder">
+			<destination>{d5dd0780-d670-476a-91a9-e42e073e9cb6}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{d56fa584-501d-40f5-becf-45df41e429fe}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{d56fa584-501d-40f5-becf-45df41e429fe}">
+		<property name="parameterType">
+			<value>1</value>
+		</property>
+		<property name="maximum">
+			<value>2</value>
+		</property>
+		<property name="initialValue">
+			<value>1</value>
+		</property>
+	</object>
+</objects>

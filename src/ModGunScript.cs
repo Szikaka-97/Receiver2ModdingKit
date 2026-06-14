@@ -308,7 +308,7 @@ namespace Receiver2ModdingKit {
 			try {
 				AwakeGun();
 			} catch (Exception e) {
-				Debug.LogError(String.Format("Catched exception during {0}'s AwakeGun", this.InternalName));
+				Debug.LogError(String.Format("Caught exception during {0}'s AwakeGun", this.InternalName));
 				Debug.LogException(e);
 			}
 		}
@@ -318,7 +318,7 @@ namespace Receiver2ModdingKit {
 				try {
 					this.EarlyUpdateGun();
 				} catch (Exception e) {
-					Debug.LogError(String.Format("Catched exception during {0}'s EarlyUpdateGun", this.InternalName));
+					Debug.LogError(String.Format("Caught exception during {0}'s EarlyUpdateGun", this.InternalName));
 
 					Debug.LogException(e);
 				}
@@ -329,7 +329,7 @@ namespace Receiver2ModdingKit {
 					UpdateAnimatedComponents();
 					if (safety.transform) safety.UpdateDisplay();
 				} catch (NullReferenceException e) {
-					Debug.LogError(String.Format("Catched exception during {0}'s Update", this.InternalName));
+					Debug.LogError(String.Format("Caught exception during {0}'s Update", this.InternalName));
 
 					if (!String.IsNullOrEmpty(TransformDebugScope.last_target)) {
 						Debug.LogError("You seem to be missing the " + TransformDebugScope.last_target + " transform.");
@@ -344,7 +344,7 @@ namespace Receiver2ModdingKit {
 				try {
 					this.LateUpdateGun();
 				} catch (Exception e) {
-					Debug.LogError(String.Format("Catched exception during {0}'s LateUpdateGun", this.InternalName));
+					Debug.LogError(String.Format("Caught exception during {0}'s LateUpdateGun", this.InternalName));
 
 					Debug.LogException(e);
 				}

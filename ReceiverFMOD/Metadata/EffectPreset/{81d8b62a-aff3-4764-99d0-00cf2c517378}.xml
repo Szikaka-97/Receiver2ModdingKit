@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="EffectPreset" id="{81d8b62a-aff3-4764-99d0-00cf2c517378}">
+		<property name="name">
+			<value>arcade_spaitalizer</value>
+		</property>
+		<relationship name="folder">
+			<destination>{caf1f488-312a-40fd-9422-8544fc419b94}</destination>
+		</relationship>
+		<relationship name="effect">
+			<destination>{635f732d-7e11-4e5d-9fcf-2d7e985746ea}</destination>
+		</relationship>
+	</object>
+	<object class="SpatialiserEffect" id="{635f732d-7e11-4e5d-9fcf-2d7e985746ea}">
+		<property name="distanceRolloffType">
+			<value>3</value>
+		</property>
+		<property name="minimumDistance">
+			<value>0.299999982</value>
+		</property>
+		<property name="maximumDistance">
+			<value>10</value>
+		</property>
+		<property name="extentMode">
+			<value>1</value>
+		</property>
+		<property name="minimumExtent">
+			<value>140</value>
+		</property>
+	</object>
+</objects>

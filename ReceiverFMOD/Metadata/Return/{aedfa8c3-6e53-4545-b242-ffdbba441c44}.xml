@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="MixerReturn" id="{aedfa8c3-6e53-4545-b242-ffdbba441c44}">
+		<property name="name">
+			<value>shots</value>
+		</property>
+		<relationship name="effectChain">
+			<destination>{03bd09bd-bcf2-46a5-8c39-b8fdf88a5c21}</destination>
+		</relationship>
+		<relationship name="panner">
+			<destination>{6e3afea6-fd0d-470c-8fef-05bc4dca94ba}</destination>
+		</relationship>
+		<relationship name="output">
+			<destination>{e0365931-c7b5-4ad0-aabc-30881ce123e1}</destination>
+		</relationship>
+	</object>
+	<object class="MixerBusEffectChain" id="{03bd09bd-bcf2-46a5-8c39-b8fdf88a5c21}">
+		<relationship name="effects">
+			<destination>{fbc03af6-243e-4c8a-ac13-337f951e8865}</destination>
+			<destination>{a6d58261-5f81-41a5-96c3-4207a555a19d}</destination>
+			<destination>{92744bdf-6aff-4eb8-9883-d0d925034c78}</destination>
+		</relationship>
+	</object>
+	<object class="MixerBusPanner" id="{6e3afea6-fd0d-470c-8fef-05bc4dca94ba}" />
+	<object class="SFXReverbEffect" id="{fbc03af6-243e-4c8a-ac13-337f951e8865}">
+		<property name="decayTime">
+			<value>4900</value>
+		</property>
+		<property name="HFReference">
+			<value>5500</value>
+		</property>
+		<property name="HFDecayRatio">
+			<value>70</value>
+		</property>
+		<property name="diffusion">
+			<value>50.5</value>
+		</property>
+		<property name="lowShelfFrequency">
+			<value>64</value>
+		</property>
+		<property name="lowShelfGain">
+			<value>2</value>
+		</property>
+		<property name="highCut">
+			<value>20000</value>
+		</property>
+		<relationship name="automators">
+			<destination>{938775b5-81ff-44f8-86fb-d00155112357}</destination>
+		</relationship>
+	</object>
+	<object class="CompressorEffect" id="{a6d58261-5f81-41a5-96c3-4207a555a19d}">
+		<property name="threshold">
+			<value>-41</value>
+		</property>
+		<property name="ratio">
+			<value>2.19999981</value>
+		</property>
+		<property name="attackTime">
+			<value>9.19999981</value>
+		</property>
+		<property name="releaseTime">
+			<value>140</value>
+		</property>
+		<relationship name="sidechains">
+			<destination>{9ded6d31-d0d9-4510-ab1b-1a9b769c03ab}</destination>
+		</relationship>
+	</object>
+	<object class="MixerBusFader" id="{92744bdf-6aff-4eb8-9883-d0d925034c78}" />
+	<object class="Automator" id="{938775b5-81ff-44f8-86fb-d00155112357}">
+		<property name="nameOfPropertyBeingAutomated">
+			<value>wetLevel</value>
+		</property>
+		<relationship name="automationCurves">
+			<destination>{2bef3dc9-a107-4d7d-b891-a974558fa6b4}</destination>
+		</relationship>
+	</object>
+	<object class="AutomationCurve" id="{2bef3dc9-a107-4d7d-b891-a974558fa6b4}">
+		<relationship name="parameter">
+			<destination>{0426735e-8f8b-4163-a5f2-59660c93f5b5}</destination>
+		</relationship>
+		<relationship name="automationPoints">
+			<destination>{df705901-1583-4d45-bacf-776a20e5a73b}</destination>
+			<destination>{a3bf8472-21e1-417c-8901-31b1487f0662}</destination>
+		</relationship>
+	</object>
+	<object class="AutomationPoint" id="{df705901-1583-4d45-bacf-776a20e5a73b}">
+		<property name="position">
+			<value>1</value>
+		</property>
+		<property name="value">
+			<value>6</value>
+		</property>
+	</object>
+	<object class="AutomationPoint" id="{a3bf8472-21e1-417c-8901-31b1487f0662}">
+		<property name="position">
+			<value>0</value>
+		</property>
+		<property name="value">
+			<value>-80</value>
+		</property>
+	</object>
+</objects>

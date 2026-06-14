@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="EffectPreset" id="{7a3c82b2-e6c7-43f2-9bde-d7b2849310ed}">
+		<property name="name">
+			<value>PlayerMovement</value>
+		</property>
+		<relationship name="folder">
+			<destination>{caf1f488-312a-40fd-9422-8544fc419b94}</destination>
+		</relationship>
+		<relationship name="effect">
+			<destination>{f07428b1-3811-448e-a473-ef2fb9df3486}</destination>
+		</relationship>
+	</object>
+	<object class="PluginEffect" id="{f07428b1-3811-448e-a473-ef2fb9df3486}">
+		<relationship name="plugin">
+			<destination>{a7c44928-9a92-4b7f-b227-b7f4fe83ee8c}</destination>
+		</relationship>
+	</object>
+	<object class="Plugin" id="{a7c44928-9a92-4b7f-b227-b7f4fe83ee8c}">
+		<property name="identifier">
+			<value>Resonance Audio Source</value>
+		</property>
+		<relationship name="pluginParameters">
+			<destination>{7f20b7d4-4ac1-4578-8017-6000b7507416}</destination>
+			<destination>{0339c029-b75d-4b56-be50-f8785fdcd2aa}</destination>
+			<destination>{a8ef1ebe-ca4f-44b8-b204-b56d2d8662a2}</destination>
+			<destination>{b779f5c1-5595-43ef-9b60-5e378a1d1e99}</destination>
+			<destination>{0e33b1f9-2f93-46d4-8cb3-686dd7f80ad3}</destination>
+			<destination>{c1b30d6e-5841-4295-93df-704756c8fd88}</destination>
+			<destination>{3ed493e9-1ece-4495-b8f8-b856d14ce297}</destination>
+			<destination>{a3d7d54b-bef7-4860-a856-1d013dfc3478}</destination>
+			<destination>{81f6e777-56aa-4f5c-bd30-d92eb8a810f5}</destination>
+			<destination>{1b845eea-888c-4902-a60a-3f4213330e8f}</destination>
+			<destination>{6149ef82-ee1b-4a29-84fd-048387fe3437}</destination>
+			<destination>{3f84a556-e5af-4270-9629-7e95bdab4532}</destination>
+			<destination>{0a7592fc-5e8c-4c5b-acf0-d36e62336a25}</destination>
+		</relationship>
+	</object>
+	<object class="FloatPluginParameter" id="{7f20b7d4-4ac1-4578-8017-6000b7507416}">
+		<property name="name">
+			<value>Gain</value>
+		</property>
+		<property name="value">
+			<value>0</value>
+		</property>
+		<property name="curve">
+			<value>{(0.000000,-80.000000)(1.000000,24.000000)}</value>
+		</property>
+	</object>
+	<object class="FloatPluginParameter" id="{0339c029-b75d-4b56-be50-f8785fdcd2aa}">
+		<property name="name">
+			<value>Spread</value>
+		</property>
+		<property name="value">
+			<value>0</value>
+		</property>
+		<property name="curve">
+			<value>{(0.000000,0.000000)(1.000000,360.000000)}</value>
+		</property>
+	</object>
+	<object class="FloatPluginParameter" id="{a8ef1ebe-ca4f-44b8-b204-b56d2d8662a2}">
+		<property name="name">
+			<value>Min Distance</value>
+		</property>
+		<property name="value">
+			<value>1.80000007</value>
+		</property>
+		<property name="curve">
+			<value>{(0.000000,0.000000)(2.000000,1.000000)(5.000000,5.000000)(10.000000,10.000000)(15.000000,100.000000)(20.000000,1000.000000)(27.000000,10000.000000)}</value>
+		</property>
+	</object>
+	<object class="FloatPluginParameter" id="{b779f5c1-5595-43ef-9b60-5e378a1d1e99}">
+		<property name="name">
+			<value>Max Distance</value>
+		</property>
+		<property name="value">
+			<value>30</value>
+		</property>
+		<property name="curve">
+			<value>{(0.000000,0.000000)(2.000000,1.000000)(5.000000,5.000000)(10.000000,10.000000)(15.000000,100.000000)(20.000000,1000.000000)(27.000000,10000.000000)}</value>
+		</property>
+	</object>
+	<object class="IntPluginParameter" id="{0e33b1f9-2f93-46d4-8cb3-686dd7f80ad3}">
+		<property name="name">
+			<value>Dist Rolloff</value>
+		</property>
+		<property name="value">
+			<value>1</value>
+		</property>
+		<property name="minimumValue">
+			<value>0</value>
+		</property>
+		<property name="maximumValue">
+			<value>4</value>
+		</property>
+	</object>
+	<object class="FloatPluginParameter" id="{c1b30d6e-5841-4295-93df-704756c8fd88}">
+		<property name="name">
+			<value>Occlusion</value>
+		</property>
+		<property name="value">
+			<value>0</value>
+		</property>
+		<property name="curve">
+			<value>{(0.000000,0.000000)(1.000000,10.000000)}</value>
+		</property>
+	</object>
+	<object class="FloatPluginParameter" id="{3ed493e9-1ece-4495-b8f8-b856d14ce297}">
+		<property name="name">
+			<value>Directivity</value>
+		</property>
+		<property name="value">
+			<value>9.99999975e-06</value>
+		</property>
+		<property name="curve">
+			<value>{(0.000000,0.000000)(1.000000,1.000000)}</value>
+		</property>
+	</object>
+	<object class="FloatPluginParameter" id="{a3d7d54b-bef7-4860-a856-1d013dfc3478}">
+		<property name="name">
+			<value>Dir Sharpness</value>
+		</property>
+		<property name="value">
+			<value>1.00001001</value>
+		</property>
+		<property name="curve">
+			<value>{(0.000000,1.000000)(1.000000,2.000000)(2.000000,5.000000)(3.000000,10.000000)}</value>
+		</property>
+	</object>
+	<object class="DataPluginParameter" id="{81f6e777-56aa-4f5c-bd30-d92eb8a810f5}">
+		<property name="name">
+			<value>3D Attributes</value>
+		</property>
+		<property name="dataType">
+			<value>-2</value>
+		</property>
+	</object>
+	<object class="BoolPluginParameter" id="{1b845eea-888c-4902-a60a-3f4213330e8f}">
+		<property name="name">
+			<value>Bypass Room</value>
+		</property>
+		<property name="value">
+			<value>false</value>
+		</property>
+	</object>
+	<object class="BoolPluginParameter" id="{6149ef82-ee1b-4a29-84fd-048387fe3437}">
+		<property name="name">
+			<value>Near-Field FX</value>
+		</property>
+		<property name="value">
+			<value>false</value>
+		</property>
+	</object>
+	<object class="FloatPluginParameter" id="{3f84a556-e5af-4270-9629-7e95bdab4532}">
+		<property name="name">
+			<value>Near-Field Gain</value>
+		</property>
+		<property name="value">
+			<value>1.00001001</value>
+		</property>
+		<property name="curve">
+			<value>{(0.000000,0.000000)(1.000000,9.000000)}</value>
+		</property>
+	</object>
+	<object class="DataPluginParameter" id="{0a7592fc-5e8c-4c5b-acf0-d36e62336a25}">
+		<property name="name">
+			<value>Overall Gain</value>
+		</property>
+		<property name="dataType">
+			<value>-1</value>
+		</property>
+	</object>
+</objects>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="ParameterPreset" id="{15febd2d-26a9-4e20-90ff-68c325f9b06e}">
+		<property name="name">
+			<value>RankTransitionSting</value>
+		</property>
+		<relationship name="folder">
+			<destination>{d5dd0780-d670-476a-91a9-e42e073e9cb6}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{a3ff6070-f036-4ccc-bc3a-93e06a41788a}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{a3ff6070-f036-4ccc-bc3a-93e06a41788a}">
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+	</object>
+</objects>

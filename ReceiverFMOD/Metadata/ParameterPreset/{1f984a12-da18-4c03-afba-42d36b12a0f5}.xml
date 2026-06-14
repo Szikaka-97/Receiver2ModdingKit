@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="ParameterPreset" id="{1f984a12-da18-4c03-afba-42d36b12a0f5}">
+		<property name="name">
+			<value>InZenGarden</value>
+		</property>
+		<relationship name="folder">
+			<destination>{d5dd0780-d670-476a-91a9-e42e073e9cb6}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{c8584cae-6833-481f-8f36-86fd58ac59bf}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{c8584cae-6833-481f-8f36-86fd58ac59bf}">
+		<property name="isGlobal">
+			<value>true</value>
+		</property>
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+		<property name="seekSpeed">
+			<value>0.8200000524520874</value>
+		</property>
+		<property name="isExposedRecursively">
+			<value>false</value>
+		</property>
+	</object>
+</objects>

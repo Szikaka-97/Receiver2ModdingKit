@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="EffectPreset" id="{6b3af5f3-1544-45af-8b7f-6b9e55cb04ac}">
+		<property name="name">
+			<value>gun mechanics loud</value>
+		</property>
+		<relationship name="folder">
+			<destination>{caf1f488-312a-40fd-9422-8544fc419b94}</destination>
+		</relationship>
+		<relationship name="effect">
+			<destination>{32afda9d-9c34-4418-9c81-0935abf227e5}</destination>
+		</relationship>
+	</object>
+	<object class="SpatialiserEffect" id="{32afda9d-9c34-4418-9c81-0935abf227e5}">
+		<property name="distanceRolloffType">
+			<value>2</value>
+		</property>
+		<property name="minimumDistance">
+			<value>0.49999997</value>
+		</property>
+		<property name="maximumDistance">
+			<value>5</value>
+		</property>
+		<property name="extentMode">
+			<value>2</value>
+		</property>
+	</object>
+</objects>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="ParameterPreset" id="{2a11877a-1d34-4848-ad87-df8b5b305779}">
+		<property name="name">
+			<value>Transceiver Channel</value>
+		</property>
+		<relationship name="folder">
+			<destination>{d5dd0780-d670-476a-91a9-e42e073e9cb6}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{918a84c5-e6cf-4692-8e16-2e77a0c83bc2}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{918a84c5-e6cf-4692-8e16-2e77a0c83bc2}">
+		<property name="parameterType">
+			<value>1</value>
+		</property>
+		<property name="maximum">
+			<value>33</value>
+		</property>
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+	</object>
+</objects>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="MixerReturn" id="{ce2f1970-bb01-46e7-8b42-76e99c3ca2ed}">
+		<property name="name">
+			<value>balloon</value>
+		</property>
+		<relationship name="effectChain">
+			<destination>{39dba873-18a4-4e75-88f6-f57a68875627}</destination>
+		</relationship>
+		<relationship name="panner">
+			<destination>{ea89c279-b93d-481c-92a6-910d1fc67846}</destination>
+		</relationship>
+		<relationship name="output">
+			<destination>{e0365931-c7b5-4ad0-aabc-30881ce123e1}</destination>
+		</relationship>
+	</object>
+	<object class="MixerBusEffectChain" id="{39dba873-18a4-4e75-88f6-f57a68875627}">
+		<relationship name="effects">
+			<destination>{9ded6d31-d0d9-4510-ab1b-1a9b769c03ab}</destination>
+			<destination>{ba5dc92e-52dc-4d0d-8171-8a38bdd8dfaa}</destination>
+		</relationship>
+	</object>
+	<object class="MixerBusPanner" id="{ea89c279-b93d-481c-92a6-910d1fc67846}" />
+	<object class="Sidechain" id="{9ded6d31-d0d9-4510-ab1b-1a9b769c03ab}" />
+	<object class="MixerBusFader" id="{ba5dc92e-52dc-4d0d-8171-8a38bdd8dfaa}" />
+</objects>

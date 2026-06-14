@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="ParameterPreset" id="{b87f34f7-31c9-4555-89e4-afe80c2ba5b3}">
+		<property name="name">
+			<value>Mystical</value>
+		</property>
+		<relationship name="folder">
+			<destination>{d5dd0780-d670-476a-91a9-e42e073e9cb6}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{0fadd49c-2413-4e9d-8a85-131256feba70}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{0fadd49c-2413-4e9d-8a85-131256feba70}">
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+	</object>
+</objects>

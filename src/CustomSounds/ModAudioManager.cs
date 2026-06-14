@@ -9,6 +9,7 @@ using ImGuiNET;
 using Receiver2;
 using Receiver2ModdingKit.Editor;
 using HarmonyLib;
+using System.Reflection;
 
 namespace Receiver2ModdingKit.CustomSounds {
 
@@ -32,13 +33,12 @@ namespace Receiver2ModdingKit.CustomSounds {
 			return FMOD.RESULT.OK;
 		});
 
-		public static FMOD.Studio.System mod_system;
-
 		public class CustomEventInstanceUserData { public IntPtr sound_handle; }
 
 		private static Dictionary<string, SoundAsset> customEvents = new Dictionary<string, SoundAsset>();
 		private static List<string> prefixes = new List<string>();
 		private static Bus[] busList;
+		public static FMOD.Studio.System mod_system;
 
 		/// <summary>
 		/// Load the main sound bank and setup variables for modded audio to use
@@ -53,6 +53,17 @@ namespace Receiver2ModdingKit.CustomSounds {
 				//ToDo - Error message
 
 				return;
+			}
+
+			//each FMOD compiled c# lib has its pre-compiled own way of getting the path, let's use it instead of making our own (do they know you're supposed to use runtime stuff? fucking C people I swear)
+			var resonanceaudioPath = typeof(RuntimeUtils).GetMethod("GetPluginPath", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, new object[] { "resonanceaudio" }) as string;
+
+			if (
+				Utility.IsError(mod_system.getCoreSystem(out var coresystem), "Couldn't get core system, whatever")
+				||
+				Utility.IsError(coresystem.loadPlugin(resonanceaudioPath, out _), "Couldn't load resonance audio, whatever")
+			) {
+				//who care
 			}
 
 			FMOD.Studio.Bank master_bank, master_strings_bank;
@@ -81,7 +92,6 @@ namespace Receiver2ModdingKit.CustomSounds {
 			}
 		}
 
-
 		/// <summary>
 		/// Try to load banks from the provided lists, returning the banks that loaded properly
 		/// </summary>
@@ -103,29 +113,85 @@ namespace Receiver2ModdingKit.CustomSounds {
 					Debug.LogError("ModAudioManager: Bank list " + list.name + " contains no banks");
 				}
 
-				int index = 0;
-
-				foreach(var bank_data in bank_data_list) {
-					index++;
-
-					if (
-						Utility.IsError(mod_system.loadBankMemory(bank_data, LOAD_BANK_FLAGS.NORMAL, out Bank bank))
-						||
-						Utility.IsError(bank.loadSampleData())
-					) {
-						Debug.LogError("ModAudioManager: Bank at index " + index + " from bank list " + list.name + " is invalid and will not be loaded");
-
-						if (bank.isValid()) bank.unload();
-
-						continue;
-					}
-
-					if (bank.isValid()) loaded_banks.Add(bank);
+				//we want to have the main banks (i.e. the non .strings banks) first, because .strings banks always succeed, if we load a .strings bank, then fucking fail to load a master bank, we'll get errors out the ass hole, not fun!
+				bank_data_list = ReorderBankList(bank_data_list);
+				
+				//try loading with the game's studio system, if it fails, load the banks with our own studio system
+				if (!TryLoadReceiverFMODProjectBanks(bank_data_list, out var loaded_cool_banks)) {
+					loaded_cool_banks = LoadLegacyProjectBanks(bank_data_list, list.name);
 				}
+
+				loaded_banks.AddRange(loaded_cool_banks);
 			}
 
 			if (loaded_banks.Count == 0) return null;
 			return loaded_banks.ToArray();
+		}
+
+		private static List<byte[]> ReorderBankList(List<byte[]> banks) {
+			var reordered_banks = new List<byte[]>();
+
+			var string_banks = new List<byte[]>();
+
+			for (int i = 0; i < banks.Count; i++) {
+				if (BitConverter.ToUInt32(banks[i], 0x00000054) == 4) {
+					//save them and add them l8er
+					string_banks.Add(banks[i]);
+
+					continue;
+				}
+
+				reordered_banks.Add(banks[i]);
+			}
+
+			reordered_banks.AddRange(string_banks);
+
+			return reordered_banks;
+		}
+
+		private static bool TryLoadReceiverFMODProjectBanks(List<byte[]> banks, out List<Bank> loaded_banks) {
+			loaded_banks = new List<Bank>();
+
+			foreach (var bank_data in banks) {
+				//silently fail
+				if  ( (RuntimeManager.StudioSystem.loadBankMemory(bank_data, LOAD_BANK_FLAGS.NORMAL, out var bank) != FMOD.RESULT.OK) || (bank.loadSampleData() != FMOD.RESULT.OK) ) {
+					if (bank.isValid()) bank.unload();
+
+					//ummmmmmmmmmmmmmmmmmmmmmmmmmmmmmm fuck it lol
+					foreach (var successfully_loaded_banks in loaded_banks) {
+						successfully_loaded_banks.unload();
+					}
+
+					//return at first failure? fuck it, why not
+					return false;
+				}
+
+				loaded_banks.Add(bank);
+			}
+
+			return true;
+		}
+
+		private static List<Bank> LoadLegacyProjectBanks(List<byte[]> banks, string bank_list_name) {
+			Debug.Log("using mod studio system for banks");
+
+			var loaded_banks = new List<Bank>();
+
+			var index = 0;
+
+			foreach (var bank_data in banks) {
+				if ( Utility.IsError(mod_system.loadBankMemory(bank_data, LOAD_BANK_FLAGS.NORMAL, out var bank)) || Utility.IsError(bank.loadSampleData()) ) {
+					if (bank.isValid()) bank.unload();
+
+					Debug.LogError($"ModAudioManager: Bank at index {index} from bank list {bank_list_name} is invalid and will not be loaded");
+
+					continue;
+				}
+
+				loaded_banks.Add(bank);
+			}
+
+			return loaded_banks;
 		}
 
 		/// <summary>
@@ -178,7 +244,7 @@ namespace Receiver2ModdingKit.CustomSounds {
 
 			List<string> active_instances = new List<string>();
 
-			if (Utility.IsError(mod_system.getBankList(out Bank[] bank_list))) return;
+			if (Utility.IsError(RuntimeManager.StudioSystem.getBankList(out Bank[] bank_list))) return;
 
 			foreach (Bank bank in bank_list) {
 				if (Utility.CheckResult(bank.getEventList(out var event_list))) {

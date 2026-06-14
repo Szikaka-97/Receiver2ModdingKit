@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="EventFolder" id="{69881335-f359-4bc1-9cb6-4468afe28230}">
+		<property name="name">
+			<value>Intercom</value>
+		</property>
+		<relationship name="folder">
+			<destination>{bfb150fb-e3ec-4317-a0fe-60d3db7185db}</destination>
+		</relationship>
+	</object>
+</objects>

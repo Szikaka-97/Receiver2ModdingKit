@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="ParameterPreset" id="{874762ff-3411-496c-a6a1-2566d5009863}">
+		<property name="name">
+			<value>HackProgress</value>
+		</property>
+		<relationship name="folder">
+			<destination>{d5dd0780-d670-476a-91a9-e42e073e9cb6}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{db23bf99-d63f-41d4-a710-f27bec930d7e}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{db23bf99-d63f-41d4-a710-f27bec930d7e}">
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+	</object>
+</objects>

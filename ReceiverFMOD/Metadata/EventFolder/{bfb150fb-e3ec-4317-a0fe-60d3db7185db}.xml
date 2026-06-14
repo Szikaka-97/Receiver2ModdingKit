@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="EventFolder" id="{bfb150fb-e3ec-4317-a0fe-60d3db7185db}">
+		<property name="name">
+			<value>MallDLC</value>
+		</property>
+		<relationship name="folder">
+			<destination>{c5b093aa-2222-47c1-ba8b-7bb4571c4613}</destination>
+		</relationship>
+	</object>
+</objects>

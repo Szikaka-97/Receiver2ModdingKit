@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="MixerGroup" id="{fa7db8ee-a775-4ad1-a0cd-37bf423d5332}">
+		<property name="volume">
+			<value>-12.4000006</value>
+		</property>
+		<property name="overridingInputFormat">
+			<value>1</value>
+		</property>
+		<property name="inputFormatOverridden">
+			<value>true</value>
+		</property>
+		<property name="name">
+			<value>Quiet</value>
+		</property>
+		<relationship name="effectChain">
+			<destination>{9d1d2f69-d615-4316-927b-af0a50ac1305}</destination>
+		</relationship>
+		<relationship name="panner">
+			<destination>{d9eb19f4-c6e2-4282-8751-ad35b9868ee9}</destination>
+		</relationship>
+		<relationship name="output">
+			<destination>{eecff63c-57f4-4309-b6eb-2ad095bbb74f}</destination>
+		</relationship>
+	</object>
+	<object class="MixerBusEffectChain" id="{9d1d2f69-d615-4316-927b-af0a50ac1305}">
+		<relationship name="effects">
+			<destination>{eddfdf79-7ebe-4765-91e7-b34d9af6addd}</destination>
+		</relationship>
+	</object>
+	<object class="MixerBusPanner" id="{d9eb19f4-c6e2-4282-8751-ad35b9868ee9}" />
+	<object class="MixerBusFader" id="{eddfdf79-7ebe-4765-91e7-b34d9af6addd}" />
+</objects>

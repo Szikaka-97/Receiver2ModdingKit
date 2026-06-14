@@ -161,10 +161,10 @@ public class MultiOSBuild : PipelineJob
 						break;
 				}
 			}
-
-			File.Delete(Path.Combine(resolvedBundleArtifactPath, Path.GetFileName(resolvedBundleArtifactPath)));
-			File.Delete(Path.Combine(resolvedBundleArtifactPath, Path.GetFileName(resolvedBundleArtifactPath) + ".manifest"));
 		}
+
+		File.Delete(Path.Combine(resolvedBundleArtifactPath, Path.GetFileName(resolvedBundleArtifactPath)));
+		File.Delete(Path.Combine(resolvedBundleArtifactPath, Path.GetFileName(resolvedBundleArtifactPath) + ".manifest"));
 
 		void BuildBundle(BuildTarget buildTarget)
 		{

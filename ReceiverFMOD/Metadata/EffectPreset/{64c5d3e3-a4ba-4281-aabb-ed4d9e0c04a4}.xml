@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="EffectPreset" id="{64c5d3e3-a4ba-4281-aabb-ed4d9e0c04a4}">
+		<property name="name">
+			<value>Thunder Spatializer</value>
+		</property>
+		<relationship name="folder">
+			<destination>{caf1f488-312a-40fd-9422-8544fc419b94}</destination>
+		</relationship>
+		<relationship name="effect">
+			<destination>{b68cd735-7680-46f7-9348-a66650f69578}</destination>
+		</relationship>
+	</object>
+	<object class="SpatialiserEffect" id="{b68cd735-7680-46f7-9348-a66650f69578}">
+		<property name="bypass">
+			<value>true</value>
+		</property>
+		<property name="distanceRolloffType">
+			<value>4</value>
+		</property>
+		<property name="extentMode">
+			<value>1</value>
+		</property>
+		<property name="minimumExtent">
+			<value>184</value>
+		</property>
+	</object>
+</objects>

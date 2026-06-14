@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="ParameterPreset" id="{bfef7a45-19ac-40f4-968f-3127bcdc4c05}">
+		<property name="name">
+			<value>turret distance</value>
+		</property>
+		<relationship name="folder">
+			<destination>{d5dd0780-d670-476a-91a9-e42e073e9cb6}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{b155e859-d2f0-4e53-b87f-cec546e9c33b}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{b155e859-d2f0-4e53-b87f-cec546e9c33b}">
+		<property name="parameterType">
+			<value>3</value>
+		</property>
+		<property name="maximum">
+			<value>100</value>
+		</property>
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+		<property name="isExposedRecursively">
+			<value>false</value>
+		</property>
+	</object>
+</objects>

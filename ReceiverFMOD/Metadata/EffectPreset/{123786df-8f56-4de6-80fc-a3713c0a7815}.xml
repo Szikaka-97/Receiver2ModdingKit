@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="EffectPreset" id="{123786df-8f56-4de6-80fc-a3713c0a7815}">
+		<property name="name">
+			<value>bullet impact</value>
+		</property>
+		<relationship name="folder">
+			<destination>{caf1f488-312a-40fd-9422-8544fc419b94}</destination>
+		</relationship>
+		<relationship name="effect">
+			<destination>{d5a80007-8828-45a9-a990-228b1477b078}</destination>
+		</relationship>
+	</object>
+	<object class="SpatialiserEffect" id="{d5a80007-8828-45a9-a990-228b1477b078}">
+		<property name="distanceRolloffType">
+			<value>4</value>
+		</property>
+		<property name="maximumDistance">
+			<value>55</value>
+		</property>
+		<property name="extentMode">
+			<value>1</value>
+		</property>
+	</object>
+</objects>

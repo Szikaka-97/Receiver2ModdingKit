@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="EffectPreset" id="{fb5b0f51-77ef-485a-8cb3-870517a378a5}">
+		<property name="name">
+			<value>Migrated Placeholder Sidechain</value>
+		</property>
+		<relationship name="folder">
+			<destination>{caf1f488-312a-40fd-9422-8544fc419b94}</destination>
+		</relationship>
+		<relationship name="effect">
+			<destination>{464d9c84-e32e-4c3a-b92e-cf44a43a8f83}</destination>
+		</relationship>
+	</object>
+	<object class="Sidechain" id="{464d9c84-e32e-4c3a-b92e-cf44a43a8f83}" />
+</objects>

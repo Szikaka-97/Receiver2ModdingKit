@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="EffectPreset" id="{d91be840-a80c-41b5-ba4d-b9549404055c}">
+		<property name="name">
+			<value>Delay</value>
+		</property>
+		<relationship name="folder">
+			<destination>{caf1f488-312a-40fd-9422-8544fc419b94}</destination>
+		</relationship>
+		<relationship name="effect">
+			<destination>{404372e2-d5fc-4464-80f1-2d54cfd35487}</destination>
+		</relationship>
+	</object>
+	<object class="DelayEffect" id="{404372e2-d5fc-4464-80f1-2d54cfd35487}">
+		<property name="delay">
+			<value>620</value>
+		</property>
+		<property name="feedback">
+			<value>0</value>
+		</property>
+		<property name="dryLevel">
+			<value>-80</value>
+		</property>
+		<relationship name="automators">
+			<destination>{f0146607-338c-48c2-9278-8ca5a7e8ed9b}</destination>
+		</relationship>
+	</object>
+	<object class="Automator" id="{f0146607-338c-48c2-9278-8ca5a7e8ed9b}">
+		<property name="nameOfPropertyBeingAutomated">
+			<value>delay</value>
+		</property>
+		<relationship name="automationCurves">
+			<destination>{e271482a-52fc-423b-bd99-893a556aeba3}</destination>
+		</relationship>
+	</object>
+	<object class="AutomationCurve" id="{e271482a-52fc-423b-bd99-893a556aeba3}">
+		<relationship name="parameter">
+			<destination>{5c01aa64-bb3c-4f35-97d4-f34902e0b13d}</destination>
+		</relationship>
+		<relationship name="automationPoints">
+			<destination>{a003225e-938e-4cc8-a930-59c3a1bd1a80}</destination>
+			<destination>{6acfc328-0a7a-4816-852c-1bd5f6aa7eeb}</destination>
+		</relationship>
+	</object>
+	<object class="AutomationPoint" id="{a003225e-938e-4cc8-a930-59c3a1bd1a80}">
+		<property name="position">
+			<value>1</value>
+		</property>
+		<property name="value">
+			<value>1000</value>
+		</property>
+	</object>
+	<object class="AutomationPoint" id="{6acfc328-0a7a-4816-852c-1bd5f6aa7eeb}">
+		<property name="position">
+			<value>0</value>
+		</property>
+		<property name="value">
+			<value>10</value>
+		</property>
+	</object>
+</objects>

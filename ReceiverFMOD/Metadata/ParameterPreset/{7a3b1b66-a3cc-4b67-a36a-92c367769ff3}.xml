@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="ParameterPreset" id="{7a3b1b66-a3cc-4b67-a36a-92c367769ff3}">
+		<property name="name">
+			<value>RankUp</value>
+		</property>
+		<relationship name="folder">
+			<destination>{d5dd0780-d670-476a-91a9-e42e073e9cb6}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{03382d3f-e9ed-4282-9f53-bf375989f563}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{03382d3f-e9ed-4282-9f53-bf375989f563}">
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+		<property name="seekSpeed">
+			<value>0.60000002384185791</value>
+		</property>
+	</object>
+</objects>

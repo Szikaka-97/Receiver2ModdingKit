@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="ParameterPreset" id="{f52e83fb-f49a-4549-afd3-04ac842b5edd}">
+		<property name="name">
+			<value>cube_0</value>
+		</property>
+		<relationship name="folder">
+			<destination>{d5dd0780-d670-476a-91a9-e42e073e9cb6}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{c58aa8e1-63b0-4f84-ab22-134d0fde5e02}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{c58aa8e1-63b0-4f84-ab22-134d0fde5e02}">
+		<property name="parameterType">
+			<value>1</value>
+		</property>
+		<property name="maximum">
+			<value>4</value>
+		</property>
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+		<property name="isExposedRecursively">
+			<value>false</value>
+		</property>
+	</object>
+</objects>

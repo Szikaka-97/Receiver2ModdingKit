@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="EffectPreset" id="{892164dd-0e51-4050-a282-4570188ab8e0}">
+		<property name="name">
+			<value>BulletHitCompressor</value>
+		</property>
+		<relationship name="folder">
+			<destination>{caf1f488-312a-40fd-9422-8544fc419b94}</destination>
+		</relationship>
+		<relationship name="effect">
+			<destination>{f78b3817-0549-425d-81fd-85f0859850cb}</destination>
+		</relationship>
+	</object>
+	<object class="CompressorEffect" id="{f78b3817-0549-425d-81fd-85f0859850cb}">
+		<property name="gain">
+			<value>14</value>
+		</property>
+	</object>
+</objects>
