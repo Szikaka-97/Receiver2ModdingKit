@@ -1081,6 +1081,7 @@ namespace Receiver2ModdingKit {
 			HarmonyInstances.ModHelpEntry = Harmony.CreateAndPatchAll(typeof(ModHelpEntryManager));
 			HarmonyInstances.CustomSounds = Harmony.CreateAndPatchAll(typeof(CustomSounds.ModAudioPatches));
 			HarmonyInstances.ModGameMode = Harmony.CreateAndPatchAll(typeof(Gamemodes.ModGameModeManager));
+			Harmony.CreateAndPatchAll(typeof(FMODLookForTapeFilterBytes));
 
 			#if DEBUG
 			HarmonyInstances.DebugPatches = Harmony.CreateAndPatchAll(typeof(DebugTranspilers));

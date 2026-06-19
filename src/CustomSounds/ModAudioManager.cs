@@ -244,7 +244,7 @@ namespace Receiver2ModdingKit.CustomSounds {
 
 			List<string> active_instances = new List<string>();
 
-			if (Utility.IsError(RuntimeManager.StudioSystem.getBankList(out Bank[] bank_list))) return;
+			if (Utility.IsError(mod_system.getBankList(out Bank[] bank_list))) return;
 
 			foreach (Bank bank in bank_list) {
 				if (Utility.CheckResult(bank.getEventList(out var event_list))) {

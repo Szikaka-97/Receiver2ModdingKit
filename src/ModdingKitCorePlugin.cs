@@ -6,6 +6,8 @@ using TMPro;
 using BepInEx;
 using Receiver2;
 using Receiver2ModdingKit.ModInstaller;
+using System.Runtime.InteropServices;
+using System.Collections;
 
 namespace Receiver2ModdingKit {
 #if UNITY_EDITOR
@@ -93,13 +95,43 @@ namespace Receiver2ModdingKit {
 			;
 		}
 
+		private void AddPatchMessageToMenu() {
+			ReceiverCoreScript.Instance().transform.Find("Menus/New Main Menu/Canvas/CanvasGroup/Title image").gameObject.SetActive(false);
+			ReceiverCoreScript.Instance().transform.Find("Menus/New Main Menu/Canvas/CanvasGroup/Title/Number").gameObject.SetActive(false);
+			ReceiverCoreScript.Instance().transform.Find("Menus/New Main Menu/Canvas/CanvasGroup/Title").gameObject.SetActive(true);
+			ReceiverCoreScript.Instance().transform.Find("Menus/New Main Menu/Canvas/CanvasGroup/Title/Receiver").GetComponent<TMPro.TextMeshProUGUI>().text = "Please restart the game :)";
+			ReceiverCoreScript.Instance().transform.Find("Menus/New Main Menu/Canvas/CanvasGroup/PressStartText").gameObject.SetActive(false);
+			ReceiverCoreScript.Instance().transform.Find("Menus/New Main Menu/Canvas/CanvasGroup/Bottom atmospheric text/Text").GetComponent<TMPro.TextMeshProUGUI>().text 
+				= "FMOD libraries couldn't be loaded due to a \"security patch\" included in glibc >= 2.41.\n" + 
+				  "The Modding Kit has patched the libraries to be loadable again, but it requires a game restart, so restart that game :)\n" +
+				  "For more info: https://qa.fmod.com/t/glibc-2-41-breaks-loading-fmodstudio-libraries-in-standalone-linux-builds/22592/2";
+		}
+
 		private void Awake() {
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
+				var pluginsDirPath = Path.Combine(Application.dataPath, "Plugins");
+				var libfmodPath = Path.Combine(pluginsDirPath, "libfmod.so");
+				var libfmodstudioPath = Path.Combine(pluginsDirPath, "libfmodstudio.so");
+
+				if (Helpers.LinuxELFExecstackPatcher.PatchFlag(libfmodPath) | Helpers.LinuxELFExecstackPatcher.PatchFlag(libfmodstudioPath)) {
+					ModdingKitEvents.AddTaskAtCoreStartup(AddPatchMessageToMenu);
+				}
+			}
+
+			if (Logging.FMODLogger.Initialize())
+			{
+				Debug.Log("FMOD Logger initialisation successful");
+			}
+			else
+			{
+				Debug.Log("Loaded FMOD Library is the non-logging version");
+			}
+
 			instance = this;
 
-			foreach (Type type in typeof(BepInPlugin).Assembly.GetTypes()) //needs to be at beginning, other the Kon won't get assigned until later
-			{
-				if (type.FullName == "BepInEx.ConsoleUtil.Kon")
-				{
+			//needs to be at beginning, other the Kon won't get assigned until later
+			foreach (Type type in typeof(BepInPlugin).Assembly.GetTypes()) {
+				if (type.FullName == "BepInEx.ConsoleUtil.Kon") {
 					Extensions.konType = type;
 					break;
 				}

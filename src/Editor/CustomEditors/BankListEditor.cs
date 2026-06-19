@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Runtime.InteropServices;
 
 namespace Receiver2ModdingKit.Editor {
 	[CustomEditor(typeof(BankList))]
@@ -71,6 +72,9 @@ namespace Receiver2ModdingKit.Editor {
 							resonance_audio_path = file;
 						}
 					}
+
+					if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+						Helpers.LinuxELFExecstackPatcher.PatchFlag(resonance_audio_path);
 
 					Receiver2ModdingKit.CustomSounds.Utility.IsError(core_system.loadPlugin(resonance_audio_path, out _), "Couldn't load resonance audio library, damn");
 
