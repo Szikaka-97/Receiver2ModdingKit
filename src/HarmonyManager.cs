@@ -26,6 +26,7 @@ namespace Receiver2ModdingKit {
 			public static Harmony CustomSounds;
 			public static Harmony ModHelpEntry;
 			public static Harmony ModGameMode;
+			public static Harmony ModPersistentData;
 		}
 
 		private static void DisplayInstructions(CodeMatcher code_matcher, int breadth) {
@@ -1081,6 +1082,7 @@ namespace Receiver2ModdingKit {
 			HarmonyInstances.ModHelpEntry = Harmony.CreateAndPatchAll(typeof(ModHelpEntryManager));
 			HarmonyInstances.CustomSounds = Harmony.CreateAndPatchAll(typeof(CustomSounds.ModAudioPatches));
 			HarmonyInstances.ModGameMode = Harmony.CreateAndPatchAll(typeof(Gamemodes.ModGameModeManager));
+			HarmonyInstances.ModPersistentData = Harmony.CreateAndPatchAll(typeof(ModPersistentData));
 			Harmony.CreateAndPatchAll(typeof(FMODLookForTapeFilterBytes));
 
 			#if DEBUG
