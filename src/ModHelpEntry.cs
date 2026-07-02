@@ -38,6 +38,14 @@ namespace Receiver2ModdingKit {
 		[TextArea]
 		public string description;
 
+		/// <summary>
+		/// Whether or not the entry is locked by default
+		/// </summary>
+		[Tooltip("Whether or not the entry is locked by default")]
+		public bool locked_default;
+		
+		public MenuEntryCategories menu_entry_category;
+
 		internal bool settings_button_active;
 
 		private EntryComponentScript m_entry_component;

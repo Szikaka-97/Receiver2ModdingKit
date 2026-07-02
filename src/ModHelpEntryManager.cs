@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace Receiver2ModdingKit {
-	internal class ModHelpEntryManager : MonoBehaviour {
+	public class ModHelpEntryManager : MonoBehaviour {
 		public static Dictionary<string, ModHelpEntry> entries = new Dictionary<string, ModHelpEntry>();
 
 		private static Delegate OnEntryClick;
@@ -60,40 +60,65 @@ namespace Receiver2ModdingKit {
 
 			foreach (var mod_entry in entries.Values) {
 				if (!Locale.active_locale_help_menu_entries_string.ContainsKey(mod_entry.name)) {
-					var entry = new LocaleHelpMenuEntry();
-					entry.title = mod_entry.title;
-					entry.description = mod_entry.description;
-					entry.id_string = mod_entry.name;
-					entry.name = mod_entry.name;
+					var entry = new LocaleHelpMenuEntry()
+					{
+						title = mod_entry.title,
+						description = mod_entry.description,
+						id_string = mod_entry.name,
+						name = mod_entry.name
+					};
 
 					Locale.active_locale_help_menu_entries_string.Add(mod_entry.name, entry);
 				}
 
-				EntryDescriptionMenuScript.Category gun_help = __instance.categories[4];
+				if (mod_entry.menu_entry_category != MenuEntryCategories.None) {
+					for (int entryIndex = 0; entryIndex < __instance.categories.Count; entryIndex++) {
+						if (__instance.categories[entryIndex].category_id == mod_entry.menu_entry_category) {
+							CreateEntry(mod_entry, __instance.categories[entryIndex]);
+						}
+					}
+				}
+				else
+				{
+					CreateEntry(mod_entry, __instance.categories[4]);
+				}
+			}
 
-				if (!gun_help.entry_string_id_dict.ContainsKey(mod_entry.name)) {
+			void CreateEntry(ModHelpEntry mod_entry, EntryDescriptionMenuScript.Category help_page)
+			{
+				if (!help_page.entry_string_id_dict.ContainsKey(mod_entry.name)) {
+
 					GameObject entry_button = Instantiate(help_menu.ecsPrefab);
+
 					entry_button.name = mod_entry.name;
-					entry_button.transform.SetParent(gun_help.root_object.transform, true);
+					entry_button.transform.SetParent(help_page.root_object.transform, true);
 					entry_button.transform.Find("Button").localPosition += (Vector3.left * 37);
+
 					RectTransform button_transform = entry_button.GetComponent<RectTransform>();
+
 					button_transform.localScale = new Vector3(1f, 1f, 1f);
+
 					EntryComponentScript entry_script = entry_button.GetComponent<EntryComponentScript>();
+
 					entry_script.string_id = mod_entry.name;
 					entry_script.title.text = mod_entry.name;
-					entry_script.button.onClick.AddListener( delegate {
+					entry_script.button.onClick.AddListener(delegate {
 						OnEntryClick.DynamicInvoke(mod_entry.name);
 					});
-					entry_script.default_enabled = true;
+
+					entry_script.default_enabled = !mod_entry.locked_default;
+
 					if (mod_entry.info_sprite != null) {
 						entry_script.media.sprite_index = help_menu.sprites.Count();
 						help_menu.sprites.Add(mod_entry.info_sprite);
 					}
-					gun_help.entries.Add(entry_script);
-					gun_help.entry_string_id_dict.Add(mod_entry.name, entry_script);
-					__instance.category_string_id_dict.Add(mod_entry.name, gun_help);
 
-					if (mod_entry.settings_button_active) {
+					help_page.entries.Add(entry_script);
+					help_page.entry_string_id_dict.Add(mod_entry.name, entry_script);
+					__instance.category_string_id_dict.Add(mod_entry.name, help_page);
+
+					if (mod_entry.settings_button_active)
+					{
 						GameObject secondary_button = Instantiate(GameObject.Find("ReceiverCore/Menus/Overlay Menu Canvas/Aspect Ratio Fitter/New Pause Menu/Backdrop1/Sub-Menu Layout Group/New Help Menu/Entries Layout/ScrollableContent Variant/Viewport/Content/Guns/StovePipe/Secondary Button"));
 						secondary_button.transform.SetParent(entry_button.transform);
 						secondary_button.transform.localScale = Vector3.one;
