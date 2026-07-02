@@ -475,6 +475,10 @@ namespace Receiver2ModdingKit.CustomRounds {
 					__instance.recoil_transfer_x -= def.extra_recoil_x;
 					__instance.recoil_transfer_y += Random.Range(0, def.extra_recoil_y * Mathf.Sign(__instance.recoil_transfer_y));
 					__instance.slide.vel += def.extra_slide_fire_speed;
+
+					if (def.onRoundFired != null) {
+						def.onRoundFired(__instance);
+					}
 				}
 			}
 
