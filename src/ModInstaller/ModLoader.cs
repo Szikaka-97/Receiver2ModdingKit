@@ -7,6 +7,7 @@ using Receiver2;
 using System.Reflection;
 using Receiver2ModdingKit.CustomSounds;
 using Receiver2ModdingKit.Editor;
+using Receiver2ModdingKit.CustomRounds;
 
 namespace Receiver2ModdingKit.ModInstaller {
 	public static class ModLoader {
@@ -76,11 +77,19 @@ namespace Receiver2ModdingKit.ModInstaller {
 							round.glint_renderer.material = prefab_9mm.GetComponent<ShellCasingScript>().glint_renderer.material;
 						}
 
-						if (round is ModShellCasingScript) {
+						if (round is ModShellCasingScript mscs) {
 							ModShellCasingScript.mod_cartridges.Add(
 								round.cartridge_type,
-								((ModShellCasingScript) round).spec.CreateSpec()
+								mscs.spec.CreateSpec()
 							);
+
+							if (!ModdingKitCorePlugin.round_prefabs.ContainsKey(mscs.cartridge_type)) {
+								ModdingKitCorePlugin.AddShellCasingScriptPrefab(mscs);
+							}
+
+							if (mscs.customRoundTypeParameters != null && mscs.customRoundTypeParameters.cartridge != 0) {
+								CustomRoundTypes.RegisterCustomRound(mscs.customRoundTypeParameters);
+							}
 						}
 						else {
 							Debug.LogWarning("Gun " + gun.InternalName + " adds a cartridge via ModGunScript.GetCustomCartridgeSpec(); Consider using ModShellCasingScript instead");

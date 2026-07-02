@@ -12,7 +12,6 @@ using Receiver2;
 using Receiver2ModdingKit.ModInstaller;
 using Receiver2ModdingKit.Editor;
 using Receiver2ModdingKit.Helpers;
-using Wolfire;
 using BepInEx.Logging;
 using SharpCompress.Archives;
 
@@ -26,6 +25,7 @@ namespace Receiver2ModdingKit {
 			public static Harmony CustomSounds;
 			public static Harmony ModHelpEntry;
 			public static Harmony ModGameMode;
+			public static Harmony CustomRoundTypes;
 			public static Harmony ModPersistentData;
 		}
 
@@ -1082,6 +1082,7 @@ namespace Receiver2ModdingKit {
 			HarmonyInstances.ModHelpEntry = Harmony.CreateAndPatchAll(typeof(ModHelpEntryManager));
 			HarmonyInstances.CustomSounds = Harmony.CreateAndPatchAll(typeof(CustomSounds.ModAudioPatches));
 			HarmonyInstances.ModGameMode = Harmony.CreateAndPatchAll(typeof(Gamemodes.ModGameModeManager));
+			HarmonyInstances.CustomRoundTypes = Harmony.CreateAndPatchAll(typeof(CustomRounds.CustomRoundTypes.Patches));
 			HarmonyInstances.ModPersistentData = Harmony.CreateAndPatchAll(typeof(ModPersistentData));
 			Harmony.CreateAndPatchAll(typeof(FMODLookForTapeFilterBytes));
 

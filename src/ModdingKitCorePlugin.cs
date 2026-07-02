@@ -8,6 +8,7 @@ using Receiver2;
 using Receiver2ModdingKit.ModInstaller;
 using System.Runtime.InteropServices;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Receiver2ModdingKit {
 #if UNITY_EDITOR
@@ -30,6 +31,14 @@ namespace Receiver2ModdingKit {
 				Debug.LogError(e);
 			}
 		}
+
+		internal static Dictionary<CartridgeSpec.Preset, ShellCasingScript> round_prefabs;
+
+		public static void AddNewCartridgePreset(CartridgeSpec.Preset preset, CartridgeSpec cartridge) { }
+
+		public static void AddShellCasingScriptPrefab(ShellCasingScript prefab) { }
+
+		public static ShellCasingScript GetRoundPrefab(CartridgeSpec.Preset cartridge_type) { return null; }
 	}
 
 #else
@@ -43,6 +52,8 @@ namespace Receiver2ModdingKit {
 
 		private static ModHelpEntryManager mod_help;
 		private static ModTapeManager mod_tapes;
+
+		internal static Dictionary<CartridgeSpec.Preset, ShellCasingScript> round_prefabs = new Dictionary<CartridgeSpec.Preset, ShellCasingScript>();
 
 		public static readonly string supportedVersion = "2.2.4";
 
@@ -65,6 +76,33 @@ namespace Receiver2ModdingKit {
 				return File.OpenRead(Path.Combine(Path.GetDirectoryName(ModdingKitCorePlugin.instance.Info.Location), resource_name));
 			}
 			return Stream.Null;
+		}
+
+		public static void AddNewCartridgePreset(CartridgeSpec.Preset preset, CartridgeSpec cartridge) {
+			ModShellCasingScript.mod_cartridges.Add(preset, cartridge);
+		}
+
+		private static void GatherAllRoundPrefabs() {
+			foreach (var item in ReceiverCoreScript.Instance().generic_prefabs) {
+				if (item is ShellCasingScript shellCasingScript) {
+					//oh la villaine
+					if (shellCasingScript.name != "load_progression" && shellCasingScript.name != "762x54r_round_object" && !round_prefabs.ContainsKey(shellCasingScript.cartridge_type)) {
+						round_prefabs.Add(shellCasingScript.cartridge_type, shellCasingScript);
+					}
+				}
+			}
+		}
+
+		public static void AddShellCasingScriptPrefab(ShellCasingScript prefab) {
+			round_prefabs.Add(prefab.cartridge_type, prefab);
+
+			Array.Resize(ref ReceiverCoreScript.Instance().generic_prefabs, ReceiverCoreScript.Instance().generic_prefabs.Length + 1);
+
+			ReceiverCoreScript.Instance().generic_prefabs[ReceiverCoreScript.Instance().generic_prefabs.Length - 1] = prefab;
+		}
+
+		public static ShellCasingScript GetRoundPrefab(CartridgeSpec.Preset cartridge_type) {
+			return round_prefabs[cartridge_type];
 		}
 
 		private System.Collections.IEnumerator SetErrorState() {
@@ -136,6 +174,8 @@ namespace Receiver2ModdingKit {
 					break;
 				}
 			}
+
+			ModdingKitEvents.AddTaskAtCoreStartup(GatherAllRoundPrefabs);
 
 			try {
 				if (Thunderstore.Thunderstore.LaunchedWithR2ModMan) {

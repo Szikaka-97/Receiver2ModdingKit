@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using FMODUnity;
 using Receiver2;
+using Receiver2ModdingKit.CustomRounds;
 using UnityEngine;
 
 namespace Receiver2ModdingKit {
@@ -44,6 +45,8 @@ namespace Receiver2ModdingKit {
 		public string sound_shell_casing_impact_soft = "event:/bullets/shell_casing_impact_soft";
 
 		public ModCartridgeSpec spec;
+
+		public CustomRoundDefinition customRoundTypeParameters;
 
 		[SerializeField]
 		[HideInInspector]
