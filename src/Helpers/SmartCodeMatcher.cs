@@ -6,6 +6,7 @@ using System.Reflection.Emit;
 using HarmonyLib;
 
 namespace Receiver2ModdingKit.Helpers {
+	/// <inheritdoc cref="CodeMatcher" />
 	public class SmartCodeMatcher {
 		public class Condition {
 
@@ -19,6 +20,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Value:
 		//     The index or -1 if out of bounds
+		/// <inheritdoc cref="CodeMatcher.Pos" />
 		public int Pos {
 			get {
 				return this.matcher.Pos;
@@ -35,6 +37,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Value:
 		//     The count
+		/// <inheritdoc cref="CodeMatcher.Length" />
 		public int Length => this.matcher.Length;
 
 		//
@@ -43,6 +46,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Value:
 		//     True if this CodeMatcher is valid
+		/// <inheritdoc cref="CodeMatcher.IsValid" />
 		public bool IsValid => this.matcher.IsValid;
 
 		//
@@ -51,6 +55,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Value:
 		//     True if this CodeMatcher is invalid
+		/// <inheritdoc cref="CodeMatcher.IsInvalid" />
 		public bool IsInvalid => this.matcher.IsInvalid;
 
 		//
@@ -59,6 +64,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Value:
 		//     The remaining count
+		/// <inheritdoc cref="CodeMatcher.Remaining" />
 		public int Remaining => this.matcher.Remaining;
 
 		//
@@ -67,6 +73,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Value:
 		//     The opcode
+		/// <inheritdoc cref="CodeMatcher.Opcode" />
 		public ref OpCode Opcode => ref this.matcher.Opcode;
 
 		//
@@ -75,6 +82,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Value:
 		//     The operand
+		/// <inheritdoc cref="CodeMatcher.Operand" />
 		public ref object Operand => ref this.matcher.Operand;
 
 		//
@@ -83,6 +91,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Value:
 		//     The labels
+		/// <inheritdoc cref="CodeMatcher.Labels" />
 		public ref List<Label> Labels => ref this.matcher.Labels;
 
 		//
@@ -91,6 +100,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Value:
 		//     The blocks
+		/// <inheritdoc cref="CodeMatcher.Blocks" />
 		public ref List<ExceptionBlock> Blocks => ref this.matcher.Blocks;
 
 		//
@@ -99,11 +109,13 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Value:
 		//     The instruction
+		/// <inheritdoc cref="CodeMatcher.Instruction" />
 		public CodeInstruction Instruction => this.matcher.Instruction;
 
 		//
 		// Summary:
 		//     Creates an empty code matcher
+		/// <inheritdoc cref="CodeMatcher.CodeMatcher())" />
 		public SmartCodeMatcher() {
 			this.matcher = new CodeMatcher();
 		}
@@ -118,6 +130,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		//   generator:
 		//     An optional IL generator
+		/// <inheritdoc cref="CodeMatcher.CodeMatcher(IEnumerable{CodeInstruction}, ILGenerator)" />
 		public SmartCodeMatcher(IEnumerable<CodeInstruction> instructions, ILGenerator generator = null) {
 			this.matcher = new CodeMatcher(instructions, generator);
 		}
@@ -128,6 +141,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     A copy of this matcher
+		/// <inheritdoc cref="CodeMatcher.Clone" />
 		public SmartCodeMatcher Clone() {
 			return new SmartCodeMatcher() {
 				matcher = this.matcher.Clone()
@@ -144,6 +158,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The instruction
+		/// <inheritdoc cref="CodeMatcher.InstructionAt" />
 		public CodeInstruction InstructionAt(int offset) => this.matcher.InstructionAt(offset);
 
 		//
@@ -152,6 +167,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     A list of instructions
+		/// <inheritdoc cref="CodeMatcher.Instructions" />
 		public List<CodeInstruction> Instructions() => this.matcher.Instructions();
 
 		//
@@ -160,6 +176,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     A list of instructions
+		/// <inheritdoc cref="CodeMatcher.InstructionEnumeration" />
 		public IEnumerable<CodeInstruction> InstructionEnumeration() => this.matcher.InstructionEnumeration();
 
 		//
@@ -172,6 +189,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     A list of instructions
+		/// <inheritdoc cref="CodeMatcher.Instructions(int)" />
 		public List<CodeInstruction> Instructions(int count) => this.matcher.Instructions(count);
 
 		//
@@ -187,6 +205,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     A list of instructions
+		/// <inheritdoc cref="CodeMatcher.InstructionsInRange" />
 		public List<CodeInstruction> InstructionsInRange(int start, int end) => this.matcher.InstructionsInRange(start, end);
 
 		//
@@ -202,6 +221,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     A list of instructions
+		/// <inheritdoc cref="CodeMatcher.InstructionsWithOffsets" />
 		public List<CodeInstruction> InstructionsWithOffsets(int startOffset, int endOffset) => InstructionsInRange(Pos + startOffset, Pos + endOffset);
 
 		//
@@ -214,6 +234,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     A list of Labels
+		/// <inheritdoc cref="CodeMatcher.DistinctLabels" />
 		public List<Label> DistinctLabels(IEnumerable<CodeInstruction> instructions) => this.matcher.DistinctLabels(instructions);
 
 		//
@@ -229,6 +250,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     True if current position is invalid and error was logged
+		/// <inheritdoc cref="CodeMatcher.ReportFailure" />
 		public bool ReportFailure(MethodBase method, Action<string> logger) => this.matcher.ReportFailure(method, logger);
 
 		//
@@ -243,6 +265,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.ThrowIfInvalid" />
 		public SmartCodeMatcher ThrowIfInvalid(string explanation) { 
 			this.matcher.ThrowIfInvalid(explanation);
 
@@ -265,6 +288,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.ThrowIfNotMatch" />
 		public SmartCodeMatcher ThrowIfNotMatch(string explanation, params CodeMatch[] matches) { 
 			this.matcher.ThrowIfNotMatch(explanation, matches);
 
@@ -287,6 +311,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.ThrowIfNotMatchForward" />
 		public SmartCodeMatcher ThrowIfNotMatchForward(string explanation, params CodeMatch[] matches) {
 			this.matcher.ThrowIfNotMatchForward(explanation, matches);
 
@@ -309,6 +334,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.ThrowIfNotMatchBack" />
 		public SmartCodeMatcher ThrowIfNotMatchBack(string explanation, params CodeMatch[] matches) {
 			this.matcher.ThrowIfNotMatchBack(explanation, matches);
 			
@@ -331,6 +357,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.ThrowIfFalse" />
 		public SmartCodeMatcher ThrowIfFalse(string explanation, Func<CodeMatcher, bool> stateCheckFunc) {
 			this.matcher.ThrowIfFalse(explanation, stateCheckFunc);
 
@@ -347,6 +374,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.SetInstruction" />
 		public SmartCodeMatcher SetInstruction(CodeInstruction instruction) {
 			if (this.matcher.IsValid) {
 				this.matcher.SetInstruction(instruction);
@@ -365,6 +393,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.SetInstructionAndAdvance" />
 		public SmartCodeMatcher SetInstructionAndAdvance(CodeInstruction instruction) {
 			if (this.matcher.IsValid) {
 				this.matcher.SetInstructionAndAdvance(instruction);
@@ -386,6 +415,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.Set" />
 		public SmartCodeMatcher Set(OpCode opcode, object operand) {
 			if (this.matcher.IsValid) {
 				this.matcher.Set(opcode, operand);
@@ -407,6 +437,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.SetAndAdvance" />
 		public SmartCodeMatcher SetAndAdvance(OpCode opcode, object operand) {
 			if (this.matcher.IsValid) {
 				this.matcher.SetAndAdvance(opcode, operand);
@@ -425,6 +456,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.SetOpcodeAndAdvance" />
 		public SmartCodeMatcher SetOpcodeAndAdvance(OpCode opcode) {
 			if (this.matcher.IsValid) {
 				this.matcher.SetOpcodeAndAdvance(opcode);
@@ -443,6 +475,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.SetOperandAndAdvance" />
 		public SmartCodeMatcher SetOperandAndAdvance(object operand) {
 			if (this.matcher.IsValid) {
 				this.matcher.SetOperandAndAdvance(operand);
@@ -461,6 +494,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.CreateLabel" />
 		public SmartCodeMatcher CreateLabel(out Label label) {
 			if (this.matcher.IsValid) {
 				matcher.CreateLabel(out label);
@@ -482,6 +516,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.CreateLabelAt" />
 		public SmartCodeMatcher CreateLabelAt(int position, out Label label) {
 			this.matcher.CreateLabelAt(position, out label);
 
@@ -498,6 +533,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.AddLabels" />
 		public SmartCodeMatcher AddLabels(IEnumerable<Label> labels) {
 			if (this.matcher.IsValid) {
 				this.matcher.AddLabels(labels);
@@ -519,6 +555,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.AddLabelsAt" />
 		public SmartCodeMatcher AddLabelsAt(int position, IEnumerable<Label> labels) {
 			this.matcher.AddLabelsAt(position, labels);
 			
@@ -541,6 +578,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.SetJumpTo" />
 		public SmartCodeMatcher SetJumpTo(OpCode opcode, int destination, out Label label) {
 			if (this.matcher.IsValid) {
 				this.matcher.SetJumpTo(opcode, destination, out label);
@@ -559,6 +597,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.Insert" />
 		public SmartCodeMatcher Insert(OpCode opcode, object operand = null) {
 			if (this.matcher.IsValid) {
 				this.matcher.Insert(new CodeInstruction(opcode, operand));
@@ -577,6 +616,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.Insert" />
 		public SmartCodeMatcher Insert(params CodeInstruction[] instructions) {
 			if (this.matcher.IsValid) {
 				this.matcher.Insert(instructions);
@@ -595,6 +635,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.Insert" />
 		public SmartCodeMatcher Insert(IEnumerable<CodeInstruction> instructions) {
 			if (this.matcher.IsValid) {
 				this.matcher.Insert(instructions);
@@ -616,6 +657,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.InsertBranch" />
 		public SmartCodeMatcher InsertBranch(OpCode opcode, int destination) {
 			if (this.matcher.IsValid) {
 				this.matcher.InsertBranch(opcode, destination);
@@ -634,6 +676,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.InsertAndAdvance" />
 		public SmartCodeMatcher InsertAndAdvance(OpCode opcode, object operand = null) {
 			if (this.matcher.IsValid) {
 				this.matcher.InsertAndAdvance(new CodeInstruction(opcode, operand));
@@ -652,6 +695,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.InsertAndAdvance" />
 		public SmartCodeMatcher InsertAndAdvance(params CodeInstruction[] instructions) {
 			if (this.matcher.IsValid) {
 				this.matcher.InsertAndAdvance(instructions);
@@ -670,6 +714,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.InsertAndAdvance" />
 		public SmartCodeMatcher InsertAndAdvance(IEnumerable<CodeInstruction> instructions) {
 			if (this.matcher.IsValid) {
 				this.matcher.InsertAndAdvance(instructions);
@@ -691,6 +736,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.InsertBranchAndAdvance" />
 		public SmartCodeMatcher InsertBranchAndAdvance(OpCode opcode, int destination) {
 			if (this.matcher.IsValid) {
 				this.matcher.InsertBranchAndAdvance(opcode, destination);
@@ -705,6 +751,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.RemoveInstruction" />
 		public SmartCodeMatcher RemoveInstruction() {
 			if (this.matcher.IsValid) {
 				this.matcher.RemoveInstruction();
@@ -723,6 +770,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.RemoveInstructions" />
 		public SmartCodeMatcher RemoveInstructions(int count) {
 			if (this.matcher.IsValid) {
 				this.matcher.RemoveInstructions(count);
@@ -744,6 +792,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.RemoveInstructionsInRange" />
 		public SmartCodeMatcher RemoveInstructionsInRange(int start, int end) {
 			this.matcher.RemoveInstructionsInRange(start, end);
 
@@ -763,6 +812,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.RemoveInstructionsWithOffsets" />
 		public SmartCodeMatcher RemoveInstructionsWithOffsets(int startOffset, int endOffset) {
 			if (this.matcher.IsValid) {
 				this.matcher.RemoveInstructionsWithOffsets(startOffset, endOffset);
@@ -781,6 +831,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.Advance" />
 		public SmartCodeMatcher Advance(int offset = 1) {
 			if (this.matcher.IsValid) {
 				this.matcher.Advance(offset);
@@ -795,6 +846,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.Start" />
 		public SmartCodeMatcher Start() {
 			this.matcher.Start();
 
@@ -807,6 +859,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.End" />
 		public SmartCodeMatcher End() {
 			this.matcher.End();
 
@@ -823,6 +876,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.SearchForward" />
 		public SmartCodeMatcher SearchForward(Func<CodeInstruction, bool> predicate) {
 			if (this.matcher.IsInvalid) {
 				this.matcher.Start();
@@ -843,6 +897,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.SearchBack" />
 		public SmartCodeMatcher SearchBack(Func<CodeInstruction, bool> predicate) {
 			if (this.matcher.IsInvalid) {
 				this.matcher.Start();
@@ -867,6 +922,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.MatchForward" />
 		public SmartCodeMatcher MatchForward(bool useEnd, params CodeMatch[] matches) {
 			if (this.matcher.IsInvalid) {
 				this.matcher.Start();
@@ -891,6 +947,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.MatchBack" />
 		public SmartCodeMatcher MatchBack(bool useEnd, params CodeMatch[] matches) {
 			if (this.matcher.IsInvalid) {
 				this.matcher.Start();
@@ -911,6 +968,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.MatchStartForward" />
 		public SmartCodeMatcher MatchStartForward(params CodeMatch[] matches) {
 			if (this.matcher.IsInvalid) {
 				this.matcher.Start();
@@ -931,6 +989,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.MatchEndForward" />
 		public SmartCodeMatcher MatchEndForward(params CodeMatch[] matches) {
 			if (this.matcher.IsInvalid) {
 				this.matcher.Start();
@@ -951,6 +1010,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.MatchStartBackwards" />
 		public SmartCodeMatcher MatchStartBackwards(params CodeMatch[] matches) {
 			if (this.matcher.IsInvalid) {
 				this.matcher.Start();
@@ -971,6 +1031,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.MatchEndBackwards" />
 		public SmartCodeMatcher MatchEndBackwards(params CodeMatch[] matches) {
 			if (this.matcher.IsInvalid) {
 				this.matcher.Start();
@@ -994,6 +1055,7 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     The same code matcher
+		/// <inheritdoc cref="CodeMatcher.Repeat" />
 		public SmartCodeMatcher Repeat(Action<CodeMatcher> matchAction, Action<string> notFoundAction = null) {
 			if (this.matcher.IsInvalid) {
 				this.matcher.Start();
@@ -1014,8 +1076,10 @@ namespace Receiver2ModdingKit.Helpers {
 		//
 		// Returns:
 		//     An instruction
+		/// <inheritdoc cref="CodeMatcher.NamedMatch" />
 		public CodeInstruction NamedMatch(string name) => this.matcher.NamedMatch(name);
 
+		/// <inheritdoc cref="CodeMatcher.CreateBranch" />
 		public SmartCodeMatcher CreateBranch(OpCode branch_opcode, CodeInstruction[] if_true, CodeInstruction[] if_false = null) {
 
 			this.Insert(OpCodes.Nop);
