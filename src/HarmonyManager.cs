@@ -1017,6 +1017,15 @@ namespace Receiver2ModdingKit {
 		// 	}
 		// }
 
+		[HarmonyPatch(typeof(GunScript), nameof(GunScript.FireBullet))]
+		[HarmonyPrefix]
+		private static bool PatchFireEmptyShell(ShellCasingScript round) {
+			if (round == null || round.IsSpent()) {
+				return false;
+			}
+			return true;
+		}
+
 		#endregion
 
 		internal static class GetConsoleColorPatch
