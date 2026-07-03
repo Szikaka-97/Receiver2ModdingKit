@@ -325,9 +325,6 @@ namespace Receiver2ModdingKit {
 
 				try {
 					base.Update();
-					
-					UpdateAnimatedComponents();
-					if (safety.transform) safety.UpdateDisplay();
 				} catch (NullReferenceException e) {
 					Debug.LogError(String.Format("Caught exception during {0}'s Update", this.InternalName));
 
@@ -338,11 +335,17 @@ namespace Receiver2ModdingKit {
 						Debug.LogError("Carefully check if you've assigned all the fields properly and if there aren't any missing references");
 					}
 
-					Debug.LogError(e);
+					Debug.LogException(e);
 				}
 
 				try {
 					this.LateUpdateGun();
+
+					UpdateAnimatedComponents();
+					
+					if (safety.transform) {
+						safety.UpdateDisplay();
+					}
 				} catch (Exception e) {
 					Debug.LogError(String.Format("Caught exception during {0}'s LateUpdateGun", this.InternalName));
 
