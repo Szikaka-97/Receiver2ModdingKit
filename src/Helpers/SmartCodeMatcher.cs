@@ -253,6 +253,20 @@ namespace Receiver2ModdingKit.Helpers {
 		/// <inheritdoc cref="CodeMatcher.ReportFailure" />
 		public bool ReportFailure(MethodBase method, Action<string> logger) => this.matcher.ReportFailure(method, logger);
 
+		/// <summary>
+		/// Continue if this CodeMatcher is valid
+		/// </summary>
+		/// <param name="method">The target method</param>
+		/// <param name="logger">Which logger to log the error to</param>
+		/// <returns>The same code matcher</returns>
+		public SmartCodeMatcher ContinueIfValid(MethodBase method, Action<string> logger) {
+			if (!ReportFailure(method, logger)) {
+				return this;
+			}
+
+			return null;
+		}
+
 		//
 		// Summary:
 		//     Throw an InvalidOperationException if current state is invalid (position out
