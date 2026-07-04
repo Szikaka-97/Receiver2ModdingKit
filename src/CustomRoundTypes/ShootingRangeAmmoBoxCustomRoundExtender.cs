@@ -9,6 +9,10 @@ namespace Receiver2ModdingKit.CustomRounds {
 
 		private ShootingRangeAmmoBoxScript shootingRangeAmmoBoxScript;
 
+		private MeshRenderer shootingRangeAmmoBoxRenderer;
+
+		private Texture2D originalTex;
+
 		private readonly static Dictionary<CartridgeSpec.Preset, string> cartridgeNamesLookUp = new Dictionary<CartridgeSpec.Preset, string>()
 		{
 			{CartridgeSpec.Preset._9mm, "9mm"},
@@ -22,6 +26,18 @@ namespace Receiver2ModdingKit.CustomRounds {
 			shootingRangeButton = (GetComponent<PressableButton>() == null) ? GetComponentInChildren<PressableButton>() : GetComponent<PressableButton>();
 
 			shootingRangeAmmoBoxScript = GetComponent<ShootingRangeAmmoBoxScript>();
+
+			foreach (Transform child in transform) {
+				if (!child.GetComponentInChildren<TextMeshPro>() && !child.name.Contains("Blob")) {
+					var renderer = child.GetComponentInChildren<MeshRenderer>();
+
+					if (renderer) {
+						shootingRangeAmmoBoxRenderer = renderer;
+
+						originalTex = shootingRangeAmmoBoxRenderer.sharedMaterial.mainTexture as Texture2D;
+					}
+				}
+			}
 		}
 
 		private void Update() {
@@ -120,6 +136,17 @@ namespace Receiver2ModdingKit.CustomRounds {
 		}
 
 		void UpdateTapeText(CustomRoundDefinition round_def, CartridgeSpec.Preset cartridge_type) {
+			if (round_def != null) {
+				if (round_def.shootingRangeAmmoBoxTexture != null)
+				{
+					shootingRangeAmmoBoxRenderer.material.mainTexture = round_def.shootingRangeAmmoBoxTexture;
+				}
+			}
+			else
+			{
+				shootingRangeAmmoBoxRenderer.material.mainTexture = originalTex;
+			}
+
 			foreach (Transform go in this.transform) {
 				if (go.name.StartsWith("Tape")) {
 					Debug.Log(go.name);
@@ -163,10 +190,10 @@ namespace Receiver2ModdingKit.CustomRounds {
 					for (int tapeIndex = 7; tapeIndex > 0; tapeIndex--) {
 						var tape = go.transform.Find("Tape_0" + tapeIndex);
 
-						var text_fits = (Quaternion.AngleAxis(tape.eulerAngles.y, Vector3.up) * tape.GetComponent<MeshRenderer>().bounds.extents).z > text.bounds.extents.x + 0.02f;
+						var text_fits = (Quaternion.AngleAxis(-tape.eulerAngles.y, Vector3.up) * tape.GetComponent<MeshRenderer>().bounds.extents).z > text.bounds.extents.x + 0.02f;
 
 						Debug.Log($"index: {tapeIndex} fits: {text_fits}");
-						Debug.Log($"tape extents: {(Quaternion.AngleAxis(tape.eulerAngles.y, Vector3.up) * tape.GetComponent<MeshRenderer>().bounds.extents).z} vs text extents: {text.bounds.extents.x}");
+						Debug.Log($"tape extents: {(Quaternion.AngleAxis(-tape.eulerAngles.y, Vector3.up) * tape.GetComponent<MeshRenderer>().bounds.extents).z} vs text extents: {text.bounds.extents.x}");
 						Debug.Log($"already found fitting tape: {found_fitting_text}");
 
 						if (text_fits && !found_fitting_text)
@@ -189,7 +216,7 @@ namespace Receiver2ModdingKit.CustomRounds {
 
 							tape.gameObject.SetActive(true);
 
-							var diff = text.bounds.extents.x / (Quaternion.AngleAxis(tape.eulerAngles.y, Vector3.up) * tape.GetComponent<MeshRenderer>().bounds.extents).z;
+							var diff = text.bounds.extents.x / (Quaternion.AngleAxis(-tape.eulerAngles.y, Vector3.up) * tape.GetComponent<MeshRenderer>().bounds.extents).z;
 
 							tape.localScale = new Vector3(tape.localScale.x, tape.localScale.y, (tape.localScale.z * diff) + 0.02f);
 						}
