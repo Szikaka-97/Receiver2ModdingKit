@@ -139,13 +139,13 @@ namespace Receiver2ModdingKit {
 		[HarmonyPatch(typeof(HelpMenuScript), "OnLoad")]
 		[HarmonyPostfix]
 		private static void PatchHelpOnLoad(HelpMenuScript __instance) {
-			EntryDescriptionMenuScript.Category gun_help = __instance.categories[4];
+			foreach (var category in __instance.categories) {
+				int active = category.entry_string_id_dict.Values.Count(e => e.isActiveAndEnabled);
+				int hidden = category.entry_string_id_dict.Values.Count(e => e.hidden);
 
-			int active = gun_help.entry_string_id_dict.Values.Count(e => e.isActiveAndEnabled);
-			int hidden = gun_help.entry_string_id_dict.Values.Count(e => e.hidden);
-
-			if (Locale.active_locale_category_string.TryGetValue(gun_help.category_id, out string title)) {
-				gun_help.title.text = string.Format("{0} - {1}/{2}", title, active, gun_help.entries.Count - hidden);
+				if (Locale.active_locale_category_string.TryGetValue(category.category_id, out string title)) {
+					category.title.text = string.Format("{0} - {1}/{2}", title, active, category.entries.Count - hidden);
+				}
 			}
 		}
 
