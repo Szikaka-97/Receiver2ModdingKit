@@ -966,6 +966,24 @@ namespace Receiver2ModdingKit {
 				}
 			}
 		}
+
+		[HarmonyPatch(typeof(LocalAimHandler), "UpdateLooseBulletDisplay")]
+		[HarmonyPrefix]
+		private static void ShowBulletInventoryIfCanInsertRoundInChamber(LocalAimHandler __instance) {
+			var state = __instance.GetHandWithState(LocalAimHandler.Hand.State.HoldingGun);
+
+			if (state != -1) {
+				GunScript gun = (GunScript)__instance.hands[state].slot.contents[0];
+
+				if (__instance.GetHandWithState(LocalAimHandler.Hand.State.HoldingMag) == -1 && (gun.IsSlideLockedOpen() || (gun.SlideLockIsSafety() && gun.IsSafetyOn()) && !gun.IsThereAChamberedRound() && !gun.IsThereAMagInGun() && gun.slide.amount > 0.2f)) {
+					Extensions.lah_force_bullet_display = true;
+
+					return;
+				}
+			}
+
+			Extensions.lah_force_bullet_display = false;
+		}
 		
 		[HarmonyPatch(typeof(LocalAimHandler), nameof(LocalAimHandler.HandleGunControls))]
 		[HarmonyPostfix]
