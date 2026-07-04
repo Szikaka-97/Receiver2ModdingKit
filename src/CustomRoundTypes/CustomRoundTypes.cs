@@ -150,6 +150,7 @@ namespace Receiver2ModdingKit.CustomRounds {
 						new CodeMatch(OpCodes.Call, AccessTools.PropertyGetter(typeof(Random), nameof(Random.rotation))),
 						new CodeMatch(OpCodes.Call, instantiateMethodInfo)
 					)
+					.ContinueIfValid(__originalMethod, Debug.LogError)
 					.Advance(2)
 					.InsertAndAdvance(
 						insertGetRandomRoundInstructions
@@ -159,7 +160,7 @@ namespace Receiver2ModdingKit.CustomRounds {
 				return codeMatcher.InstructionEnumeration();
 			}
 
-			[HarmonyPatch(typeof(ClassicBulletPileScript), nameof(ClassicBulletPileScript.Start))]
+			[HarmonyPatch(typeof(ClassicBulletPileScript), nameof(ClassicBulletPileScript.Start), MethodType.Enumerator)]
 			[HarmonyTranspiler]
 			private static IEnumerable<CodeInstruction> PatchClassicBulletPileScript(IEnumerable<CodeInstruction> instructions, ILGenerator iLGenerator, MethodBase __originalMethod) {
 				var instantiateMethodInfo = typeof(Object).GetMethods(AccessTools.all).First(mi => mi.GetGenericArguments().Length == 1 && mi.GetParameters().Length == 3 && mi.GetParameters()[1].ParameterType == typeof(Vector3) && mi.GetParameters()[2].ParameterType == typeof(Quaternion)).MakeGenericMethod(typeof(GameObject));
@@ -172,6 +173,7 @@ namespace Receiver2ModdingKit.CustomRounds {
 						new CodeMatch(OpCodes.Ldloc_S),
 						new CodeMatch(OpCodes.Call, instantiateMethodInfo)
 					)
+					.ContinueIfValid(__originalMethod, Debug.LogError)
 					.Advance(2)
 					.InsertAndAdvance(
 						insertGetRandomRoundInstructions
@@ -194,6 +196,7 @@ namespace Receiver2ModdingKit.CustomRounds {
 						new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(GameObject), nameof(GameObject.GetComponent), null, new System.Type[] { typeof(ShellCasingScript) })),
 						new CodeMatch(OpCodes.Stloc_2)
 					)
+					.ContinueIfValid(__originalMethod, Debug.LogError)
 					.Advance(2)
 					.InsertAndAdvance(
 						insertGetRandomRoundInstructions
@@ -212,8 +215,10 @@ namespace Receiver2ModdingKit.CustomRounds {
 						new CodeMatch(OpCodes.Callvirt, AccessTools.PropertyGetter(typeof(ReceiverCoreScript), nameof(ReceiverCoreScript.RoundPrefab))),
 						new CodeMatch(OpCodes.Ldarg_1),
 						new CodeMatch(OpCodes.Ldarg_2),
+						new CodeMatch(OpCodes.Call),
 						new CodeMatch(OpCodes.Stloc_0)
 					)
+					.ContinueIfValid(__originalMethod, Debug.LogError)
 					.Advance(2)
 					.InsertAndAdvance(
 						insertGetRandomRoundInstructions
@@ -234,8 +239,9 @@ namespace Receiver2ModdingKit.CustomRounds {
 						new CodeMatch(OpCodes.Ldc_R4, 0.0f),
 						new CodeMatch(OpCodes.Ldc_R4, 0.0f),
 						new CodeMatch(OpCodes.Ldc_R4, 360.0f),
-						new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(Random), nameof(Random.RandomRange), new System.Type[] { typeof(float), typeof(float) }))
+						new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(Random), nameof(Random.Range), new System.Type[] { typeof(float), typeof(float) }))
 					)
+					.ContinueIfValid(__originalMethod, Debug.LogError)
 					.Advance(2)
 					.InsertAndAdvance(
 						insertGetRandomRoundInstructions
@@ -252,8 +258,10 @@ namespace Receiver2ModdingKit.CustomRounds {
 					.MatchForward(false,
 						new CodeMatch(OpCodes.Ldarg_0),
 						new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(ChamberState), "cylinder")),
+						new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(CylinderScript), nameof(CylinderScript.gun_script))),
 						new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(GunScript), nameof(GunScript.loaded_cartridge_prefab)))
 					)
+					.ContinueIfValid(__originalMethod, Debug.LogError)
 					.Advance(4)
 					.InsertAndAdvance(
 						insertGetRandomRoundInstructions
