@@ -14,6 +14,7 @@ using Receiver2ModdingKit.Editor;
 using Receiver2ModdingKit.Helpers;
 using BepInEx.Logging;
 using SharpCompress.Archives;
+using System.Text;
 
 namespace Receiver2ModdingKit {
 	public static class HarmonyManager {
@@ -366,6 +367,32 @@ namespace Receiver2ModdingKit {
 				matcher.Insert(OpCodes.Call, AccessTools.Method(typeof(Gamemodes.ModGameModeManager), nameof(Gamemodes.ModGameModeManager.GetGameModeName)));
 
 				return matcher.InstructionEnumeration();
+			}
+
+			//epic fucking awesome sharpcompress uses code point 437 by default for encoding which idk maybe doesn't fucking exist on linux but it's weird because it worked when I tried it and now it doesn't? so idk, but it worked back then? fuck
+			//newer epic fucking aesome sharpcompress versions switched the codepoint to be Encoding.Default, which is awedsome befcause it works preoperly but it fuckign sucks because those epic fucking awesome sharpcompress versions require System.Memory, which R2 doesn't have, so we have to fucking fuck do this fuck, yeah
+			//It used to work perfectly and flawlessly, when I tried it and now even versions that I was sure worked don't anymore, mandelo effect?
+			[HarmonyPatch(typeof(SharpCompress.Common.ArchiveEncoding), MethodType.Constructor)]
+			[HarmonyTranspiler]
+			private static IEnumerable<CodeInstruction> ImDoingBad(IEnumerable<CodeInstruction> instructions) {
+				return new SmartCodeMatcher(instructions)
+					.MatchForward(false,
+						new CodeMatch(OpCodes.Ldc_I4, 437),
+						new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(Encoding), nameof(Encoding.GetEncoding), new System.Type[] { typeof(Int32) }))
+					)
+					.RemoveInstructions(2)
+					.Insert(
+						new CodeInstruction(OpCodes.Call, AccessTools.PropertyGetter(typeof(Encoding), nameof(Encoding.Default)))
+					)
+					.MatchForward(false,
+						new CodeMatch(OpCodes.Ldc_I4, 437),
+						new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(Encoding), nameof(Encoding.GetEncoding), new System.Type[] { typeof(Int32) }))
+					)
+					.RemoveInstructions(2)
+					.Insert(
+						new CodeInstruction(OpCodes.Call, AccessTools.PropertyGetter(typeof(Encoding), nameof(Encoding.Default)))
+					)
+					.InstructionEnumeration();
 			}
 		}
 
