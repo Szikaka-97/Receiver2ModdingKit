@@ -49,6 +49,16 @@ namespace Receiver2ModdingKit.Editor {
 		protected GunScript gun;
 
 		protected void UpdateKeys() {
+			if (Application.isPlaying && ModdingKitCorePlugin.instance == null) {
+				GUIStyle errorStyle = GUI.skin.label;
+
+				errorStyle.normal.textColor = Color.red;
+
+				GUILayout.Label("Please include the ModdingKitCorePlugin component in your scene", errorStyle);
+
+				return;
+			}
+
 			var keys = this.states.Keys.ToArray();
 
 			foreach (var input in keys) {
