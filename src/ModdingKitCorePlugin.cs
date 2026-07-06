@@ -22,12 +22,13 @@ namespace Receiver2ModdingKit {
 
 		public static Stream GetResourceStream(string resource_name) { return null; }
 
-		private void Awake() {
+		private void OnEnable() {
 			instance = this;
 
 			try {
 				ReflectionManager.Initialize();
-			} catch (MissingFieldException e) {
+				HarmonyManager.Initialize();
+			} catch (Exception e) {
 				Debug.LogError(e);
 			}
 		}
