@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Threading;
 using HarmonyLib;
 using Receiver2;
 using Receiver2ModdingKit.Helpers;
@@ -17,14 +16,19 @@ namespace Receiver2ModdingKit.CustomRounds {
 
 		public static Dictionary<CartridgeSpec.Preset, List<CartridgeSpec.Preset>> presets_children_dictionary = new Dictionary<CartridgeSpec.Preset, List<CartridgeSpec.Preset>>();
 
+		static Keybind drop_round_key_config;
+
+		internal static void CreateDropRoundKeybind()
+		{
+			drop_round_key_config = new Keybind("Drop selected round", RewiredConsts.Action.Eject_Drop_Magazine, new Keybind.KeyboardKey(KeyCode.X));
+
+			ModdingKitConfig.BindKeybindConfig(drop_round_key_config);
+		}
+
 		public static ShellCasingScript GetRandomRound(CartridgeSpec.Preset baseVariant) {
-			Debug.Log(baseVariant);
-
 			if (presets_children_dictionary.TryGetValue(baseVariant, out var children)) {
-				float total = 0f;
-
 				//account for base round;
-				total += 1f;
+				float total = 1f;
 
 				for (int i = 0; i < children.Count; i++) {
 					var roundDef = GetDefinitionForRound(children[i]);
@@ -35,23 +39,21 @@ namespace Receiver2ModdingKit.CustomRounds {
 				}
 
 				var randFloat = Random.Range(0f, total);
-				Debug.Log("randFloat: " + randFloat);
-				Debug.Log(children.Count);
 
-				if (randFloat <= 1.0f) {
+				if (randFloat < 1.0f) {
 					return ModdingKitCorePlugin.GetRoundPrefab(baseVariant);
 				}
 
-				float accumBreak = 0.0f;
+				float accumBreak = 1.0f;
 				for (int i = 0; i < children.Count; i++) {
 					var roundDef = GetDefinitionForRound(children[i]);
 
 					if (roundDef.IsUnlocked) {
 						accumBreak += GetDefinitionForRound(children[i]).spawn_chance;
-					}
 
-					if (randFloat <= accumBreak) {
-						return ModdingKitCorePlugin.GetRoundPrefab(children[i]);
+						if (randFloat <= accumBreak) {
+							return ModdingKitCorePlugin.GetRoundPrefab(children[i]);
+						}
 					}
 				}
 
@@ -1097,20 +1099,20 @@ namespace Receiver2ModdingKit.CustomRounds {
 			[HarmonyPatch(typeof(ReceiverCoreScript), "SpawnPlayer")]
 			[HarmonyPostfix]
 			private static void RoundCompatStuffTwo(ReceiverCoreScript __instance) {
-				Debug.Log("postfix spawnplayer");
+				//Debug.Log("postfix spawnplayer");
 
 				var player_equipment_component = Object.FindObjectOfType<PlayerScript>().equipment.GetComponent<PlayerEquipment>();
 
-				Debug.Log(LocalAimHandler.player_instance.loadout);
+				//Debug.Log(LocalAimHandler.player_instance.loadout);
 
-				Debug.Log(LocalAimHandler.player_instance.loadout.equipment);
+				//Debug.Log(LocalAimHandler.player_instance.loadout.equipment);
 
 				if (LocalAimHandler.player_instance.loadout != null) {
 					foreach (var equipment in LocalAimHandler.player_instance.loadout.equipment) {
 						Debug.Log(equipment.equipment_type);
 
 						if (equipment.equipment_type == k_CustomRoundEquipmentType) {
-							Debug.Log((CartridgeSpec.Preset)equipment.magazine_class);
+							//Debug.Log((CartridgeSpec.Preset)equipment.magazine_class);
 							var roundPrefab = Object.Instantiate(ModdingKitCorePlugin.GetRoundPrefab((CartridgeSpec.Preset)equipment.magazine_class).gameObject);
 							player_equipment_component.AddRound(roundPrefab);
 						}
@@ -1118,25 +1120,27 @@ namespace Receiver2ModdingKit.CustomRounds {
 				}
 			}
 
-			// [HarmonyPatch(typeof(ReceiverCoreScript), nameof(ReceiverCoreScript.SpawnMagazine))]
-			// [HarmonyPostfix]
-			// private static void DoTheSwitcheroo(ReceiverCoreScript __instance, MagazineScript __result, PlayerLoadoutEquipment ple) {
-			// 	if (ple.persistent_data != null) {
-			// 		if (ple.persistent_data["rounds"] != null) {
-			// 			__result.SetRoundCount(0);
+			[HarmonyPatch(typeof(RuntimeTileLevelGenerator), "SpawnMagazine")]
+			[HarmonyPostfix]
+			private static void DoTheSwitcheroo(ActiveItem __result) {
+				var rounds_in_mag = __result.persistent_data["rounds_in_mag"].AsInt;
 
-			// 			var rounds = ple.persistent_data["rounds"].AsArray;
+				//this seems like a good non future-proof way to do this #fuckdafuture
+				var vanilla_cartridge = ReceiverCoreScript.Instance().GetMagazinePrefab(ReceiverCoreScript.Instance().CurrentLoadout.gun_internal_name, MagazineClass.StandardCapacity).round_prefab.GetComponent<ShellCasingScript>().cartridge_type;
 
-			// 			for (int i = 0; i < rounds.Count; i++) {
-			// 				var cartridge_type = (CartridgeSpec.Preset)rounds[i]["type"].AsInt;
+				JSONArray rounds = new JSONArray();
 
-			// 				var roundPrefab = Object.Instantiate(__instance.generic_prefabs.First(item => item is ShellCasingScript shellCasingScript && shellCasingScript.cartridge_type == cartridge_type)) as ShellCasingScript;
+				for (int i = 0; i < rounds_in_mag; i++)
+				{
+					JSONObject jsonObject = new JSONObject();
 
-			// 				__result.AddRound(roundPrefab);
-			// 			}
-			// 		}
-			// 	}
-			// }
+					jsonObject.Add("type", (int)GetRandomRound(vanilla_cartridge).cartridge_type);
+
+					rounds.Add(jsonObject);
+				}
+
+				__result.persistent_data.Add("rounds", rounds);
+			}
 
 			[HarmonyPatch(typeof(MagazineScript), nameof(MagazineScript.GetPersistentData))]
 			[HarmonyPostfix]
@@ -1144,7 +1148,7 @@ namespace Receiver2ModdingKit.CustomRounds {
 				JSONArray rounds = new JSONArray();
 
 				for (int i = 0; i < __instance.rounds.Count; i++) {
-					Debug.Log(__instance.rounds[i].cartridge_type);
+					//Debug.Log(__instance.rounds[i].cartridge_type);
 
 					JSONObject jsonObject = new JSONObject();
 
@@ -1189,46 +1193,103 @@ namespace Receiver2ModdingKit.CustomRounds {
 				}
 			}
 
+			[HarmonyPatch(typeof(LocalAimHandler), "AddLooseBullet")]
+			[HarmonyPostfix]
+			private static void UpdateSpringTargetOnPickUp(ShellCasingScript round, object ___loose_bullets) {
+				var item_count = (int)_list_get_count_info.Invoke(___loose_bullets, null);
+
+				var boolet_inventory_item = _list_get_item_info.Invoke(___loose_bullets, new object[] { item_count - 1 });
+
+				var item = _boolet_display_item_info.GetValue(boolet_inventory_item);
+
+				//if the latest added bullet is the selected cartridge type, we want it to "settle" to the "selected" bigger zoom state thing
+				if (item is ShellCasingScript shellCasingScript)
+				{
+					var spring = (Spring)_boolet_display_spring_info.GetValue(boolet_inventory_item);
+
+					if (shellCasingScript.cartridge_type == inventory_selected_cartridge) {
+						spring.target_state = 0.4f;
+					}
+					else
+					{
+						spring.target_state = 0.3f;
+					}
+				}
+			}
+
+
 			[HarmonyPatch(typeof(LocalAimHandler), "UpdateLooseBulletDisplay")]
 			[HarmonyPostfix]
-			private static void UpdateBulletSelectDisplay(object ___loose_bullets) {
+			private static void UpdateBulletSelectDisplay(LocalAimHandler __instance, object ___loose_bullets, Spring ___show_bullet_spring) {
 				var distinct_presets = GetPresetsInInventory();
 
-				if (Input.GetKeyDown(KeyCode.UpArrow) || distinct_presets.Count <= 1)
+				if (___show_bullet_spring.target_state == 0f && distinct_presets.Count <= 1)
 				{
 					inventory_selected_cartridge = (CartridgeSpec.Preset)int.MaxValue;
 
 					UpdateSelectedCartridge();
-
-					return;
 				}
 
-				if (Input.GetKeyDown(KeyCode.LeftArrow))
-				{
-					var roundIndex = distinct_presets.IndexOf(inventory_selected_cartridge);
+				if (___show_bullet_spring.target_state == 1f) {
+					if (Input.GetKeyDown((KeyCode)drop_round_key_config.key.GetKey()))
+					{
+						ShellCasingScript selectedRound;
 
-					if (roundIndex == distinct_presets.Count - 1) {
-						inventory_selected_cartridge = distinct_presets[0];
+						if (inventory_selected_cartridge != (CartridgeSpec.Preset)int.MaxValue || distinct_presets.Count == 1)
+						{
+							if (distinct_presets.Count == 1)
+							{
+								selectedRound = __instance.GetBullet(distinct_presets[0]);
+							}
+							else
+							{
+								selectedRound = __instance.GetBullet(inventory_selected_cartridge);
+							}
+
+							__instance.MoveInventoryItem(selectedRound, null);
+						}
 					}
-					else {
-						inventory_selected_cartridge = distinct_presets[roundIndex + 1];
-					}		
 
-					UpdateSelectedCartridge();
-				}
+					if (Input.GetKeyDown(KeyCode.UpArrow) || distinct_presets.Count <= 1)
+					{
+						inventory_selected_cartridge = (CartridgeSpec.Preset)int.MaxValue;
 
-				if (Input.GetKeyDown(KeyCode.RightArrow))
-				{
-					var roundIndex = distinct_presets.IndexOf(inventory_selected_cartridge);
+						UpdateSelectedCartridge();
 
-					if (roundIndex <= 0) {
-						inventory_selected_cartridge = distinct_presets[distinct_presets.Count - 1];
+						return;
 					}
-					else {
-						inventory_selected_cartridge = distinct_presets[roundIndex - 1];
-					}		
 
-					UpdateSelectedCartridge();
+					if (Input.GetKeyDown(KeyCode.LeftArrow))
+					{
+						var roundIndex = distinct_presets.IndexOf(inventory_selected_cartridge);
+
+						if (roundIndex == distinct_presets.Count - 1)
+						{
+							inventory_selected_cartridge = distinct_presets[0];
+						}
+						else
+						{
+							inventory_selected_cartridge = distinct_presets[roundIndex + 1];
+						}
+
+						UpdateSelectedCartridge();
+					}
+
+					if (Input.GetKeyDown(KeyCode.RightArrow))
+					{
+						var roundIndex = distinct_presets.IndexOf(inventory_selected_cartridge);
+
+						if (roundIndex <= 0)
+						{
+							inventory_selected_cartridge = distinct_presets[distinct_presets.Count - 1];
+						}
+						else
+						{
+							inventory_selected_cartridge = distinct_presets[roundIndex - 1];
+						}
+
+						UpdateSelectedCartridge();
+					}
 				}
 
 				void UpdateSelectedCartridge()

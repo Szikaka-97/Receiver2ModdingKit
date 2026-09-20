@@ -45,6 +45,50 @@ namespace Receiver2ModdingKit.CustomRounds {
 				if (Input.GetKeyDown(KeyCode.LeftArrow)) {
 					var current_round = shootingRangeAmmoBoxScript.round_prefab.GetComponent<ShellCasingScript>();
 
+					var round_def = CustomRoundTypes.GetDefinitionForRound(current_round.cartridge_type);
+
+					CartridgeSpec.Preset base_cartridge_type;
+
+					if (round_def != null) {
+						base_cartridge_type = round_def.baseVariant;
+					}
+					else
+					{
+						base_cartridge_type = current_round.cartridge_type;
+					}
+					
+					var presets = CustomRoundTypes.GetSiblingCartridgeTypes(base_cartridge_type);
+
+					//current round is vanilla, wrap around
+					if (presets.Length > 0 && round_def == null) {
+						base_cartridge_type = presets[presets.Length - 1];
+						shootingRangeAmmoBoxScript.round_prefab = ModdingKitCorePlugin.GetRoundPrefab(base_cartridge_type).gameObject;
+					}
+
+					for (int i = presets.Length - 1; i >= 0; i--) {
+						Debug.Log(presets[i]);
+						if (presets[i] == current_round.cartridge_type) {
+							if (i == 0) {
+								shootingRangeAmmoBoxScript.round_prefab = ModdingKitCorePlugin.GetRoundPrefab(base_cartridge_type).gameObject;
+							}
+							else {
+								base_cartridge_type = presets[i - 1];
+								shootingRangeAmmoBoxScript.round_prefab = ModdingKitCorePlugin.GetRoundPrefab(base_cartridge_type).gameObject;
+								Debug.Log($"got type: {base_cartridge_type}");
+							}
+
+							break;
+						}
+					}
+
+					round_def = CustomRoundTypes.GetDefinitionForRound(base_cartridge_type);
+
+					UpdateTapeText(round_def, base_cartridge_type);
+				}
+
+				if (Input.GetKeyDown(KeyCode.RightArrow)) {
+					var current_round = shootingRangeAmmoBoxScript.round_prefab.GetComponent<ShellCasingScript>();
+
 					Debug.Log(current_round);
 
 					var round_def = CustomRoundTypes.GetDefinitionForRound(current_round.cartridge_type);
@@ -64,10 +108,10 @@ namespace Receiver2ModdingKit.CustomRounds {
 					
 					var presets = CustomRoundTypes.GetSiblingCartridgeTypes(base_cartridge_type);
 
-					//current round is vanilla
+					//current round is vanilla, wrap around
 					if (presets.Length > 0 && round_def == null) {
 						base_cartridge_type = presets[0];
-						shootingRangeAmmoBoxScript.round_prefab = ModdingKitCorePlugin.GetRoundPrefab(presets[0]).gameObject;
+						shootingRangeAmmoBoxScript.round_prefab = ModdingKitCorePlugin.GetRoundPrefab(base_cartridge_type).gameObject;
 					}
 
 					for (int i = 0; i < presets.Length; i++) {
@@ -78,56 +122,14 @@ namespace Receiver2ModdingKit.CustomRounds {
 							}
 							else {
 								base_cartridge_type = presets[i + 1];
-								Debug.Log($"got type: {base_cartridge_type}");
 								shootingRangeAmmoBoxScript.round_prefab = ModdingKitCorePlugin.GetRoundPrefab(base_cartridge_type).gameObject;
+								Debug.Log($"got type: {base_cartridge_type}");
 							}
 
 							break;
 						}
 					}
 					
-					round_def = CustomRoundTypes.GetDefinitionForRound(base_cartridge_type);
-
-					UpdateTapeText(round_def, base_cartridge_type);
-				}
-
-				if (Input.GetKeyDown(KeyCode.RightArrow)) {
-					var current_round = shootingRangeAmmoBoxScript.round_prefab.GetComponent<ShellCasingScript>();
-
-					var round_def = CustomRoundTypes.GetDefinitionForRound(current_round.cartridge_type);
-
-					CartridgeSpec.Preset base_cartridge_type;
-
-					if (round_def != null) {
-						base_cartridge_type = round_def.baseVariant;
-					}
-					else
-					{
-						base_cartridge_type = current_round.cartridge_type;
-					}
-					
-					var presets = CustomRoundTypes.GetSiblingCartridgeTypes(base_cartridge_type);
-
-					//current round is vanilla
-					if (presets.Length > 0 && round_def == null) {
-						base_cartridge_type = presets[0];
-						shootingRangeAmmoBoxScript.round_prefab = ModdingKitCorePlugin.GetRoundPrefab(presets[0]).gameObject;
-					}
-
-					for (int i = presets.Length - 1; i >= 0; i--) {
-						if (presets[i] == current_round.cartridge_type) {
-							if (i - 1 == -1) {
-								shootingRangeAmmoBoxScript.round_prefab = ModdingKitCorePlugin.GetRoundPrefab(base_cartridge_type).gameObject;
-							}
-							else {
-								base_cartridge_type = presets[i - 1];
-								shootingRangeAmmoBoxScript.round_prefab = ModdingKitCorePlugin.GetRoundPrefab(base_cartridge_type).gameObject;
-								Debug.Log($"got type: {base_cartridge_type}");
-							}
-							break;
-						}
-					}
-
 					round_def = CustomRoundTypes.GetDefinitionForRound(base_cartridge_type);
 
 					UpdateTapeText(round_def, base_cartridge_type);
@@ -149,8 +151,6 @@ namespace Receiver2ModdingKit.CustomRounds {
 
 			foreach (Transform go in this.transform) {
 				if (go.name.StartsWith("Tape")) {
-					Debug.Log(go.name);
-
 					if (!go.TryGetComponent<TextMeshPro>(out TextMeshPro text))
 					{
 						text = go.GetComponentInChildren<TextMeshPro>();
@@ -161,7 +161,6 @@ namespace Receiver2ModdingKit.CustomRounds {
 					if (round_def != null) {
 						if (!string.IsNullOrWhiteSpace(round_def.clean_name)) {
 							title = round_def.clean_name;
-							Debug.Log("getting clean name");
 						}
 						else
 						{
@@ -192,28 +191,18 @@ namespace Receiver2ModdingKit.CustomRounds {
 
 						var text_fits = (Quaternion.AngleAxis(-tape.eulerAngles.y, Vector3.up) * tape.GetComponent<MeshRenderer>().bounds.extents).z > text.bounds.extents.x + 0.02f;
 
-						Debug.Log($"index: {tapeIndex} fits: {text_fits}");
-						Debug.Log($"tape extents: {(Quaternion.AngleAxis(-tape.eulerAngles.y, Vector3.up) * tape.GetComponent<MeshRenderer>().bounds.extents).z} vs text extents: {text.bounds.extents.x}");
-						Debug.Log($"already found fitting tape: {found_fitting_text}");
-
 						if (text_fits && !found_fitting_text)
 						{
 							found_fitting_text = true;
 							tape.gameObject.SetActive(true);
-
-							Debug.Log("setting active");
 						}
 						else
 						{
 							tape.gameObject.SetActive(false);
-
-							Debug.Log("setting inactive");
 						}
 
 						if (tapeIndex == 1 && !found_fitting_text)
 						{
-							Debug.Log("didn't find any fitting tape, enable biggest & scaling");
-
 							tape.gameObject.SetActive(true);
 
 							var diff = text.bounds.extents.x / (Quaternion.AngleAxis(-tape.eulerAngles.y, Vector3.up) * tape.GetComponent<MeshRenderer>().bounds.extents).z;

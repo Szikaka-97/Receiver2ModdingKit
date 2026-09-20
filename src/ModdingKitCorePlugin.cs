@@ -168,6 +168,8 @@ namespace Receiver2ModdingKit {
 
 			instance = this;
 
+			ModdingKitEvents.AddTaskAtCoreStartup(CustomRounds.CustomRoundTypes.CreateDropRoundKeybind);
+
 			//needs to be at beginning, other the Kon won't get assigned until later
 			foreach (Type type in typeof(BepInPlugin).Assembly.GetTypes()) {
 				if (type.FullName == "BepInEx.ConsoleUtil.Kon") {
