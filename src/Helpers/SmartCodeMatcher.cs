@@ -178,6 +178,13 @@ namespace Receiver2ModdingKit.Helpers {
 		//     A list of instructions
 		/// <inheritdoc cref="CodeMatcher.InstructionEnumeration" />
 		public IEnumerable<CodeInstruction> InstructionEnumeration() => this.matcher.InstructionEnumeration();
+		
+		/// <summary>
+		/// Gets all instructions as an enumeration, but checks if the matcher is valid.
+		/// </summary>
+		/// <param name="explanation">The explanation for the throw if the matcher is invalid</param>
+		/// <returns>A list of instructions</returns>
+		public IEnumerable<CodeInstruction> InstructionEnumeration(string explanation) => this.matcher.ThrowIfInvalid(explanation).InstructionEnumeration();
 
 		//
 		// Summary:

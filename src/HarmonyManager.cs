@@ -394,6 +394,19 @@ namespace Receiver2ModdingKit {
 					)
 					.InstructionEnumeration();
 			}
+
+			[HarmonyPatch(typeof(FMODTapeFileStream), nameof(FMODTapeFileStream.LoadTapeContent))]
+			[HarmonyTranspiler]
+			private static IEnumerable<CodeInstruction> SwitchTapeLoadModeToStreaming(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase __originalMethod) {
+				return new SmartCodeMatcher(instructions, generator)
+					.MatchForward(false,
+					new CodeMatch(OpCodes.Ldc_I4_0), new CodeMatch(OpCodes.Ldarg_0), new CodeMatch(OpCodes.Ldflda), new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(FMOD.System), nameof(FMOD.System.createSound), new Type[] { typeof(string), typeof(FMOD.MODE), typeof(FMOD.Sound).MakeByRefType() })))
+					.Set(OpCodes.Ldc_I4, (int)FMOD.MODE.CREATESTREAM)
+					.MatchForward(false,
+					new CodeMatch(OpCodes.Ldc_I4_0), new CodeMatch(OpCodes.Ldarg_0), new CodeMatch(OpCodes.Ldflda), new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(FMOD.System), nameof(FMOD.System.createSound), new Type[] { typeof(string), typeof(FMOD.MODE), typeof(FMOD.Sound).MakeByRefType() })))
+					.Set(OpCodes.Ldc_I4, (int)FMOD.MODE.CREATESTREAM)
+					.InstructionEnumeration("Failed To Fucking Patch Lol");
+			}
 		}
 
 		private static class DebugTranspilers {
