@@ -758,7 +758,7 @@ namespace Receiver2ModdingKit.CustomRounds {
 					.AddLabels(labels)
 					;
 
-				Debug.Log($"labels: {codeMatcher.Instruction.labels.Count}");
+				//Debug.Log($"labels: {codeMatcher.Instruction.labels.Count}");
 
 				codeMatcher
 					.MatchForward(true,
@@ -833,14 +833,14 @@ namespace Receiver2ModdingKit.CustomRounds {
 				if (LocalAimHandler.player_instance != null) {
 					JSONArray jsonarray = __result["equipment"].AsArray;
 					if (LocalAimHandler.player_instance.LooseBulletCount > 0) {
-						Debug.Log(LocalAimHandler.player_instance.LooseBulletCount);
+						//Debug.Log(LocalAimHandler.player_instance.LooseBulletCount);
 
 
 						var loose_bullets = _lah_loose_bullets.GetValue(LocalAimHandler.player_instance);
 
 						for (int roundIndex = 0; roundIndex < (int)_list_get_count_info.Invoke(loose_bullets, null); roundIndex++) {
 							if (_boolet_display_item_info.GetValue(_list_get_item_info.Invoke(loose_bullets, new object[] { roundIndex })) is ShellCasingScript shellCasingScript) {
-								Debug.Log(shellCasingScript.cartridge_type);
+								//Debug.Log(shellCasingScript.cartridge_type);
 
 								var player_equipment = new PlayerLoadoutEquipment
 								{
@@ -944,7 +944,7 @@ namespace Receiver2ModdingKit.CustomRounds {
 			[HarmonyPatch(typeof(ReceiverCoreScript), nameof(ReceiverCoreScript.SpawnGun))]
 			[HarmonyPostfix]
 			private static void HandleChamberCompatStuff(ReceiverCoreScript __instance, GunScript __result, PlayerLoadout loadout) {
-				Debug.Log("chamber compat yay");
+				//Debug.Log("chamber compat yay");
 
 				if (__result.gun_type == GunType.Automatic)
 				{
@@ -952,8 +952,8 @@ namespace Receiver2ModdingKit.CustomRounds {
 					{
 						if (equipment.equipment_type == k_CustomChamberEquipmentType)
 						{
-							Debug.Log("automatic");
-							Debug.Log((CartridgeSpec.Preset)equipment.magazine_class);
+							//Debug.Log("automatic");
+							//Debug.Log((CartridgeSpec.Preset)equipment.magazine_class);
 
 							if (__result.round_in_chamber != null)
 							{
@@ -986,14 +986,14 @@ namespace Receiver2ModdingKit.CustomRounds {
 						}
 					}
 
-					Debug.Log(chambers.Count);
+					//Debug.Log(chambers.Count);
 
 					for (int chamberIndex = 0; chamberIndex < chambers.Count && chamberIndex < __result.cylinder.GetChamberCount(); chamberIndex++) {
 						var chamber = __result.cylinder.GetChamber(chamberIndex);
 
 						var cartridge_type = (CartridgeSpec.Preset)chambers[chamberIndex].magazine_class;
 
-						Debug.Log(cartridge_type);
+						//Debug.Log(cartridge_type);
 
 						switch ((PlayerLoadout.ChamberState)chambers[chamberIndex].slot) {
 							case PlayerLoadout.ChamberState.Blocked:
@@ -1083,15 +1083,15 @@ namespace Receiver2ModdingKit.CustomRounds {
 			[HarmonyPatch(typeof(ReceiverCoreScript), "SpawnPlayer")]
 			[HarmonyPrefix]
 			private static void RoundCompatStuff(ReceiverCoreScript __instance) {
-				Debug.Log("prefix spawnplayer");
+				//Debug.Log("prefix spawnplayer");
 
 				foreach (var equipment in __instance.CurrentLoadout.equipment) {
-					Debug.Log(equipment.equipment_type);
+					//Debug.Log(equipment.equipment_type);
 					if (equipment.equipment_type == k_CustomRoundEquipmentType) {
 
 						__instance.CurrentLoadout.ammo_count = 0;
 
-						Debug.Log($"current loadout ammo count: {__instance.CurrentLoadout.ammo_count}");
+						//Debug.Log($"current loadout ammo count: {__instance.CurrentLoadout.ammo_count}");
 					}
 				}
 			}
@@ -1109,7 +1109,7 @@ namespace Receiver2ModdingKit.CustomRounds {
 
 				if (LocalAimHandler.player_instance.loadout != null) {
 					foreach (var equipment in LocalAimHandler.player_instance.loadout.equipment) {
-						Debug.Log(equipment.equipment_type);
+						//Debug.Log(equipment.equipment_type);
 
 						if (equipment.equipment_type == k_CustomRoundEquipmentType) {
 							//Debug.Log((CartridgeSpec.Preset)equipment.magazine_class);
@@ -1173,18 +1173,18 @@ namespace Receiver2ModdingKit.CustomRounds {
 
 					__instance.rounds_in_mag = 0;
 
-					Debug.Log("adding rounds 2 mag");
+					//Debug.Log("adding rounds 2 mag");
 
-					Debug.Log(rounds.Count);
+					//Debug.Log(rounds.Count);
 
 					for (int i = 0; i < rounds.Count; i++) {
 						var cartridge_type = (CartridgeSpec.Preset)rounds[i]["type"].AsInt;
 
-						Debug.Log(cartridge_type);
+						//Debug.Log(cartridge_type);
 
 						var prefurb = ModdingKitCorePlugin.GetRoundPrefab(cartridge_type);
 
-						Debug.Log(prefurb.name);
+						//Debug.Log(prefurb.name);
 
 						var roundPrefab = Object.Instantiate(prefurb);
 
@@ -1343,7 +1343,7 @@ namespace Receiver2ModdingKit.CustomRounds {
             	var shootingRangeAmmoBoxes = GameObject.Find("Shooting Range/Gameplay/Ammo Tables");
 				if (shootingRangeAmmoBoxes != null) {
 					foreach (var ammoBox in shootingRangeAmmoBoxes.GetComponentsInChildren<ShootingRangeAmmoBoxScript>()) {
-						Debug.Log(ammoBox.name);
+						//Debug.Log(ammoBox.name);
 						
 						ammoBox.gameObject.AddComponent<ShootingRangeAmmoBoxCustomRoundExtender>();
 					}
@@ -1352,7 +1352,7 @@ namespace Receiver2ModdingKit.CustomRounds {
             	var shootingDomeAmmoBoxes = GameObject.Find("Challenge Room/Challenge Room Geometry/AmmoTable");
 				if (shootingDomeAmmoBoxes != null) {
 					foreach (var ammoBox in shootingDomeAmmoBoxes.GetComponentsInChildren<ShootingRangeAmmoBoxScript>()) {
-						Debug.Log(ammoBox.name);
+						//Debug.Log(ammoBox.name);
 						
 						ammoBox.gameObject.AddComponent<ShootingRangeAmmoBoxCustomRoundExtender>();
 					}
@@ -1361,7 +1361,7 @@ namespace Receiver2ModdingKit.CustomRounds {
 				var weaponStorageRoomAmmoBoxes = GameObject.Find("Weapon Storage Room/NewGunsLocation");
 				if (weaponStorageRoomAmmoBoxes != null) {
 					foreach (var ammoBox in weaponStorageRoomAmmoBoxes.GetComponentsInChildren<ShootingRangeAmmoBoxScript>()) {
-						Debug.Log(ammoBox.name);
+						//Debug.Log(ammoBox.name);
 						
 						ammoBox.gameObject.AddComponent<ShootingRangeAmmoBoxCustomRoundExtender>();
 					}
