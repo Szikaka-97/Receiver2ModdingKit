@@ -7,9 +7,28 @@ using UnityEngine.Events;
 namespace Receiver2ModdingKit.CustomRounds {
 	[Serializable]
 	public class CustomRoundDefinition {
+		/// <summary>
+		/// The gun's vertical kick.
+		/// </summary>
+		[Tooltip("The gun's vertical kick.")]
 		public float extra_rotation_x;
+
+		/// <summary>
+		/// The gun's horizontal kick.
+		/// </summary>
+		[Tooltip("The gun's horizontal kick.")]
 		public float extra_rotation_y;
+
+		/// <summary>
+		/// The gun's horizontal wobble.
+		/// </summary>
+		[Tooltip("The gun's horizontal wobble.")]
 		public float extra_recoil_x;
+
+		/// <summary>
+		/// The gun's vertical wobble.
+		/// </summary>
+		[Tooltip("The gun's vertical wobble.")]
 		public float extra_recoil_y;
 		public float extra_stovepipe_chance;
 		public float extra_doublefeed_chance;
