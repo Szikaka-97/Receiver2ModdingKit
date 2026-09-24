@@ -6,11 +6,41 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using SharpCompress.Archives;
 
-namespace Receiver2ModdingKit.Helpers
-{
-	public static class AssetHelper
-	{
+namespace Receiver2ModdingKit.Helpers {
+	public static class AssetHelper {
+		public static void DecompressSigmaBundles(string path) { //hello my name is sizwaz and I love K&R braces
+			const string k_CompressedBundlesExtension = ".sigma";
+
+			bool valid;
+
+			foreach (var file in Directory.GetFiles(path)) {
+				valid = false;
+
+				if (Path.GetExtension(file) == k_CompressedBundlesExtension) {
+					using (var archive = ArchiveFactory.Open(file)) {
+						valid = true;
+
+						foreach (var entry in archive.Entries) {
+							if (Path.GetExtension(entry.Key).Contains(SystemInfo.operatingSystemFamily.ToString().ToLower())) {
+								using (var bundleStream = entry.OpenEntryStream()) {
+									byte[] buffer = new byte[entry.Size];
+									bundleStream.Read(buffer, 0, (int)entry.Size);
+									using (var decompressedFile = File.Create(Path.Combine(path, entry.Key))) {
+										decompressedFile.Write(buffer, 0, buffer.Length);
+									}
+								}
+							}
+						}
+					}
+					if (valid) {
+						File.Delete(file);
+					}
+				}
+			}
+		}
+
 		public static bool FindAssetBundle<T>(string path, out T asset) where T : class
 		{
 			asset = null;
