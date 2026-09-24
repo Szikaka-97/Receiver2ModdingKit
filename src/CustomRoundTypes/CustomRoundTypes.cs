@@ -1223,7 +1223,7 @@ namespace Receiver2ModdingKit.CustomRounds {
 			private static void UpdateBulletSelectDisplay(LocalAimHandler __instance, object ___loose_bullets, Spring ___show_bullet_spring) {
 				var distinct_presets = GetPresetsInInventory();
 
-				if (___show_bullet_spring.target_state == 0f && distinct_presets.Count <= 1)
+				if (distinct_presets.Count <= 1)
 				{
 					inventory_selected_cartridge = (CartridgeSpec.Preset)int.MaxValue;
 
