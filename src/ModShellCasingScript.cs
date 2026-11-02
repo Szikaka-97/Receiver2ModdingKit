@@ -4,6 +4,7 @@ using FMODUnity;
 using Receiver2;
 using Receiver2ModdingKit.CustomRounds;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Receiver2ModdingKit {
 	public class ModShellCasingScript : ShellCasingScript, ISerializationCallbackReceiver {
@@ -48,6 +49,26 @@ namespace Receiver2ModdingKit {
 
 		public CustomRoundDefinition customRoundTypeParameters;
 
+		[SerializeField, HideInInspector] float _round_type_parameters_extra_rotation_x;
+		[SerializeField, HideInInspector] float _round_type_parameters_extra_rotation_y;
+		[SerializeField, HideInInspector] float _round_type_parameters_extra_recoil_x;
+		[SerializeField, HideInInspector] float _round_type_parameters_extra_recoil_y;
+		[SerializeField, HideInInspector] float _round_type_parameters_extra_stovepipe_chance;
+		[SerializeField, HideInInspector] float _round_type_parameters_extra_doublefeed_chance;
+		[SerializeField, HideInInspector] float _round_type_parameters_extra_ftf_chance;
+		[SerializeField, HideInInspector] float _round_type_parameters_extra_wrongly_seated_mag_chance;
+		[SerializeField, HideInInspector] float _round_type_parameters_extra_out_of_battery_chance;
+		[SerializeField, HideInInspector] float _round_type_parameters_extra_slamfire_chance;
+		[SerializeField, HideInInspector] float _round_type_parameters_extra_slide_fire_speed;
+		[SerializeField, HideInInspector] float _round_type_parameters_extra_wedged_amount;
+		[SerializeField, HideInInspector] float _round_type_parameters_spawn_chance;
+		[SerializeField, HideInInspector] CartridgeSpec.Preset _round_type_parameters_baseVariant;
+		[SerializeField, HideInInspector] CartridgeSpec.Preset _round_type_parameters_cartridge;
+		[SerializeField, HideInInspector] string _round_type_parameters_clean_name;
+		[SerializeField, HideInInspector] UnityAction<GunScript> _round_type_parameters_onRoundFired;
+		[SerializeField, HideInInspector] Func<bool> _round_type_parameters_checkUnlockCondition;
+		[SerializeField, HideInInspector] Texture2D _round_type_parameters_shootingRangeAmmoBoxTexture;
+
 		[SerializeField]
 		[HideInInspector]
 		private float spec_casing_mass;
@@ -70,6 +91,29 @@ namespace Receiver2ModdingKit {
 			this.spec_speed = spec.speed;
 			this.spec_diameter = spec.diameter;
 			this.spec_density = spec.density;
+
+			if (customRoundTypeParameters != null)
+			{
+				_round_type_parameters_extra_rotation_x = customRoundTypeParameters.extra_rotation_x;
+				_round_type_parameters_extra_rotation_y = customRoundTypeParameters.extra_rotation_y;
+				_round_type_parameters_extra_recoil_x = customRoundTypeParameters.extra_recoil_x;
+				_round_type_parameters_extra_recoil_y = customRoundTypeParameters.extra_recoil_y;
+				_round_type_parameters_extra_stovepipe_chance = customRoundTypeParameters.extra_stovepipe_chance;
+				_round_type_parameters_extra_doublefeed_chance = customRoundTypeParameters.extra_doublefeed_chance;
+				_round_type_parameters_extra_ftf_chance = customRoundTypeParameters.extra_ftf_chance;
+				_round_type_parameters_extra_wrongly_seated_mag_chance = customRoundTypeParameters.extra_wrongly_seated_mag_chance;
+				_round_type_parameters_extra_out_of_battery_chance = customRoundTypeParameters.extra_out_of_battery_chance;
+				_round_type_parameters_extra_slamfire_chance = customRoundTypeParameters.extra_slamfire_chance;
+				_round_type_parameters_extra_slide_fire_speed = customRoundTypeParameters.extra_slide_fire_speed;
+				_round_type_parameters_extra_wedged_amount = customRoundTypeParameters.extra_wedged_amount;
+				_round_type_parameters_spawn_chance = customRoundTypeParameters.spawn_chance;
+				_round_type_parameters_baseVariant = customRoundTypeParameters.baseVariant;
+				_round_type_parameters_cartridge = customRoundTypeParameters.cartridge;
+				_round_type_parameters_clean_name = customRoundTypeParameters.clean_name;
+				_round_type_parameters_onRoundFired = customRoundTypeParameters.onRoundFired;
+				_round_type_parameters_checkUnlockCondition = customRoundTypeParameters.checkUnlockCondition;
+				_round_type_parameters_shootingRangeAmmoBoxTexture = customRoundTypeParameters.shootingRangeAmmoBoxTexture;
+			}
 		}
 
 		public void OnAfterDeserialize() {
@@ -80,6 +124,32 @@ namespace Receiver2ModdingKit {
 					speed = spec_speed,
 					diameter = spec_diameter,
 					density = spec_density
+				};
+			}
+
+			if (this.customRoundTypeParameters == null && _round_type_parameters_cartridge != 0)
+			{
+				this.customRoundTypeParameters = new CustomRoundDefinition()
+				{
+					extra_rotation_x = _round_type_parameters_extra_rotation_x,
+					extra_rotation_y = _round_type_parameters_extra_rotation_y,
+					extra_recoil_x = _round_type_parameters_extra_recoil_x,
+					extra_recoil_y = _round_type_parameters_extra_recoil_y,
+					extra_stovepipe_chance = _round_type_parameters_extra_stovepipe_chance,
+					extra_doublefeed_chance = _round_type_parameters_extra_doublefeed_chance,
+					extra_ftf_chance = _round_type_parameters_extra_ftf_chance,
+					extra_wrongly_seated_mag_chance = _round_type_parameters_extra_wrongly_seated_mag_chance,
+					extra_out_of_battery_chance = _round_type_parameters_extra_out_of_battery_chance,
+					extra_slamfire_chance = _round_type_parameters_extra_slamfire_chance,
+					extra_slide_fire_speed = _round_type_parameters_extra_slide_fire_speed,
+					extra_wedged_amount = _round_type_parameters_extra_wedged_amount,
+					spawn_chance = _round_type_parameters_spawn_chance,
+					baseVariant = _round_type_parameters_baseVariant,
+					cartridge = _round_type_parameters_cartridge,
+					clean_name = _round_type_parameters_clean_name,
+					onRoundFired = _round_type_parameters_onRoundFired,
+					checkUnlockCondition = _round_type_parameters_checkUnlockCondition,
+					shootingRangeAmmoBoxTexture = 	_round_type_parameters_shootingRangeAmmoBoxTexture,
 				};
 			}
 		}

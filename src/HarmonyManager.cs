@@ -15,6 +15,7 @@ using Receiver2ModdingKit.Helpers;
 using BepInEx.Logging;
 using SharpCompress.Archives;
 using System.Text;
+using Receiver2ModdingKit.CustomRounds;
 
 namespace Receiver2ModdingKit {
 	public static class HarmonyManager {
@@ -744,11 +745,47 @@ namespace Receiver2ModdingKit {
 				Debug.LogError("An error accured when trying to create settings for the Modding Kit");
 			}
 
-			foreach (var asset_bundle in AssetBundle.GetAllLoadedAssetBundles()) {
+			foreach (var asset_bundle in AssetBundle.GetAllLoadedAssetBundles())
+			{
 				BankList[] lists = asset_bundle.LoadAllAssets<BankList>();
 
-				if (lists != null) { 
+				if (lists != null)
+				{
 					CustomSounds.ModAudioManager.LoadBanksFromLists(lists);
+				}
+
+				UnityEngine.Object[] objects = asset_bundle.LoadAllAssets();
+
+				//you can't just do asset_bundle.LoadAllAssets<ModShellCasingScript>() because they're GameObjects
+				foreach (var obj in objects)
+				{
+					if (obj is GameObject go)
+					{
+						//were I smart I'd do a "LoadModShellCasingScript" method but literally who cares
+						if (go.TryGetComponent<ModShellCasingScript>(out var mscs))
+						{
+							//is this a bad idea? probably
+							//do I care? no
+							//is anyone even going to use this? no
+							if (mscs.customRoundTypeParameters != null && mscs.customRoundTypeParameters.cartridge != 0)
+							{
+								if (CustomRoundTypes.GetDefinitionForRound(mscs.cartridge_type) == null)
+								{
+									CustomRoundTypes.RegisterCustomRound(mscs.customRoundTypeParameters);
+
+									if (!ModShellCasingScript.mod_cartridges.ContainsKey(mscs.cartridge_type))
+									{
+										ModdingKitCorePlugin.AddNewCartridgePreset(mscs.cartridge_type, mscs.spec.CreateSpec());
+									}
+
+									if (!ModdingKitCorePlugin.round_prefabs.ContainsKey(mscs.cartridge_type))
+									{
+										ModdingKitCorePlugin.AddShellCasingScriptPrefab(mscs);
+									}
+								}
+							}
+						}
+					}
 				}
 			}
 
