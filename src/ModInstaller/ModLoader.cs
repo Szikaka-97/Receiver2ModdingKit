@@ -48,6 +48,18 @@ namespace Receiver2ModdingKit.ModInstaller {
 				items.Add(gun);
 			}
 
+			MallUnlockData gun_mall_unlock_data = new MallUnlockData
+			{
+				criteria = -1,
+				unlock_id = gun.InternalName,
+				weapon_groups = new string[] { gun.InternalName }
+			};
+
+			var unlock_internal_names = new List<string>
+			{
+				gun.InternalName
+			};
+
 			if (!prefab_9mm) { //Fallback bullet prefab
 				prefab_9mm = items.First( item => { return item is ShellCasingScript && ((ShellCasingScript) item).cartridge_type == CartridgeSpec.Preset._9mm && ((ShellCasingScript) item).go_casing != null; }).gameObject;
 			}
@@ -86,10 +98,6 @@ namespace Receiver2ModdingKit.ModInstaller {
 							if (!ModdingKitCorePlugin.round_prefabs.ContainsKey(mscs.cartridge_type)) {
 								ModdingKitCorePlugin.AddShellCasingScriptPrefab(mscs);
 							}
-
-							if (mscs.customRoundTypeParameters != null && mscs.customRoundTypeParameters.cartridge != 0) {
-								CustomRoundTypes.RegisterCustomRound(mscs.customRoundTypeParameters);
-							}
 						}
 						else {
 							Debug.LogWarning("Gun " + gun.InternalName + " adds a cartridge via ModGunScript.GetCustomCartridgeSpec(); Consider using ModShellCasingScript instead");
@@ -127,6 +135,28 @@ namespace Receiver2ModdingKit.ModInstaller {
 						.Where( mag => !items.Contains(mag) && gun.magazine_root_types.Contains(mag.magazine_root_type)).ToList();
 
 				foreach (MagazineScript magazine in magazines) { //Handling magazine pegboard collision
+					if (magazine.MagazineClass == MagazineClass.StandardCapacity || magazine.MagazineClass == MagazineClass.StandardCapacityGold || magazine.MagazineClass == MagazineClass.HighCapacity || magazine.MagazineClass == MagazineClass.HighCapacityGold)
+					{
+						var unlocked_items = new HashSet<string>();
+
+						foreach (var item in ReceiverCoreScript.Instance().mall_unlock_manager.mall_unlocks)
+						{
+							foreach (var internal_name in item.internal_names)
+							{
+								unlocked_items.Add(internal_name);
+							}
+						}
+
+						//don't want to add a million useless mags, if a weapon shares its magazine root with other guns
+						if (!unlocked_items.Contains(magazine.InternalName))
+						{
+							//do it three times, unlocks three copies of the thang
+							unlock_internal_names.Add(magazine.InternalName);
+							unlock_internal_names.Add(magazine.InternalName);
+							unlock_internal_names.Add(magazine.InternalName);
+						}
+					}
+
 					if (magazine.round_prefab == null || magazine.round_prefab.GetComponent<ShellCasingScript>() == null) magazine.round_prefab = gun.loaded_cartridge_prefab;
 
 					if (magazine.glint_renderer && (magazine.glint_renderer.material == null || magazine.glint_renderer.material.name != "ItemGlint (Instance)")) {
@@ -151,6 +181,12 @@ namespace Receiver2ModdingKit.ModInstaller {
 
 				items.AddRange( magazines );
 			}
+
+			gun_mall_unlock_data.internal_names = unlock_internal_names.ToArray();
+
+			ReceiverCoreScript.Instance().mall_unlock_manager.mall_unlocks.Add(gun_mall_unlock_data);
+
+			ReceiverCoreScript.Instance().MallData.UnlockItemGroup(gun_mall_unlock_data.unlock_id);
 
 			if (!Locale.active_locale_tactics.ContainsKey(gun.weapon_group_name)) { //Loading pause menu description
 				Locale.active_locale_tactics.Add(gun.weapon_group_name, gun.GetGunTactics());
