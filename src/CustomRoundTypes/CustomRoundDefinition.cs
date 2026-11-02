@@ -46,7 +46,7 @@ namespace Receiver2ModdingKit.CustomRounds {
 
 		public string clean_name;
 
-		public Action<GunScript> onRoundFired;
+		public UnityAction<GunScript> onRoundFired;
 		public Func<bool> checkUnlockCondition;
 		public Texture2D shootingRangeAmmoBoxTexture;
 
