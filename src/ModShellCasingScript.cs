@@ -92,8 +92,7 @@ namespace Receiver2ModdingKit {
 			this.spec_diameter = spec.diameter;
 			this.spec_density = spec.density;
 
-			if (customRoundTypeParameters != null)
-			{
+			if (customRoundTypeParameters != null) {
 				_round_type_parameters_extra_rotation_x = customRoundTypeParameters.extra_rotation_x;
 				_round_type_parameters_extra_rotation_y = customRoundTypeParameters.extra_rotation_y;
 				_round_type_parameters_extra_recoil_x = customRoundTypeParameters.extra_recoil_x;
@@ -127,10 +126,8 @@ namespace Receiver2ModdingKit {
 				};
 			}
 
-			if (this.customRoundTypeParameters == null && _round_type_parameters_cartridge != 0)
-			{
-				this.customRoundTypeParameters = new CustomRoundDefinition()
-				{
+			if (this.customRoundTypeParameters == null && _round_type_parameters_cartridge != 0) {
+				this.customRoundTypeParameters = new CustomRoundDefinition() {
 					extra_rotation_x = _round_type_parameters_extra_rotation_x,
 					extra_rotation_y = _round_type_parameters_extra_rotation_y,
 					extra_recoil_x = _round_type_parameters_extra_recoil_x,
@@ -149,7 +146,7 @@ namespace Receiver2ModdingKit {
 					clean_name = _round_type_parameters_clean_name,
 					onRoundFired = _round_type_parameters_onRoundFired,
 					checkUnlockCondition = _round_type_parameters_checkUnlockCondition,
-					shootingRangeAmmoBoxTexture = 	_round_type_parameters_shootingRangeAmmoBoxTexture,
+					shootingRangeAmmoBoxTexture = _round_type_parameters_shootingRangeAmmoBoxTexture,
 				};
 			}
 		}

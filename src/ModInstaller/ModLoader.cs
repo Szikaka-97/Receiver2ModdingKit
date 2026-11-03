@@ -85,32 +85,7 @@ namespace Receiver2ModdingKit.ModInstaller {
 
 				if (!ModShellCasingScript.mod_cartridges.ContainsKey(round.cartridge_type)) {
 					if ((int) round.cartridge_type > (int) Enum.GetValues(typeof(CartridgeSpec.Preset)).Cast<CartridgeSpec.Preset>().Max()) {
-						if (round.glint_renderer && (round.glint_renderer.material == null || round.glint_renderer.material.name != "ItemGlint (Instance)")) {
-							round.glint_renderer.material = prefab_9mm.GetComponent<ShellCasingScript>().glint_renderer.material;
-						}
-
-						if (round is ModShellCasingScript mscs) {
-							ModShellCasingScript.mod_cartridges.Add(
-								round.cartridge_type,
-								mscs.spec.CreateSpec()
-							);
-
-							if (!ModdingKitCorePlugin.round_prefabs.ContainsKey(mscs.cartridge_type)) {
-								ModdingKitCorePlugin.AddShellCasingScriptPrefab(mscs);
-							}
-						}
-						else {
-							Debug.LogWarning("Gun " + gun.InternalName + " adds a cartridge via ModGunScript.GetCustomCartridgeSpec(); Consider using ModShellCasingScript instead");
-
-#pragma warning disable CS0618 // Type or member is obsolete
-							ModShellCasingScript.mod_cartridges.Add(
-								round.cartridge_type,
-								gun.GetCustomCartridgeSpec()
-							);
-#pragma warning restore CS0618 // Type or member is obsolete
-						}
-
-						if (round.TryGetComponent<ItemWithGlint>(out var glint_item)) GameObject.Destroy(glint_item);
+						SetupShellCasingScript(round, gun);
 
 						items.Add(round);
 					}
@@ -135,21 +110,17 @@ namespace Receiver2ModdingKit.ModInstaller {
 						.Where( mag => !items.Contains(mag) && gun.magazine_root_types.Contains(mag.magazine_root_type)).ToList();
 
 				foreach (MagazineScript magazine in magazines) { //Handling magazine pegboard collision
-					if (magazine.MagazineClass == MagazineClass.StandardCapacity || magazine.MagazineClass == MagazineClass.StandardCapacityGold || magazine.MagazineClass == MagazineClass.HighCapacity || magazine.MagazineClass == MagazineClass.HighCapacityGold)
-					{
+					if (magazine.MagazineClass == MagazineClass.StandardCapacity || magazine.MagazineClass == MagazineClass.StandardCapacityGold || magazine.MagazineClass == MagazineClass.HighCapacity || magazine.MagazineClass == MagazineClass.HighCapacityGold) {
 						var unlocked_items = new HashSet<string>();
 
-						foreach (var item in ReceiverCoreScript.Instance().mall_unlock_manager.mall_unlocks)
-						{
-							foreach (var internal_name in item.internal_names)
-							{
+						foreach (var item in ReceiverCoreScript.Instance().mall_unlock_manager.mall_unlocks) {
+							foreach (var internal_name in item.internal_names) {
 								unlocked_items.Add(internal_name);
 							}
 						}
 
 						//don't want to add a million useless mags, if a weapon shares its magazine root with other guns
-						if (!unlocked_items.Contains(magazine.InternalName))
-						{
+						if (!unlocked_items.Contains(magazine.InternalName)) {
 							//do it three times, unlocks three copies of the thang
 							unlock_internal_names.Add(magazine.InternalName);
 							unlock_internal_names.Add(magazine.InternalName);
@@ -159,7 +130,7 @@ namespace Receiver2ModdingKit.ModInstaller {
 
 					if (magazine.round_prefab == null || magazine.round_prefab.GetComponent<ShellCasingScript>() == null) magazine.round_prefab = gun.loaded_cartridge_prefab;
 
-					if (magazine.glint_renderer && (magazine.glint_renderer.material == null || magazine.glint_renderer.material.name != "ItemGlint (Instance)")) {
+					if (magazine.glint_renderer && (magazine.glint_renderer.material == null || magazine.glint_renderer.material.shader.name != "Wolfire/GlintSurface")) {
 						magazine.glint_renderer.material = prefab_9mm.GetComponent<ShellCasingScript>().glint_renderer.material;
 					}
 
@@ -253,7 +224,7 @@ namespace Receiver2ModdingKit.ModInstaller {
 		public static void Finish() {
 			foreach (var prefab in ReceiverCoreScript.Instance().generic_prefabs) {
 				foreach (var glint_item in prefab.GetComponentsInChildren<ItemWithGlint>()) {
-					if (glint_item.TryGetComponent<InventoryItem>(out var item) && item.glint_renderer != null && (item.glint_renderer.material == null || item.glint_renderer.material.name != "ItemGlint (Instance)")) {
+					if (glint_item.TryGetComponent<InventoryItem>(out var item) && item.glint_renderer != null && (item.glint_renderer.material == null || item.glint_renderer.material.shader.name != "Wolfire/GlintSurface")) {
 						item.glint_renderer.material = prefab_9mm.GetComponent<InventoryItem>().glint_renderer.sharedMaterial;
 					}
 				}
@@ -274,6 +245,44 @@ namespace Receiver2ModdingKit.ModInstaller {
 			}
 
 			return false;
+		}
+
+		public static void SetupShellCasingScript(ShellCasingScript round, ModGunScript source = null) {
+			if (round.glint_renderer && (round.glint_renderer.material == null || round.glint_renderer.material.shader.name != "Wolfire/GlintSurface")) {
+				round.glint_renderer.material = prefab_9mm.GetComponent<ShellCasingScript>().glint_renderer.material;
+			}
+
+			if (round is ModShellCasingScript mscs) {
+				if (!ModShellCasingScript.mod_cartridges.ContainsKey(round.cartridge_type)) {
+					ModShellCasingScript.mod_cartridges.Add(
+						round.cartridge_type,
+						mscs.spec.CreateSpec()
+					);
+				}
+
+				if (!ModdingKitCorePlugin.round_prefabs.ContainsKey(mscs.cartridge_type)) {
+					ModdingKitCorePlugin.AddShellCasingScriptPrefab(mscs);
+				}
+			}
+			else {
+				var gun = source;
+
+				if (gun) {
+					Debug.LogWarning("Gun " + gun.InternalName + " adds a cartridge via ModGunScript.GetCustomCartridgeSpec(); Consider using ModShellCasingScript instead");
+
+#pragma warning disable CS0618 // Type or member is obsolete
+					ModShellCasingScript.mod_cartridges.Add(
+						round.cartridge_type,
+						gun.GetCustomCartridgeSpec()
+					);
+#pragma warning restore CS0618 // Type or member is obsolete
+				}
+				else {
+					Debug.LogWarning($"Hey, buddy, you should probably use a ModShellCasingScript over a ShellCasingScript!");
+				}
+			}
+
+			if (round.TryGetComponent<ItemWithGlint>(out var glint_item)) GameObject.Destroy(glint_item);
 		}
 	}
 }

@@ -767,23 +767,7 @@ namespace Receiver2ModdingKit {
 							//is this a bad idea? probably
 							//do I care? no
 							//is anyone even going to use this? no
-							if (mscs.customRoundTypeParameters != null && mscs.customRoundTypeParameters.cartridge != 0)
-							{
-								if (CustomRoundTypes.GetDefinitionForRound(mscs.cartridge_type) == null)
-								{
-									CustomRoundTypes.RegisterCustomRound(mscs.customRoundTypeParameters);
-
-									if (!ModShellCasingScript.mod_cartridges.ContainsKey(mscs.cartridge_type))
-									{
-										ModdingKitCorePlugin.AddNewCartridgePreset(mscs.cartridge_type, mscs.spec.CreateSpec());
-									}
-
-									if (!ModdingKitCorePlugin.round_prefabs.ContainsKey(mscs.cartridge_type))
-									{
-										ModdingKitCorePlugin.AddShellCasingScriptPrefab(mscs);
-									}
-								}
-							}
+							ModLoader.SetupShellCasingScript(mscs, null);
 						}
 					}
 				}

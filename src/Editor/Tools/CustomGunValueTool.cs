@@ -45,14 +45,14 @@ public class CustomGunValueTool : EditorTool {
 		using (new Handles.DrawingScope()) {
 			StringBuilder gun_info_string = new StringBuilder();
 
-			if (!Int32.TryParse(gun.gun_model.ToString(), out int parsed_gun_model) || parsed_gun_model != (int) gun.gun_model) {
+			if (!int.TryParse(gun.gun_model.ToString(), out int parsed_gun_model) || parsed_gun_model != (int) gun.gun_model) {
 				gun_info_string.AppendLine("gun_model: " + (int) gun.gun_model + "\t(" + gun.gun_model.ToString() + ")");
 			}
 			else {
 				gun_info_string.AppendLine("gun_model: " + (int) gun.gun_model);
 			}
 
-			if (!Int32.TryParse(gun.gun_type.ToString(), out int parsed_gun_type) || parsed_gun_type != (int) gun.gun_type) {
+			if (!int.TryParse(gun.gun_type.ToString(), out int parsed_gun_type) || parsed_gun_type != (int) gun.gun_type) {
 				gun_info_string.AppendLine("gun_type:    " + (int) gun.gun_type + "\t(" + gun.gun_type.ToString() + ")");
 			}
 			else {
